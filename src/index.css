@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ant-layout-content {
+    padding: 18px 32px !important;
+    margin: 5px 0 0 !important;
+}
