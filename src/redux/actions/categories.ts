@@ -1,5 +1,6 @@
 import { Category } from "../../Schema";
 import { Dispatch } from "redux";
+import { API_URL } from "../network/api";
 
 const GET_CATEGORIES = "categories/GET_ALL" as const;
 const GET_CATEGORIES_DONE = "categories/GET_ALL_DONE" as const;
@@ -19,7 +20,7 @@ export const fetchCategories = (page: number = 1, limit: number = 10) => {
 
     try {
       const response = await fetch(
-        `http://localhost:11700/categories?page=${page}&limit=${limit}`
+        `${API_URL}/categories?page=${page}&limit=${limit}`
       );
       const data = await response.json();
 

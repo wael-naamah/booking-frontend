@@ -6,6 +6,7 @@ import {
   Contact,
   PaginatedForm,
 } from "../../Schema";
+import { API_URL } from "../network/api";
 
 const GET_TIME_SLOTS = "appointments/GET_TIME_SLOTS" as const;
 const GET_TIME_SLOTS_DONE = "appointments/GET_TIME_SLOTS_DONE" as const;
@@ -45,7 +46,7 @@ export const fetchTimeSlots = (
       service_id && queryparams.append("service_id", service_id);
 
       const response = await fetch(
-        `http://localhost:11700/appointments/timeslots?${queryparams.toString()}`
+        `${API_URL}/appointments/timeslots?${queryparams.toString()}`
       );
       const data = await response.json();
 
@@ -77,7 +78,7 @@ export const fetchAppointments = (form: AppointmentForm) => {
       form.end && queryparams.append("end", form.end);
 
       const response = await fetch(
-        `http://localhost:11700/appointments?${queryparams.toString()}`
+        `${API_URL}/appointments?${queryparams.toString()}`
       );
       const data = await response.json();
 
@@ -100,7 +101,7 @@ export const addAppointment = (
 ) => {
   return async () => {
     try {
-      const response = await fetch(`http://localhost:11700/appointments`, {
+      const response = await fetch(`${API_URL}/appointments`, {
         method: "POST",
         body: JSON.stringify({
           category_id,
@@ -142,7 +143,7 @@ export const fetchEmployees = (form: PaginatedForm) => {
       form.search && queryparams.append("search", form.search.toString());
 
       const response = await fetch(
-        `http://localhost:11700/calendars?${queryparams.toString()}`
+        `${API_URL}/calendars?${queryparams.toString()}`
       );
       const data = await response.json();
 

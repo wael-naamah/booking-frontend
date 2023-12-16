@@ -9,11 +9,13 @@ import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Calendar, Spin } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
+import { compose } from 'redux'
 
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import withAuthorization from "../HOC/withAuthorization";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
@@ -22,7 +24,6 @@ dayjs.updateLocale('en', {
 
 interface ICalendarState {
     currentDate: Dayjs | null;
-    defaultDate: Date;
     views: ['day', 'work_week'];
 }
 
@@ -47,8 +48,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
     constructor(props: ICalendarProps) {
         super(props);
         this.state = {
-            currentDate: null,
-            defaultDate: new Date(),
+            currentDate: dayjs(),
             views: ['day', 'work_week'],
         };
     }
@@ -60,10 +60,12 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
         this.props.fetchAppointments({ start: firstDateOfMonth.toISOString(), end: lastDateOfMonth.toISOString() });
         this.props.fetchEmployees({ page: 1, limit: 100 });
+        this.fetchTimeslots();
     }
 
     fetchTimeslots = async () => {
         const { currentDate } = this.state;
+        console.log('currentDate', currentDate)
         try {
             if (currentDate)
                 this.props.fetchTimeSlots({ date: currentDate.toISOString() })
@@ -94,15 +96,15 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
     render() {
         const { loading, timeslots, timeslotsLoading, appointments, employees } = this.props;
-        const { currentDate, defaultDate, views } = this.state;
+        const { currentDate, views } = this.state;
         const localizer = momentLocalizer(moment);
 
-        const resourceMap = employees.map(el => ({
+        const resourceMap = (employees || []).map(el => ({
             resourceId: el._id,
             resourceTitle: el.employee_name
         }))
 
-        const events = appointments.map((el, index) => ({
+        const events = (appointments || []).map((el, index) => ({
             id: index,
             title: el.calendar_id,
             start: new Date(el.start_date),
@@ -158,7 +160,6 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                     <Col span={17}>
                         <div style={{ height: 600 }}>
                             <BigCalendar
-                                defaultDate={defaultDate}
                                 defaultView={Views.DAY}
                                 date={currentDate ? dayjs(currentDate).toDate() : new Date()}
                                 events={events}
@@ -194,5 +195,7 @@ const mapDispatchToProps = (
     fetchEmployees: (form: PaginatedForm) => dispatch(fetchEmployees(form)),
 });
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(CalendarPage);
+export default compose(
+    withAuthorization,
+  )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
+  

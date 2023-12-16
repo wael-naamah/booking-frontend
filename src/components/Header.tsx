@@ -18,8 +18,7 @@ class Header extends React.Component {
                         <span>B-GAS GmbH | 01 / 202 85 56</span>
                     </Col>
                 </Row>
-                <Divider style={{ borderWidth: 2 }} />
-
+                <Divider className='m-0 mt-5'/>
             </Content>
         );
     }
