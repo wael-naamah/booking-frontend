@@ -8,7 +8,6 @@ interface withRouterProps {
 const withRouter = <P extends object>(Component: React.ComponentType<P>) => {
   const Wrapper: React.FC<P & withRouterProps> = (props) => {
     const navigate = useNavigate();
-
     return <Component {...props as P} navigate={navigate} />;
   };
 
