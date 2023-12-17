@@ -6,7 +6,7 @@ import { selectLoginLoading } from "../redux/selectors";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Input, Button, Form, message } from 'antd';
-import withRouter from "../HOC/withRouter";
+import withRouter from "../hoc/withRouter";
 import { compose } from 'redux'
 
 interface ILoginState {
@@ -66,7 +66,7 @@ class LoginPage extends React.Component<ILoginProps, ILoginState> {
                 <Input type="password" name="password" value={password} onChange={this.handleInputChange} className="w-full p-3" />
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading} className="w-full py-3">
+                <Button type="primary" htmlType="submit" loading={loading} className="w-full py-3 flex items-center justify-center">
                   Login
                 </Button>
               </Form.Item>

@@ -4,7 +4,7 @@ import { API_URL } from "../network/api";
 const LOGIN = "auth/LOGIN" as const;
 const LOGIN_DONE = "auth/LOGIN_DONE" as const;
 const LOGIN_ERROR = "auth/LOGIN_ERROR" as const;
-
+const LOGOUT = "auth/LOGOUT" as const;
 
 
 export const login = () => ({
@@ -19,7 +19,11 @@ export const loginDone = (data: any) => ({
 export const loginFaild = (data: any) => ({
     type: LOGIN_ERROR,
     payload: data,
-  });
+});
+
+export const logout = () => ({
+  type: LOGOUT
+});
 
 export const loginRequest = (form: {email: string; password: string}) => {
   return async (dispatch: Dispatch) => {
@@ -44,5 +48,5 @@ export const loginRequest = (form: {email: string; password: string}) => {
 };
 
 export type AuthAction = ReturnType<
-  typeof login | typeof loginDone | typeof loginFaild
+  typeof login | typeof loginDone | typeof loginFaild | typeof logout
 >;

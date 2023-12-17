@@ -9,9 +9,10 @@ class Router extends React.Component {
     return (
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<CategoryPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/" element={<LoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/category" element={<CategoryPage />} />
         </Routes>
       </BrowserRouter>
     );

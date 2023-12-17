@@ -9,9 +9,6 @@ interface AuthorizationProps {
 }
 
 const checkUserAccess = (profile: any, allowedRoles: string[] = []) => {
-    console.log('profile', profile)
-    console.log('allowedRoles', allowedRoles)
-
     if(!profile){
         return false;
     }

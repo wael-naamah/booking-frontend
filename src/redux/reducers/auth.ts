@@ -36,6 +36,12 @@ const authReducer = (
         loggedIn: false,
         profile: null,
       };
+      case "auth/LOGOUT":
+        return {
+        ...state,
+        loggedIn: false,
+        profile: null,
+        }
     default:
       return state;
   }
