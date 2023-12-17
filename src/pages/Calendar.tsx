@@ -15,7 +15,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../hoc/withAuthorization";
+import withAuthorization from "../HOC/withAuthorization";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {

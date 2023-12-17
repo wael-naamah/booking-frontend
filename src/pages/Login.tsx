@@ -6,7 +6,7 @@ import { selectLoginLoading } from "../redux/selectors";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Input, Button, Form, message } from 'antd';
-import withRouter from "../hoc/withRouter";
+import withRouter from "../HOC/withRouter";
 import { compose } from 'redux'
 
 interface ILoginState {
