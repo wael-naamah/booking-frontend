@@ -5,7 +5,6 @@ import { selectLoginLoading, selectProfile } from '../redux/selectors';
 import { Spin } from 'antd';
 
 interface AuthorizationProps {
-
 }
 
 const checkUserAccess = (profile: any, allowedRoles: string[] = []) => {
