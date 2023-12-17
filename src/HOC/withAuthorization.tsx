@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { selectLoginLoading, selectProfile } from '../redux/selectors';
 import { Spin } from 'antd';
 
-interface AuthorizationProps {
-}
+interface AuthorizationProps {}
 
 const checkUserAccess = (profile: any, allowedRoles: string[] = []) => {
     if(!profile){
