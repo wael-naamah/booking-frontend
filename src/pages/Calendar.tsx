@@ -65,7 +65,6 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
     fetchTimeslots = async () => {
         const { currentDate } = this.state;
-        console.log('currentDate', currentDate)
         try {
             if (currentDate)
                 this.props.fetchTimeSlots({ date: currentDate.toISOString() })

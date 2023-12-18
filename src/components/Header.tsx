@@ -20,7 +20,6 @@ class Header extends React.Component<IHeaderProps> {
 
     render() {
         const { logout, loggedIn } = this.props;
-        console.log(window.location.href)
         return (
             <Content>
                 <Row justify={'space-between'} className="flex items-center">

@@ -49,8 +49,6 @@ class LoginPage extends React.Component<ILoginProps, ILoginState> {
     render() {
         const { email, password } = this.state;
         const { loading } = this.props;
-        console.log('email', email)
-        console.log('password', password)
 
         return (
             <div className="flex items-center justify-center h-screen">

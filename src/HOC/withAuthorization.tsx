@@ -36,7 +36,6 @@ const withAuthorization = <P extends AuthorizationProps>(
 
         const hasAccess = checkUserAccess(profile, allowedRoles);
         if (!hasAccess) {
-            console.log('hasAccess');
             navigate('/login', { replace: true }); // Or redirect to an unauthorized page
             // return null; // You can also render an unauthorized message or component
         }
