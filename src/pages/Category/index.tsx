@@ -1,14 +1,14 @@
 import React from "react";
 import { connect } from "react-redux";
-import { RootState } from "../redux/store";
-import { fetchCategories, fetchTimeSlots, addAppointment } from "../redux/actions";
-import { selectCategories, selectCategoriesLoading, selectTimeslots, selectTimeslotsLoading } from "../redux/selectors";
-import { Category, Contact, Salutation, Service } from "../Schema";
+import { RootState } from "../../redux/store";
+import { fetchCategories, fetchTimeSlots, addAppointment } from "../../redux/actions";
+import { selectCategories, selectCategoriesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
+import { Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message } from "antd";
 
-import ServiceLogo from '../assets/services/service.png'
+import ServiceLogo from '../../assets/services/service.png'
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
@@ -16,7 +16,7 @@ import { SelectInfo } from "antd/es/calendar/generateCalendar";
 const { Panel } = Collapse;
 const { Option } = Select;
 
-dayjs.extend(updateLocale)
+dayjs.extend(updateLocale)  
 dayjs.updateLocale('en', {
     weekStart: 1
 })

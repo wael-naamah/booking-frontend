@@ -5,7 +5,7 @@ export enum DescriptionDisplayType {
 }
 
 export enum AppointmentScheduling {
-  APPOINTMENT_LENGTH = "appointment length",
+  APPOINTMENT_LENGTH = "Appointment Length",
   MINUTES_5 = "5 Minutes",
   MINUTES_10 = "10 Minutes",
   MINUTES_15 = "15 Minutes",
@@ -107,4 +107,6 @@ export interface Calendar {
   coupling_on_certain_services?: boolean;
   certain_services?: string[];
   active: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

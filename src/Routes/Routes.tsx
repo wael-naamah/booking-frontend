@@ -1,20 +1,26 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import CategoryPage from '../pages/Category';
-import CalendarPage from '../pages/Calendar';
+import AppointmentPage from '../pages/Appointment';
+import ServicesPage from '../pages/Company/Services';
+import CalendarPage from '../pages/Company/Calendar';
+import WorkingHoursPage from '../pages/Company/Schedules';
 import LoginPage from '../pages/Login';
+import SideBar from '../pages/SideBar';
 
 class Router extends React.Component {
   render() {
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/category" element={<CategoryPage />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+      <Route path="/" element={<SideBar />}>
+        <Route path="/category" element={<CategoryPage />} />
+        <Route path="/appointment" element={<AppointmentPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/working-hours" element={<WorkingHoursPage />} />
+      </Route>
+      <Route path="/login" element={<LoginPage />} /> 
+    </Routes>
     );
   }
 }

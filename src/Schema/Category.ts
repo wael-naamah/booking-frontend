@@ -1,4 +1,5 @@
 export enum SortDirection {
+  NONE = "none",
   DESC = "desc",
   ASC = "asc",
 }
@@ -10,10 +11,10 @@ export enum DisplayStatus {
 
 export interface CategorySettings {
   sorting_order?: SortDirection;
-  show_performance_in_summary: boolean;
-  show_service_in_email: boolean;
-  info_display_type: string;
-  show_performance_on: string;
+  show_performance_in_summary?: boolean;
+  show_service_in_email?: boolean;
+  info_display_type?: string;
+  show_performance_on?: string;
 }
 
 export interface Service {

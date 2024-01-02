@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
-import { RootState } from "../redux/store";
-import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../redux/actions";
-import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../redux/selectors";
-import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm } from "../Schema";
+import { RootState } from "../../redux/store";
+import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/actions";
+import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
+import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Calendar, Spin } from "antd";
@@ -15,19 +15,20 @@ import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../HOC/withAuthorization";
+import withAuthorization from "../../HOC/withAuthorization";
+import './index.css'
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
     weekStart: 1
 })
 
-interface ICalendarState {
+interface IAppointmentState {
     currentDate: Dayjs | null;
     views: ['day', 'work_week'];
 }
 
-interface ICalendarProps {
+interface IAppointmentProps {
     loading: boolean;
     timeslots: {
         start: string;
@@ -44,8 +45,8 @@ interface ICalendarProps {
     fetchEmployees: (form: PaginatedForm) => Promise<any>;
 }
 
-class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
-    constructor(props: ICalendarProps) {
+class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentState> {
+    constructor(props: IAppointmentProps) {
         super(props);
         this.state = {
             currentDate: dayjs(),
@@ -86,7 +87,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
         return `${hours}:${minutes}`;
     };
 
-    componentDidUpdate(prevProps: ICalendarProps, prevState: ICalendarState) {
+    componentDidUpdate(prevProps: IAppointmentProps, prevState: IAppointmentState) {
         const { currentDate } = this.state;
         if (prevState.currentDate !== currentDate) {
             this.fetchTimeslots();
@@ -133,11 +134,9 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
         }
 
         return (
-            <Content>
-                <Row gutter={16} justify={'space-around'}>
-                    <Col span={7}>
-                        <Card className="border border-gray-300 w-full rounded-md">
-                            <Card className="w-full h-96 rounded-md">
+                <Row gutter={16} justify={'space-around'} className="calendar-container">
+                    <Col span={6} xs={24} md={6}>
+                            <Card className="calendar-card">
                                 <Calendar
                                     fullscreen={false}
                                     value={currentDate ? currentDate : dayjs()}
@@ -145,7 +144,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                                 />
                             </Card>
                             <Spin spinning={timeslotsLoading}>
-                                <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="w-full h-96 rounded-md overflow-y-auto">
+                                <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="w-full h-96 mt-4 rounded-md overflow-y-auto">
                                     {formattedSlots.map((el) => (
                                         <div className="p-4 m-3 flex items-center justify-around border border-gray-300 rounded-md bg-gray-100">
                                             <span>{el.slot}</span>
@@ -154,9 +153,8 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                                     ))}
                                 </Card>
                             </Spin>
-                        </Card>
                     </Col>
-                    <Col span={17}>
+                    <Col span={18} xs={24} md={18}>
                         <div style={{ height: 600 }}>
                             <BigCalendar
                                 defaultView={Views.DAY}
@@ -172,7 +170,6 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                         </div>
                     </Col>
                 </Row>
-            </Content>
         );
     }
 }
@@ -194,7 +191,9 @@ const mapDispatchToProps = (
     fetchEmployees: (form: PaginatedForm) => dispatch(fetchEmployees(form)),
 });
 
-export default compose(
-    withAuthorization,
-  )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
+// export default compose(
+//     withAuthorization,
+//   )(connect(mapStateToProps, mapDispatchToProps)(AppointmentPage))
+
+  export default connect(mapStateToProps, mapDispatchToProps)(AppointmentPage)
   
