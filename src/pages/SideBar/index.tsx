@@ -9,7 +9,7 @@ import {
 import { Layout, Menu, Button, theme } from "antd";
 import "./index.css";
 import { Outlet, useNavigate } from 'react-router-dom';
-import ETermin from '../../assets/ETermin.svg'
+import Logo from '../../assets/bgas-logo.png'
 
 const { Header, Sider, Content } = Layout;
 
@@ -52,7 +52,7 @@ const SideBar: React.FC = () => {
         color="#00203b"
       >
         <div className="demo-logo-vertical">
-          <img src={ETermin} alt="etermin-logo" width={collapsed ? 50 : 100} height={collapsed ? 15 : 30} />
+          <img src={Logo} alt="etermin-logo" width={collapsed ? 60 : 120} height={collapsed ? 25 : 50} />
         </div>
         <Menu
           theme="dark"
