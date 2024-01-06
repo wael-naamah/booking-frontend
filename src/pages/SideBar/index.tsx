@@ -100,14 +100,14 @@ const SideBar: React.FC = () => {
                     </span>
                   </NavLink>,
                 },
-                // {
-                //   key: `sub3`,
-                //   label: <NavLink to={`/working-hours`}>
-                //     <span className="title">
-                //       Working Hours
-                //     </span>
-                //   </NavLink>,
-                // }
+                {
+                  key: `sub3`,
+                  label: <NavLink to={`/working-hours`}>
+                    <span className="title">
+                      Working Hours
+                    </span>
+                  </NavLink>,
+                }
               ]
             },
           ]}
