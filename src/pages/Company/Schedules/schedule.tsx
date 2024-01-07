@@ -60,6 +60,7 @@ interface IScheduleState {
   active: boolean;
   internally: boolean;
   editId: string;
+  activeKey: string;
 }
 
 interface IScheduleProps {
@@ -91,6 +92,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
       active: true,
       internally: false,
       editId: "",
+      activeKey: "1",
     };
   }
   componentDidUpdate(prevProps: Readonly<IScheduleProps>): void {
@@ -260,7 +262,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
 
     return (
       <div>
-        
+        {visible ? (
           <Modal
             title="New Schedule"
             open={visible}
@@ -386,7 +388,8 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
               </Col>
             </Row>
           </Modal>
-        
+        ) : null}
+
         <Table
           dataSource={schedules}
           style={{ marginTop: 20 }}
@@ -504,25 +507,23 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
           <Content>
             <Tabs
               defaultActiveKey="1"
+              onChange={(key) => {
+                this.setState({ activeKey: key });
+              }}
               items={[
                 {
                   key: "1",
                   label: "Working hours",
-                  children: this.renderWorkingHours(
-                    weeklySchedules,
-                    ScheduleType.Weekly
-                  ),
                 },
                 {
                   key: "2",
                   label: "Working hours (certain days) / One-time appointment",
-                  children: this.renderWorkingHours(
-                    certainSchedules,
-                    ScheduleType.Certain
-                  ),
                 },
               ]}
             />
+            {this.state.activeKey === "1"
+              ? this.renderWorkingHours(weeklySchedules, ScheduleType.Weekly)
+              : this.renderWorkingHours(certainSchedules, ScheduleType.Certain)}
           </Content>
         </Row>
       </div>
