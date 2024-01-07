@@ -29,7 +29,7 @@ const WeekdaySelector: React.FC<WeekdaySelectorProps> = ({ selectedDays, setSele
   };
 
   return (
-    <div className='mb-4'>
+    <div>
       {Object.values(WeekDay).map((day, index) => (
         <Button
           key={day}

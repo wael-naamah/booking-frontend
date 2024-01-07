@@ -115,7 +115,6 @@ export const deleteScheduleRequest = (id: string) => {
 };
 
 export const createScheduleRequest = (schedule: Schedule) => {
-  console.log('createScheduleRequest')
   return async (dispatch: Dispatch) => {
     dispatch(addSchedule());
 

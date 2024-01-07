@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { fetchSchedulesByCalendarId, fetchCalendars } from "../../../redux/actions";
 import { selectCalendars, selectCalendarsLoading, selectSchedules, selectSchedulesLoading } from "../../../redux/selectors";
-import { Schedule, Calendar } from "../../../Schema";
+import { Schedule, Calendar, ScheduleType } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Col, Empty, Row, Select, Spin } from "antd";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -97,7 +97,11 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
 
                 <Spin spinning={loading}>
-                    <SchedulePage schedules={schedules} calendarId={calendars.length ? calendars[activeIndex]._id! : ''} onDeleteSchedule={this.onDeleteSchedule} />
+                    <SchedulePage 
+                    weeklySchedules={schedules.filter(el => el.working_hours_type === ScheduleType.Weekly)} 
+                    certainSchedules={schedules.filter(el => el.working_hours_type === ScheduleType.Certain)} 
+                    calendarId={calendars.length ? calendars[activeIndex]._id! : ''} 
+                    onDeleteSchedule={this.onDeleteSchedule} />
                 </Spin>
             </div>
         );
