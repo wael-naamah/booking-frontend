@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
+  DesktopOutlined,
+  CalendarOutlined,
+  FolderOpenOutlined,
+  ContactsOutlined
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
 import "./index.css";
@@ -61,27 +62,27 @@ const SideBar: React.FC = () => {
           items={[
             {
               key: "1",
-              icon: <UserOutlined />,
+              icon: <CalendarOutlined />,
               label: (
                 <NavLink to={`/appointment`}>
                   <span className="title">
-                    Appointment
+                    Appointments
                   </span>
                 </NavLink>
               ),
             },
             {
               key: "2",
-              icon: <VideoCameraOutlined />,
+              icon: <FolderOpenOutlined />,
               label: <NavLink to={`/category`}>
                 <span className="title">
-                  Category
+                  Categories
                 </span>
               </NavLink>,
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
+              icon: <DesktopOutlined />,
               label: "Company",
               children: [
                 {
@@ -109,6 +110,15 @@ const SideBar: React.FC = () => {
                   </NavLink>,
                 }
               ]
+            },
+            {
+              key: "4",
+              icon: <ContactsOutlined />,
+              label: <NavLink to={`/contact`}>
+                <span className="title">
+                  Contacts
+                </span>
+              </NavLink>,
             },
           ]}
         />

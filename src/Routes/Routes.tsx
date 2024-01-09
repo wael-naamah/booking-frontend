@@ -7,6 +7,7 @@ import CalendarPage from '../pages/Company/Calendar';
 import WorkingHoursPage from '../pages/Company/Schedules';
 import LoginPage from '../pages/Login';
 import SideBar from '../pages/SideBar';
+import Contact from '../pages/Contact';
 
 class Router extends React.Component {
   render() {
@@ -18,6 +19,7 @@ class Router extends React.Component {
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/working-hours" element={<WorkingHoursPage />} />
+        <Route path="/contact" element={<Contact />} />
       </Route>
       <Route path="/login" element={<LoginPage />} /> 
     </Routes>
