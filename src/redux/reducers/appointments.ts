@@ -1,4 +1,4 @@
-import { Appointment, Calendar } from "../../Schema";
+import { Appointment, Calendar, ContactAppointment } from "../../Schema";
 import { AppointmentsAction } from "../actions";
 
 interface CategoriesState {
@@ -11,6 +11,10 @@ interface CategoriesState {
   timeslotsLoading: boolean;
   appointments: Appointment[];
   appointmentsLoading: boolean;
+  contactAppointments: ContactAppointment[];
+  contactAppointmentsLoading: boolean;
+  updateAppointmentLoading: boolean;
+  deleteAppointmentLoading: boolean;
   employees: Calendar[];
   employeesLoading: boolean;
 }
@@ -20,6 +24,10 @@ const initialState: CategoriesState = {
   timeslotsLoading: true,
   appointments: [],
   appointmentsLoading: true,
+  contactAppointments: [],
+  contactAppointmentsLoading: true,
+  updateAppointmentLoading: false,
+  deleteAppointmentLoading: false,
   employees: [],
   employeesLoading: true,
 };
@@ -51,6 +59,41 @@ const categoriesReducer = (
         appointmentsLoading: false,
         appointments: action.payload,
       };
+    case "appointments/GET_CONTACT_APPOINTMENTS":
+      return {
+        ...state,
+        contactAppointmentsLoading: true,
+      };
+    case "appointments/GET_CONTACT_APPOINTMENTS_DONE":
+      return {
+        ...state,
+        contactAppointmentsLoading: false,
+        contactAppointments: action.payload,
+      };
+
+    case "appointments/DELETE_APPOINTMENT":
+      return {
+        ...state,
+        deleteAppointmentLoading: true,
+      };
+    case "appointments/DELETE_APPOINTMENT_DONE": {
+      let filteredAppointments = state.appointments;
+      let filteredContactAppointments = state.contactAppointments;
+      if (action.id) {
+        filteredAppointments = state.appointments.filter(
+          (el) => el._id !== action.id
+        );
+        filteredContactAppointments = state.contactAppointments.filter(
+          (el) => el._id !== action.id
+        );
+      }
+      return {
+        ...state,
+        deleteAppointmentLoading: false,
+        appointments: filteredAppointments,
+        contactAppointments: filteredContactAppointments,
+      };
+    }
     case "appointments/GET_EMPLOYEES":
       return {
         ...state,
@@ -61,6 +104,16 @@ const categoriesReducer = (
         ...state,
         employeesLoading: false,
         employees: action.payload,
+      };
+    case "appointments/UPDATE_APPOINTMENT":
+      return {
+        ...state,
+        updateAppointmentLoading: true,
+      };
+    case "appointments/UPDATE_APPOINTMENT_DONE":
+      return {
+        ...state,
+        updateAppointmentLoading: false,
       };
     default:
       return state;

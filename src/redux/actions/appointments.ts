@@ -3,7 +3,7 @@ import {
   Appointment,
   AppointmentForm,
   Calendar,
-  Contact,
+  ContactAppointment,
   PaginatedForm,
 } from "../../Schema";
 import { API_URL } from "../network/api";
@@ -12,8 +12,14 @@ const GET_TIME_SLOTS = "appointments/GET_TIME_SLOTS" as const;
 const GET_TIME_SLOTS_DONE = "appointments/GET_TIME_SLOTS_DONE" as const;
 const GET_APPOINTMENTS = "appointments/GET_APPOINTMENTS" as const;
 const GET_APPOINTMENTS_DONE = "appointments/GET_APPOINTMENTS_DONE" as const;
+const UPDATE_APPOINTMENT = "appointments/UPDATE_APPOINTMENT" as const;
+const UPDATE_APPOINTMENT_DONE = "appointments/UPDATE_APPOINTMENT_DONE" as const;
+const DELETE_APPOINTMENT = "appointments/DELETE_APPOINTMENT" as const;
+const DELETE_APPOINTMENT_DONE = "appointments/DELETE_APPOINTMENT_DONE" as const;
 const GET_EMPLOYEES = "appointments/GET_EMPLOYEES" as const;
 const GET_EMPLOYEES_DONE = "appointments/GET_EMPLOYEES_DONE" as const;
+const GET_CONTACT_APPOINTMENTS = "appointments/GET_CONTACT_APPOINTMENTS" as const;
+const GET_CONTACT_APPOINTMENTS_DONE = "appointments/GET_CONTACT_APPOINTMENTS_DONE" as const;
 
 export const getTimeSlots = () => ({
   type: GET_TIME_SLOTS,
@@ -59,6 +65,98 @@ export const fetchTimeSlots = (
   };
 };
 
+export const deleteAppointment = () => ({
+  type: DELETE_APPOINTMENT,
+});
+
+export const deleteAppointmentDone = (id: string | null) => ({
+  type: DELETE_APPOINTMENT_DONE,
+  id,
+});
+
+export const deleteAppointmentRequest = (id: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(deleteAppointment());
+
+    try {
+      const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.status && data.status === "success")
+        dispatch(deleteAppointmentDone(id));
+      else {
+        dispatch(deleteAppointmentDone(null));
+      }
+      return data;
+    } catch (error) {
+      console.error("Error fetching calendars:", error);
+
+      dispatch(deleteAppointmentDone(null));
+    }
+  };
+};
+
+export const updateAppointment = () => ({
+  type: UPDATE_APPOINTMENT,
+});
+
+export const updateAppointmentDone = (appointment: Appointment | null) => ({
+  type: UPDATE_APPOINTMENT_DONE,
+  appointment,
+});
+
+export const updateAppointmentRequest = (id: string, appointment: Appointment) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(updateAppointment());
+
+    try {
+      const response = await fetch(`${API_URL}/appointments/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(appointment),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      dispatch(updateAppointmentDone(data));
+      return data;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+
+      dispatch(updateAppointmentDone(null));
+    }
+  };
+};
+
+export const getContactAppointments = () => ({
+  type: GET_CONTACT_APPOINTMENTS,
+});
+
+export const getContactAppointmentsDone = (data: ContactAppointment[]) => ({
+  type: GET_CONTACT_APPOINTMENTS_DONE,
+  payload: data,
+});
+
+export const fetchContactAppointments = (contactId: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(getContactAppointments());
+
+    try {
+      const response = await fetch(
+        `${API_URL}/appointments/contact/${contactId}`
+      );
+      const data = await response.json();
+
+      dispatch(getContactAppointmentsDone(data));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+
+      dispatch(getContactAppointmentsDone([]));
+    }
+  };
+};
+
 export const getAppointments = () => ({
   type: GET_APPOINTMENTS,
 });
@@ -92,25 +190,13 @@ export const fetchAppointments = (form: AppointmentForm) => {
 };
 
 export const addAppointment = (
-  category_id: string,
-  service_id: string,
-  calendar_id: string,
-  start_date: string,
-  end_date: string,
-  contact: Contact
+  appointment: Appointment,
 ) => {
   return async () => {
     try {
       const response = await fetch(`${API_URL}/appointments`, {
         method: "POST",
-        body: JSON.stringify({
-          category_id,
-          service_id,
-          calendar_id,
-          start_date,
-          end_date,
-          contact,
-        }),
+        body: JSON.stringify(appointment),
         headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
@@ -163,4 +249,10 @@ export type AppointmentsAction = ReturnType<
   | typeof getAppointmentsDone
   | typeof getEmployees
   | typeof getEmployeesDone
+  | typeof getContactAppointments
+  | typeof getContactAppointmentsDone
+  | typeof updateAppointment
+  | typeof updateAppointmentDone
+  | typeof deleteAppointment
+  | typeof deleteAppointmentDone
 >;

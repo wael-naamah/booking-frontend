@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchCategories, fetchTimeSlots, addAppointment } from "../../redux/actions";
 import { selectCategories, selectCategoriesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Category, Contact, Salutation, Service } from "../../Schema";
+import { Appointment, Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message } from "antd";
@@ -16,7 +16,7 @@ import { SelectInfo } from "antd/es/calendar/generateCalendar";
 const { Panel } = Collapse;
 const { Option } = Select;
 
-dayjs.extend(updateLocale)  
+dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
     weekStart: 1
 })
@@ -40,7 +40,7 @@ interface ICategoryProps {
     timeslotsLoading: boolean;
     fetchCategories: () => Promise<any>;
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => Promise<any>;
-    onSubmit: (category_id: string, service_id: string, calendar_id: string, start_date: string, end_date: string, contact: Contact) => Promise<any>;
+    onSubmit: (appointment: Appointment) => Promise<any>;
 }
 
 class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
@@ -57,7 +57,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
     formRef = React.createRef<any>();
 
-    onFinish = (values: Contact) => {
+    onFinish = (values: any) => {
         const { selectedCategory, selectedService, selectedSlot, currentDate } = this.state;
         const [startTime, endTime] = (selectedSlot?.slot || "").split(" - ");
         const startDateTimeString = `${currentDate!.toISOString().slice(0, 10)}T${startTime}:00.000Z`;
@@ -66,8 +66,36 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const startDate = new Date(startDateTimeString);
         const endDate = new Date(endDateTimeString);
 
+        const contact: Contact = {
+            salutation: values.salutation,
+            first_name: values.first_name,
+            last_name: values.last_name,
+            address: values.address,
+            zip_code: values.zip_code,
+            location: values.location,
+            telephone: values.telephone,
+            email: values.email,
+        };
 
-        this.props.onSubmit(selectedCategory!, selectedService?._id!, selectedSlot?.calendar_id!, startDate.toISOString(), endDate.toISOString(), values)
+        const appointment: Appointment = {
+            category_id: selectedCategory!,
+            service_id: selectedService?._id!,
+            calendar_id: selectedSlot?.calendar_id!,
+            start_date: startDate.toISOString(),
+            end_date: endDate.toISOString(),
+            contact: contact,
+            brand_of_device: values.brand_of_device,
+            model: values.model,
+            exhaust_gas_measurement: Boolean(values.exhaust_gas_measurement),
+            has_maintenance_agreement: Boolean(values.has_maintenance_agreement),
+            has_bgas_before: Boolean(values.has_bgas_before),
+            year: values.year,
+            attachments: values.attachments || undefined,
+            remarks: values.remarks || undefined,
+        }
+
+
+        this.props.onSubmit(appointment)
             .then(data => {
                 if (data && data._id) {
                     message.success('Successfully booked the appointment');
@@ -425,8 +453,8 @@ const mapDispatchToProps = (
 ) => ({
     fetchCategories: () => dispatch(fetchCategories()),
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => dispatch(fetchTimeSlots(date, categoryId, serviceId)),
-    onSubmit: (category_id: string, service_id: string, calendar_id: string, start_date: string, end_date: string, contact: Contact): Promise<any> =>
-        dispatch(addAppointment(category_id, service_id, calendar_id, start_date, end_date, contact))
+    onSubmit: (appointment: Appointment): Promise<any> =>
+        dispatch(addAppointment(appointment))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);

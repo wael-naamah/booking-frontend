@@ -10,7 +10,7 @@ import {
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
 import { Contact, Salutation } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Content } from "antd/es/layout/layout";
+import { compose } from 'redux'
 import {
   Button,
   Card,
@@ -27,11 +27,12 @@ import {
   Table,
   message,
 } from "antd";
+import withRouter from "../../HOC/withRouter";
 
 const { Column } = Table;
 const { Option } = Select;
 
-interface ICategoryState {
+interface IContactState {
   visible: boolean;
   pageNum: number;
   totalCount: number;
@@ -40,17 +41,18 @@ interface ICategoryState {
   editingContactId: string | null;
 }
 
-interface ICategoryProps {
+interface IContactProps {
   loading: boolean;
   fetchContacts: (page: number, limit: number) => Promise<any>;
   createContactRequest: (contact: Contact) => Promise<any>;
   deleteContactRequest: (id: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
   contacts: Contact[];
+  navigate?: (route: string) => void;
 }
 
-class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
-  constructor(props: ICategoryProps) {
+class ContactPage extends React.Component<IContactProps, IContactState> {
+  constructor(props: IContactProps) {
     super(props);
     this.state = {
       visible: false,
@@ -83,7 +85,7 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
     this.fetchData();
   }
 
-  componentDidUpdate(prevProps: ICategoryProps, prevState: ICategoryState) {
+  componentDidUpdate(prevProps: IContactProps, prevState: IContactState) {
     const { totalCount, pageNum, pageCount } = this.state;
 
     if (
@@ -139,7 +141,7 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
           .updateContactRequest(editingContactId, contact)
           .then((data) => {
             if (data._id) {
-              message.success("Successfully edited the contact");
+              message.success("Successfully updated the contact");
               this.setState({ visible: false, editingContactId: null });
             } else {
               message.error("Something went wrong. please try again");
@@ -259,6 +261,26 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
             </Col>
             <Col span={8}>
               <Form.Item
+                label="Phone 2"
+                name="phone_numbber_2"
+                rules={[{ required: false }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Phone 3"
+                name="phone_numbber_3"
+                rules={[{ required: false }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
                 label="Email"
                 name="email"
                 rules={[{ required: true, type: "email" }]}
@@ -266,67 +288,7 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
                 <Input />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item label="Brand of Device" name="brand_of_device">
-                <Select>
-                  {[
-                    "Baxi",
-                    "Buderus",
-                    "De Dietrich",
-                    "To give",
-                    "Junkers",
-                    "Praiseworthy",
-                    "Nordgas",
-                    "Orange",
-                    "Rapido",
-                    "Saunier Duval",
-                    "Vaillant",
-                    "Viessmann",
-                    "Wolf",
-                    "Other",
-                  ].map((salutation) => (
-                    <Option key={salutation} value={salutation}>
-                      {salutation}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
           </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Model/Type (e.g VCW AT 174/4-5. HG 15 WK19)"
-                name="model"
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Year"
-                name="year"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select a year",
-                  },
-                ]}
-              >
-                <Select placeholder="Select a year">
-                  {["Last year", `I don't know anymore`]
-                    .concat(years)
-                    .map((year) => (
-                      <Option key={year} value={year}>
-                        {year}
-                      </Option>
-                    ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item label="Notes" name="remarks">
@@ -357,7 +319,7 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
     const { loading, contacts } = this.props;
 
     return (
-      <Content>
+      <>
         {this.renderNewContactModal()}
         <Card
           title="Contacts"
@@ -396,7 +358,11 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
                   <Button
                     className="self-end mr-3"
                     type="link"
-                    onClick={() => {}}
+                    onClick={() => {
+                      if (this.props.navigate) {
+                        this.props.navigate(`/contact/appointments/${record._id}`)
+                      }
+                    }}
                   >
                     View
                   </Button>
@@ -443,7 +409,7 @@ class ContactPage extends React.Component<ICategoryProps, ICategoryState> {
             />
           </Spin>
         </Card>
-      </Content>
+      </>
     );
   }
 }
@@ -465,4 +431,6 @@ const mapDispatchToProps = (
     dispatch(updateContactRequest(id, contact)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ContactPage);
+export default compose(
+  withRouter,
+)(connect(mapStateToProps, mapDispatchToProps)(ContactPage))

@@ -5,7 +5,8 @@ import {
   DesktopOutlined,
   CalendarOutlined,
   FolderOpenOutlined,
-  ContactsOutlined
+  ContactsOutlined,
+  SettingOutlined
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme } from "antd";
 import "./index.css";
@@ -117,6 +118,15 @@ const SideBar: React.FC = () => {
               label: <NavLink to={`/contact`}>
                 <span className="title">
                   Contacts
+                </span>
+              </NavLink>,
+            },
+            {
+              key: "5",
+              icon: <SettingOutlined />,
+              label: <NavLink to={`/settings`}>
+                <span className="title">
+                  Settings
                 </span>
               </NavLink>,
             },

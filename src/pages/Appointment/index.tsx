@@ -5,7 +5,6 @@ import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/a
 import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
 import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Calendar, Spin } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';

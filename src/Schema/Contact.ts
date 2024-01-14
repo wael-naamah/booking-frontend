@@ -1,5 +1,5 @@
 export enum Salutation {
-  WOMAN = "Mrs.",
+  WOMAN = "Mrs",
   MISTER = "Mr",
   COMPANY = "Company",
 }
@@ -17,20 +17,9 @@ export interface Contact {
   phone_numbber_3?: string;
   email: string;
   note_on_address?: string;
-  brand_of_device?: string;
-  model?: string;
-  exhaust_gas_measurement?: boolean;
-  has_maintenance_agreement?: boolean;
-  has_bgas_before?: boolean;
-  year?: string;
-  invoice_number?: number;
   newsletter?: boolean;
-  remarks?: string;
-  attachments?: {
-    title: string;
-    url: string;
-  }[];
   categories_permission?: string[];
+  remarks?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

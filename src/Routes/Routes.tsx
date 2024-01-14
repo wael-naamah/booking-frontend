@@ -8,6 +8,8 @@ import WorkingHoursPage from '../pages/Company/Schedules';
 import LoginPage from '../pages/Login';
 import SideBar from '../pages/SideBar';
 import Contact from '../pages/Contact';
+import ContactAppointments from '../pages/Contact/Appointments';
+import Settings from '../pages/Settings';
 
 class Router extends React.Component {
   render() {
@@ -18,8 +20,10 @@ class Router extends React.Component {
         <Route path="/appointment" element={<AppointmentPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/contact/appointments/:contactId" element={<ContactAppointments />} />
         <Route path="/working-hours" element={<WorkingHoursPage />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="/login" element={<LoginPage />} /> 
     </Routes>
