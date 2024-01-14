@@ -12,6 +12,7 @@ import ServiceLogo from '../../assets/services/service.png'
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
+import Header from "../../components/Header";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -207,6 +208,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
         return (
             <Content>
+                <Header />
                 <Row gutter={16}>
                     <Col xs={24} sm={18}>
                         {current === 0 ? <Collapse defaultActiveKey={["0"]}>

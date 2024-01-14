@@ -4,7 +4,6 @@ import {
   MenuUnfoldOutlined,
   DesktopOutlined,
   CalendarOutlined,
-  FolderOpenOutlined,
   ContactsOutlined,
   SettingOutlined
 } from "@ant-design/icons";
@@ -74,15 +73,6 @@ const SideBar: React.FC = () => {
             },
             {
               key: "2",
-              icon: <FolderOpenOutlined />,
-              label: <NavLink to={`/category`}>
-                <span className="title">
-                  Categories
-                </span>
-              </NavLink>,
-            },
-            {
-              key: "3",
               icon: <DesktopOutlined />,
               label: "Company",
               children: [
@@ -113,7 +103,7 @@ const SideBar: React.FC = () => {
               ]
             },
             {
-              key: "4",
+              key: "3",
               icon: <ContactsOutlined />,
               label: <NavLink to={`/contact`}>
                 <span className="title">
@@ -122,7 +112,7 @@ const SideBar: React.FC = () => {
               </NavLink>,
             },
             {
-              key: "5",
+              key: "4",
               icon: <SettingOutlined />,
               label: <NavLink to={`/settings`}>
                 <span className="title">
@@ -134,7 +124,7 @@ const SideBar: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Header style={{ padding: 0, display: 'flex', paddingRight: 125, justifyContent: 'space-between', background: colorBgContainer }}>
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -145,6 +135,15 @@ const SideBar: React.FC = () => {
               height: 64,
             }}
           />
+          <Button
+            type="link"
+            onClick={() => window.open('https://booking-frontend-waels-projects-d2811c36.vercel.app/category', '_blank')}
+            style={{
+              fontSize: "16px",
+              width: 64,
+              height: 64,
+            }}
+          >booking page b-gas</Button>
         </Header>
         <Content
           style={{

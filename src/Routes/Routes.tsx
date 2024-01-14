@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import CategoryPage from '../pages/Category';
 import AppointmentPage from '../pages/Appointment';
 import ServicesPage from '../pages/Company/Services';
@@ -15,18 +15,25 @@ class Router extends React.Component {
   render() {
     return (
       <Routes>
-      <Route path="/" element={<SideBar />}>
+        <Route path="/"
+          element={
+            <>
+              <Navigate to="/appointment" replace />
+              <SideBar />
+            </>
+          }
+        >
+          <Route path="/appointment" element={<AppointmentPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/contact/appointments/:contactId" element={<ContactAppointments />} />
+          <Route path="/working-hours" element={<WorkingHoursPage />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
         <Route path="/category" element={<CategoryPage />} />
-        <Route path="/appointment" element={<AppointmentPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/contact/appointments/:contactId" element={<ContactAppointments />} />
-        <Route path="/working-hours" element={<WorkingHoursPage />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/settings" element={<Settings />} />
-      </Route>
-      <Route path="/login" element={<LoginPage />} /> 
-    </Routes>
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     );
   }
 }
