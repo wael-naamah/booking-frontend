@@ -15,13 +15,9 @@ class Router extends React.Component {
   render() {
     return (
       <Routes>
+        <Route path="/" element={<Navigate to="/appointment" replace />} />
         <Route path="/"
-          element={
-            <>
-              <Navigate to="/appointment" replace />
-              <SideBar />
-            </>
-          }
+          element={<SideBar />}
         >
           <Route path="/appointment" element={<AppointmentPage />} />
           <Route path="/services" element={<ServicesPage />} />
