@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { updateCategoryRequest, deleteCategoryRequest } from "../../../redux/actions";
@@ -23,15 +23,20 @@ import {
     message,
     Popconfirm,
     Modal,
-    Card,
     Divider,
+    Upload,
+    Space,
 } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
+import { RcFile } from "antd/es/upload";
+import { upload } from "../../../utils";
+import { FILES_STORE } from "../../../redux/network/api";
 
 const { Panel } = Collapse;
 const { TextArea } = Input;
@@ -48,6 +53,9 @@ interface ICategoryState {
     localCategory: Category;
     visible: boolean;
     newService: Service;
+    file?: RcFile;
+    fileLoading: boolean,
+    editingServiceIndex: number | null;
 }
 
 interface ICategoryProps {
@@ -72,8 +80,11 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 description: '',
                 duration: 60,
                 price: 0,
-                abbreviation_id: Math.floor(1000 + Math.random() * 9000)
+                abbreviation_id: Math.floor(1000 + Math.random() * 9000),
+                attachment: undefined
             },
+            fileLoading: false,
+            editingServiceIndex: null
         };
     }
 
@@ -108,17 +119,35 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     };
 
     renderServices = () => {
-        const { localCategory, visible, newService } = this.state;
+        const { localCategory, visible, newService, file, fileLoading, editingServiceIndex } = this.state;
+
+        const isEditing = typeof editingServiceIndex === 'number';
+        const modelTitle = editingServiceIndex ? "Edit service" : "New service";
 
         const onClose = () => {
-            this.setState({ visible: false })
+            this.setState({ 
+                visible: false,
+                newService: {
+                    name: '',
+                    description: '',
+                    duration: 60,
+                    price: 0,
+                    abbreviation_id: Math.floor(1000 + Math.random() * 9000),
+                    attachment: undefined
+                },
+                editingServiceIndex: null
+            })
         }
 
         const onOpen = () => {
             this.setState({ visible: true })
         }
 
-        const onSave = () => {
+        const setFile = (file?: RcFile) => {
+            this.setState({ file })
+        }
+
+        const onSave = async () => {
             if (!newService.name) {
                 message.error('Please add service name')
                 return;
@@ -139,19 +168,60 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 message.error('Please add service abbreviation id')
                 return;
             }
-            this.setState({
-                localCategory: {
-                    ...localCategory,
-                    services: [...this.state.localCategory.services, { ...newService }],
-                },
-                newService: {
-                    name: '',
-                    description: '',
-                    duration: 60,
-                    price: 0,
-                    abbreviation_id: Math.floor(1000 + Math.random() * 9000)
-                }
-            })
+
+            let url = '';
+            if (file) {
+                this.setState({fileLoading: true});
+                const res = await upload(file);
+                url = res.uri;
+            }
+
+            if (isEditing) {
+                let updatedServices = localCategory.services;
+                updatedServices = localCategory.services.map((service, index) =>
+                    index === editingServiceIndex
+                        ? { ...newService, attachment: file ? { title: file.name, url } : undefined }
+                        : service
+                );
+
+                this.setState({
+                    localCategory: {
+                        ...localCategory,
+                        services: [...updatedServices],
+                    },
+                    newService: {
+                        name: '',
+                        description: '',
+                        duration: 60,
+                        price: 0,
+                        abbreviation_id: Math.floor(1000 + Math.random() * 9000),
+                        attachment: undefined
+                    },
+                    editingServiceIndex: null,
+                    file: undefined,
+                    fileLoading: false,
+                })
+
+            } else {
+                this.setState({
+                    localCategory: {
+                        ...localCategory,
+                        services: [...this.state.localCategory.services, { ...newService, attachment: file ? { title: file.name, url } : undefined }],
+                    },
+                    newService: {
+                        name: '',
+                        description: '',
+                        duration: 60,
+                        price: 0,
+                        abbreviation_id: Math.floor(1000 + Math.random() * 9000),
+                        attachment: undefined
+                    },
+                    file: undefined,
+                    fileLoading: false,
+                })
+            }
+
+
             onClose();
         }
 
@@ -175,15 +245,47 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             })
         };
 
+        const onDeleteAttachment = () => {
+            if (isEditing) {
+                let updatedServices = localCategory.services;
+                updatedServices = localCategory.services.map((service, index) =>
+                    index === editingServiceIndex
+                        ? { ...newService, attachment: undefined }
+                        : service
+                );
+
+                this.setState({
+                    localCategory: {
+                        ...localCategory,
+                        services: [...updatedServices]
+                    },
+                    newService: {
+                        ...newService,
+                        attachment: undefined
+                    }
+                })
+            }
+        };
+
+        const onOpenEdit = (index: number) => {
+            const initialValues: Service | undefined = localCategory.services[index];
+
+            if (initialValues)
+                this.setState({ visible: true, editingServiceIndex: index, newService: initialValues })
+        }
+
         return (
             <div>
                 <Modal
-                    title="New service"
+                    title={modelTitle}
                     open={visible}
                     centered
+                    okText={'Save'}
+                    cancelText={'Cancel'}
                     closable={false}
                     onCancel={onClose}
                     onOk={onSave}
+                    confirmLoading={fileLoading}
                     width={750}
                 >
                     <Divider />
@@ -253,6 +355,45 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         </Col>
                     </Row>
 
+                    <Row >
+                        <Col span={8}>
+                            <span>Image</span>
+                        </Col>
+                        <Col span={16} className={newService.attachment ? "mb-12" : "mb-8"}>
+                            <Upload.Dragger
+                                fileList={file ? [file] : []}
+                                maxCount={1}
+                                multiple={false}
+                                onRemove={() => {
+                                    setFile(undefined);
+                                }}
+                                disabled={Boolean(newService.attachment)}
+                                beforeUpload={(file) => {
+                                    setFile(file);
+                                    return false;
+                                }}
+                            >
+                                <Space size={14} align="center" className="m-0">
+
+                                    <p className="upload-hint-label">
+                                        Click or drag file to this area to
+                                        upload
+                                    </p>
+
+                                </Space>
+                            </Upload.Dragger>
+                            {newService.attachment && <Row className="flex items-center my-2" justify={'space-between'}>
+                                <Col className="flex items-center">
+                                    <img src={FILES_STORE + newService.attachment.url} width={40} height={40} />
+                                    <span className="ml-2">{newService.attachment.title}</span>
+                                </Col>
+
+                                <Col><DeleteOutlined onClick={() => onDeleteAttachment()} /></Col>
+                            </Row>}
+
+
+                        </Col>
+                    </Row>
                 </Modal>
                 <Table
                     dataSource={localCategory.services}
@@ -273,20 +414,29 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                     <Column
                         title="Action"
                         key="action"
-                        render={(_: any, __: any, index: number) => (
-                            <Popconfirm
-                                title="Delete this service?"
-                                description="Are you sure you want to delete this service?"
-                                okText="Delete It"
-                                cancelText="No"
-                                okButtonProps={{
-                                    danger: true,
-                                }}
-                                onConfirm={() => onDeleteService(index)}
-                            >
-                                <Button className="self-end mr-3" type="link">Delete</Button>
+                        render={(_: any, record: any, index: number) => (
+                            <>
+                                <Button
+                                    className="self-end mr-3"
+                                    type="link"
+                                    onClick={() => onOpenEdit(index)}
+                                >
+                                    Edit
+                                </Button>
+                                <Popconfirm
+                                    title="Delete this service?"
+                                    description="Are you sure you want to delete this service?"
+                                    okText="Delete It"
+                                    cancelText="No"
+                                    okButtonProps={{
+                                        danger: true,
+                                    }}
+                                    onConfirm={() => onDeleteService(index)}
+                                >
+                                    <Button className="self-end mr-3" type="link">Delete</Button>
 
-                            </Popconfirm>
+                                </Popconfirm>
+                            </>
                         )}
                     />
                 </Table>

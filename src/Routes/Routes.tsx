@@ -10,6 +10,7 @@ import SideBar from '../pages/SideBar';
 import Contact from '../pages/Contact';
 import ContactAppointments from '../pages/Contact/Appointments';
 import Settings from '../pages/Settings';
+import EmployeePage from '../pages/Employee';
 
 class Router extends React.Component {
   render() {
@@ -28,6 +29,7 @@ class Router extends React.Component {
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="/category" element={<CategoryPage />} />
+        <Route path="/employee" element={<EmployeePage />} />
         <Route path="/login" element={<LoginPage />} />
       </Routes>
     );

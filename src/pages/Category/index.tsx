@@ -3,16 +3,18 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchCategories, fetchTimeSlots, addAppointment } from "../../redux/actions";
 import { selectCategories, selectCategoriesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Appointment, Category, Contact, Salutation, Service } from "../../Schema";
+import { Appointment, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
-import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message } from "antd";
+import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message, Upload, Space } from "antd";
 
 import ServiceLogo from '../../assets/services/service.png'
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import Header from "../../components/Header";
+import { FILES_STORE } from "../../redux/network/api";
+import { upload } from "../../utils";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -28,6 +30,8 @@ interface ICategoryState {
     selectedSlot: { slot: string, calendar_id: string } | null;
     currentDate: Dayjs | null;
     current: number;
+    savedFileList: Attachment[],
+    uploading: boolean,
 }
 
 interface ICategoryProps {
@@ -52,14 +56,16 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             selectedService: null,
             selectedSlot: null,
             currentDate: null,
-            current: 0
+            current: 0,
+            savedFileList: [],
+            uploading: false,
         };
     }
 
     formRef = React.createRef<any>();
 
     onFinish = (values: any) => {
-        const { selectedCategory, selectedService, selectedSlot, currentDate } = this.state;
+        const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList } = this.state;
         const [startTime, endTime] = (selectedSlot?.slot || "").split(" - ");
         const startDateTimeString = `${currentDate!.toISOString().slice(0, 10)}T${startTime}:00.000Z`;
         const endDateTimeString = `${currentDate!.toISOString().slice(0, 10)}T${endTime}:00.000Z`;
@@ -91,7 +97,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             has_maintenance_agreement: Boolean(values.has_maintenance_agreement),
             has_bgas_before: Boolean(values.has_bgas_before),
             year: values.year,
-            attachments: values.attachments || undefined,
+            attachments: savedFileList.length ? savedFileList : undefined,
             remarks: values.remarks || undefined,
         }
 
@@ -170,6 +176,23 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         return current && (current.isBefore(dayjs(), 'day') || current.day() === 0 || current.day() === 6);
     };
 
+    setSavedFileList = (files: Attachment[]) => {
+        this.setState({
+            savedFileList: files
+        })
+    }
+
+    setUploading = (uploading: boolean) => {
+        this.setState({
+            uploading: uploading
+        })
+    }
+
+    removeAttachment = (file: string) => {
+        let filteredFiles = this.state.savedFileList.filter((fileUrl) => fileUrl.title !== file);
+        this.setSavedFileList(filteredFiles);
+    }
+
     componentDidUpdate(prevProps: ICategoryProps, prevState: ICategoryState) {
         const { currentDate, selectedCategory, selectedService } = this.state;
 
@@ -185,7 +208,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const years = Array.from({ length: currentYear - 2003 }, (_, index) => currentYear - index).map(String);
 
         const { categories, loading, timeslots, timeslotsLoading } = this.props;
-        const { selectedService, selectedSlot, current, currentDate } = this.state;
+        const { selectedService, selectedSlot, current, currentDate, savedFileList, uploading } = this.state;
 
         const formattedSlots: { slot: string, calendar_id: string }[] = timeslots.reduce((result: { slot: string, calendar_id: string }[], slot) => {
             const formattedStart = this.formatTime(slot.start);
@@ -234,7 +257,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                     }}
                                                     className="border border-gray-400 hover:border-primary transition duration-300 transform hover:scale-105"
                                                 >
-                                                    <img src={ServiceLogo} alt={service.name} className="mb-3" width={200} height={165} />
+                                                    <img src={service.attachment?.url ? FILES_STORE + service.attachment?.url : ServiceLogo} alt={service.name} className="mb-3" width={200} height={165} />
                                                     <p className="text-gray-600">Duration: {service.duration} mins</p>
                                                     <p className="text-lg text-primary font-bold">{service.price} EUR</p>
                                                     <p className="text-sm">{service.description}</p>
@@ -380,7 +403,6 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         </Col>
                                     </Row>
 
-
                                     <Form.Item label="Do you have a maintenance agreement with us?" name="has_maintenance_agreement" rules={[{ required: true }]}>
                                         <Select>
                                             {[{ lable: 'No', value: false }, { lable: 'Yes, the prices according to the maintenance agreement apply', value: true }].map((el) => (
@@ -397,6 +419,49 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         <Checkbox>Yes, B-GAS has been with me before</Checkbox>
                                     </Form.Item>
 
+                                    <Row gutter={16} wrap={false}>
+                                        <Col span={24}>
+                                        <Form.Item>
+                                            <Upload.Dragger
+                                                accept=".jpeg,.jpg,.png"
+                                                name="attachments"
+                                                listType="picture"
+                                                fileList={[
+                                                    ...savedFileList.map((a, i) => ({
+                                                        uid: i + "",
+                                                        name: a.title,
+                                                        status: "done",
+                                                        url: FILES_STORE + a.url,
+                                                    })),
+                                                    ...(uploading
+                                                        ? [
+                                                            {
+                                                                uid: savedFileList.length + "",
+                                                                name: "",
+                                                                status: "uploading",
+                                                                url: "",
+                                                            },
+                                                        ]
+                                                        : []),
+                                                ] as any}
+                                                onRemove={(file) => this.removeAttachment(file.name)}
+                                                customRequest={async (data: any) => {
+                                                    this.setUploading(true);
+                                                    const res = await upload(data.file);
+                                                    const url = res.uri;
+                                                    this.setUploading(false);
+                                                    data.onSuccess(url);
+                                                    this.setSavedFileList([...savedFileList, { url, title: data.file.name }]);
+                                                }}>
+                                                <Space size={14} align="center" className="m-0">
+                                                    <p className="upload-hint-label">
+                                                        Take/upload a photo of the device/name plate if the type is not known
+                                                    </p>
+                                                </Space>
+                                            </Upload.Dragger>
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
 
                                     <Row gutter={16} justify={'start'}>
                                         <Col span={8}>

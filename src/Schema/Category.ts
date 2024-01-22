@@ -1,3 +1,5 @@
+import { Attachment } from "./Common";
+
 export enum SortDirection {
   NONE = "none",
   DESC = "desc",
@@ -24,6 +26,7 @@ export interface Service {
   duration: number;
   price: number;
   abbreviation_id: number;
+  attachment?: Attachment;
 }
 
 export interface Category {

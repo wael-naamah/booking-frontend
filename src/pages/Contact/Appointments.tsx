@@ -23,6 +23,7 @@ import {
   Divider,
   Form,
   Input,
+  List,
   Modal,
   Popconfirm,
   Row,
@@ -34,6 +35,8 @@ import {
 import dayjs from "dayjs";
 
 import withRouter, { RouteParams } from "../../HOC/withRouter";
+import { FILES_STORE } from "../../redux/network/api";
+import { download } from "../../utils";
 
 const { Column } = Table;
 const { Option } = Select;
@@ -41,6 +44,7 @@ const { Option } = Select;
 interface IAppointmentsState {
   visible: boolean;
   editingAppointmentId: string | null;
+  attachmentModelId: string | null;
 }
 
 interface IAppointmentsProps {
@@ -67,6 +71,7 @@ class AppointmentsPage extends React.Component<
     this.state = {
       visible: false,
       editingAppointmentId: null,
+      attachmentModelId: null,
     };
   }
 
@@ -89,6 +94,10 @@ class AppointmentsPage extends React.Component<
     this.setState({ visible: true, editingAppointmentId: id });
   };
 
+  onOpenAttachmentModel = (id: string | null = null) => {
+    this.setState({ attachmentModelId: id });
+  };
+
   onDeleteAppointment = (id: string) => {
     this.props.deleteAppointmentRequest(id).then((data) => {
       if (data.status && data.status === "success") {
@@ -99,13 +108,60 @@ class AppointmentsPage extends React.Component<
     });
   };
 
+  renderAttachmentsModal = () => {
+    const { attachmentModelId } = this.state;
+    const { appointments } = this.props;
+
+    if (!attachmentModelId) {
+      return null;
+    }
+
+    const attachments = appointments.filter(el => el._id === attachmentModelId)[0].attachments;
+
+
+    return (
+      <Modal
+        title={"Attachments"}
+        open={Boolean(attachmentModelId)}
+        centered
+        closable={true}
+        footer={() => null}
+        onCancel={() => this.onOpenAttachmentModel(null)}
+        width={800}
+      >
+        <Divider />
+        <List
+          dataSource={attachments}
+          renderItem={(item) => (
+            <List.Item>
+              <Row>
+                <Col span={24}>
+                  <div className="flex flex-col">
+                    <img src={FILES_STORE + item.url} width={'100%'} className="object-contain" height={250} />
+                    <Button
+                      className="self-start"
+                      type="link"
+                      onClick={() => download(item.title)}
+                    >
+                      Download
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+            </List.Item>
+          )}
+        />
+      </Modal>
+    );
+  }
+
   renderUpdateAppointmentModal = () => {
     const { visible, editingAppointmentId } = this.state;
     const initialValues = this.props.appointments.find(
       (c) => c._id === editingAppointmentId
     );
-    
-  
+
+
 
     const onClose = () => {
       this.setState({ visible: false });
@@ -113,11 +169,11 @@ class AppointmentsPage extends React.Component<
 
     const onFinish = (appointment: Appointment) => {
       const { editingAppointmentId } = this.state;
-    const { _id, createdAt, updatedAt, service, ...propsToUpdate} = initialValues!
+      const { _id, createdAt, updatedAt, service, ...propsToUpdate } = initialValues!
 
 
       this.props
-        .updateAppointmentRequest(editingAppointmentId!, {...propsToUpdate , ...appointment})
+        .updateAppointmentRequest(editingAppointmentId!, { ...propsToUpdate, ...appointment })
         .then((data) => {
           if (data._id) {
             message.success("Successfully updated the appointment");
@@ -273,6 +329,7 @@ class AppointmentsPage extends React.Component<
     return (
       <>
         {this.renderUpdateAppointmentModal()}
+        {this.renderAttachmentsModal()}
         <Card
           title={"Appointments"}
           extra={
@@ -367,6 +424,21 @@ class AppointmentsPage extends React.Component<
                         Delete
                       </Button>
                     </Popconfirm>
+                  </Row>
+                )}
+              />
+              <Column
+                title="attachments"
+                key="attachments"
+                render={(_: any, record: Appointment) => (
+                  <Row>
+                    {record.attachments?.length ? <Button
+                      className="self-end mr-3"
+                      type="link"
+                      onClick={() => this.onOpenAttachmentModel(record._id)}
+                    >
+                      View
+                    </Button> : null}
                   </Row>
                 )}
               />

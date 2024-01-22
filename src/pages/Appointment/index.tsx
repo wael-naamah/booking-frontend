@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/actions";
 import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm } from "../../Schema";
+import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm, ContactAppointment } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Row, Col, Card, Calendar, Spin } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
@@ -16,15 +16,23 @@ import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../HOC/withAuthorization";
 import './index.css'
+import AppointmentDetailsModal from "../../components/AppointmentDetailsModal";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
     weekStart: 1
 })
 
+interface CalendarEvent extends ContactAppointment {
+    title: string;
+    start: Date;
+    end: Date;
+}
 interface IAppointmentState {
     currentDate: Dayjs | null;
     views: ['day', 'work_week'];
+    selectedEvent: CalendarEvent | null;
+    modalState: boolean;
 }
 
 interface IAppointmentProps {
@@ -50,6 +58,8 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         this.state = {
             currentDate: dayjs(),
             views: ['day', 'work_week'],
+            selectedEvent: null,
+            modalState: false,
         };
     }
 
@@ -93,9 +103,25 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         }
     }
 
+    renderEventModal = () => {
+        const firstDateOfMonth = dayjs().startOf('month');
+        const lastDateOfMonth = dayjs().endOf('month');
+        const { selectedEvent, modalState } = this.state;
+        const onClose = () => {
+            this.setState({ modalState: false, selectedEvent: null })
+        }
+
+        const onSave = () => {
+            this.props.fetchAppointments({ start: firstDateOfMonth.toISOString(), end: lastDateOfMonth.toISOString() });
+            this.setState({ modalState: false, selectedEvent: null });
+        };
+
+        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
+    }
+
     render() {
         const { loading, timeslots, timeslotsLoading, appointments, employees } = this.props;
-        const { currentDate, views } = this.state;
+        const { currentDate, views, modalState } = this.state;
         const localizer = momentLocalizer(moment);
 
         const resourceMap = (employees || []).map(el => ({
@@ -104,12 +130,20 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         }))
 
         const events = (appointments || []).map((el, index) => ({
-            id: index,
-            title: el.calendar_id,
+            title: "",
             start: new Date(el.start_date),
             end: new Date(el.end_date),
-            resourceId: el.calendar_id
+            resourceId: el.calendar_id,
+            service: undefined,
+            ...el
         }))
+
+        const handleSelectedEvent = async (event: CalendarEvent) => {
+            this.setState({
+                selectedEvent: event,
+                modalState: true,
+            })
+        }
 
         const formattedSlots: { slot: string, calendar_id: string, employee_name: string }[] = [...timeslots]
             .sort((a, b) => a.start.localeCompare(b.start))
@@ -133,25 +167,27 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         }
 
         return (
+            <>
+                {modalState ? this.renderEventModal() : null}
                 <Row gutter={16} justify={'space-around'} className="calendar-container">
                     <Col span={6} xs={24} md={6}>
-                            <Card className="calendar-card">
-                                <Calendar
-                                    fullscreen={false}
-                                    value={currentDate ? currentDate : dayjs()}
-                                    onSelect={this.onSelectDate}
-                                />
+                        <Card className="calendar-card">
+                            <Calendar
+                                fullscreen={false}
+                                value={currentDate ? currentDate : dayjs()}
+                                onSelect={this.onSelectDate}
+                            />
+                        </Card>
+                        <Spin spinning={timeslotsLoading}>
+                            <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="w-full h-96 mt-4 rounded-md overflow-y-auto">
+                                {formattedSlots.map((el) => (
+                                    <div className="p-4 m-3 flex items-center justify-around border border-gray-300 rounded-md bg-gray-100">
+                                        <span>{el.slot}</span>
+                                        <span>{el.employee_name}</span>
+                                    </div>
+                                ))}
                             </Card>
-                            <Spin spinning={timeslotsLoading}>
-                                <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="w-full h-96 mt-4 rounded-md overflow-y-auto">
-                                    {formattedSlots.map((el) => (
-                                        <div className="p-4 m-3 flex items-center justify-around border border-gray-300 rounded-md bg-gray-100">
-                                            <span>{el.slot}</span>
-                                            <span>{el.employee_name}</span>
-                                        </div>
-                                    ))}
-                                </Card>
-                            </Spin>
+                        </Spin>
                     </Col>
                     <Col span={18} xs={24} md={18}>
                         <div style={{ height: 600 }}>
@@ -165,10 +201,13 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 resourceTitleAccessor="resourceTitle"
                                 step={60}
                                 views={views}
+                                popup={true}
+                                onSelectEvent={(e) => handleSelectedEvent(e)}
                             />
                         </div>
                     </Col>
                 </Row>
+            </>
         );
     }
 }
@@ -194,5 +233,4 @@ const mapDispatchToProps = (
 //     withAuthorization,
 //   )(connect(mapStateToProps, mapDispatchToProps)(AppointmentPage))
 
-  export default connect(mapStateToProps, mapDispatchToProps)(AppointmentPage)
-  
+export default connect(mapStateToProps, mapDispatchToProps)(AppointmentPage)

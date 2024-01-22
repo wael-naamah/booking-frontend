@@ -68,6 +68,19 @@ export const fetchContacts = (page: number = 1, limit: number = 10) => {
   };
 };
 
+export const fetchContactById = async (id: string) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/contacts/${id}`
+    );
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    return null
+  }
+};
+
 export const updateContactRequest = (id: string, contact: Contact) => {
   return async (dispatch: Dispatch) => {
     dispatch(updateContact());

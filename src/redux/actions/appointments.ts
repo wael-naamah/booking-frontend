@@ -20,6 +20,8 @@ const GET_EMPLOYEES = "appointments/GET_EMPLOYEES" as const;
 const GET_EMPLOYEES_DONE = "appointments/GET_EMPLOYEES_DONE" as const;
 const GET_CONTACT_APPOINTMENTS = "appointments/GET_CONTACT_APPOINTMENTS" as const;
 const GET_CONTACT_APPOINTMENTS_DONE = "appointments/GET_CONTACT_APPOINTMENTS_DONE" as const;
+const GET_CALENDAR_APPOINTMENTS = "appointments/GET_CALENDAR_APPOINTMENTS" as const;
+const GET_CALENDAR_APPOINTMENTS_DONE = "appointments/GET_CALENDAR_APPOINTMENTS_DONE" as const;
 
 export const getTimeSlots = () => ({
   type: GET_TIME_SLOTS,
@@ -125,6 +127,34 @@ export const updateAppointmentRequest = (id: string, appointment: Appointment) =
       console.error("Error fetching categories:", error);
 
       dispatch(updateAppointmentDone(null));
+    }
+  };
+};
+
+export const getCalendarAppointments = () => ({
+  type: GET_CALENDAR_APPOINTMENTS,
+});
+
+export const getCalendarAppointmentsDone = (data: ContactAppointment[]) => ({
+  type: GET_CALENDAR_APPOINTMENTS_DONE,
+  payload: data,
+});
+
+export const fetchCalendarAppointments = (calendarId: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(getCalendarAppointments());
+
+    try {
+      const response = await fetch(
+        `${API_URL}/appointments/calendar/${calendarId}`
+      );
+      const data = await response.json();
+
+      dispatch(getCalendarAppointmentsDone(data));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+
+      dispatch(getCalendarAppointmentsDone([]));
     }
   };
 };
@@ -255,4 +285,6 @@ export type AppointmentsAction = ReturnType<
   | typeof updateAppointmentDone
   | typeof deleteAppointment
   | typeof deleteAppointmentDone
+  | typeof getCalendarAppointments
+  | typeof getCalendarAppointmentsDone
 >;

@@ -12,5 +12,8 @@ export const selectDeleteAppointmentLoading = (state: RootState) => state.appoin
 export const selectContactAppointments = (state: RootState) => state.appointments.contactAppointments;
 export const selectContactAppointmentsLoading = (state: RootState) => state.appointments.contactAppointmentsLoading;
 
+export const selectCalendarAppointments = (state: RootState) => state.appointments.calendarAppointments;
+export const selectCalendarAppointmentsLoading = (state: RootState) => state.appointments.calendarAppointmentsLoading;
+
 export const selectEmployees = (state: RootState) => state.appointments.employees;
 export const selectEmployeesLoading = (state: RootState) => state.appointments.employeesLoading;

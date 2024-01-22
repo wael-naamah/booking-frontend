@@ -50,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@types/express-fileupload": "^1.4.4",
     "@types/react-big-calendar": "^1.8.7",
     "@types/react-router-dom": "^5.3.3",
     "tailwindcss": "^3.3.5"

@@ -13,6 +13,8 @@ interface CategoriesState {
   appointmentsLoading: boolean;
   contactAppointments: ContactAppointment[];
   contactAppointmentsLoading: boolean;
+  calendarAppointments: ContactAppointment[];
+  calendarAppointmentsLoading: boolean;
   updateAppointmentLoading: boolean;
   deleteAppointmentLoading: boolean;
   employees: Calendar[];
@@ -26,6 +28,8 @@ const initialState: CategoriesState = {
   appointmentsLoading: true,
   contactAppointments: [],
   contactAppointmentsLoading: true,
+  calendarAppointments: [],
+  calendarAppointmentsLoading: true,
   updateAppointmentLoading: false,
   deleteAppointmentLoading: false,
   employees: [],
@@ -70,7 +74,17 @@ const categoriesReducer = (
         contactAppointmentsLoading: false,
         contactAppointments: action.payload,
       };
-
+    case "appointments/GET_CALENDAR_APPOINTMENTS":
+      return {
+        ...state,
+        calendarAppointmentsLoading: true,
+      };
+    case "appointments/GET_CALENDAR_APPOINTMENTS_DONE":
+      return {
+        ...state,
+        calendarAppointmentsLoading: false,
+        calendarAppointments: action.payload,
+      };
     case "appointments/DELETE_APPOINTMENT":
       return {
         ...state,
