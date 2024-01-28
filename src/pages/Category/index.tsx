@@ -67,8 +67,12 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     onFinish = (values: any) => {
         const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList } = this.state;
         const [startTime, endTime] = (selectedSlot?.slot || "").split(" - ");
-        const startDateTimeString = `${currentDate!.toISOString().slice(0, 10)}T${startTime}:00.000Z`;
-        const endDateTimeString = `${currentDate!.toISOString().slice(0, 10)}T${endTime}:00.000Z`;
+
+        const valueISOString = currentDate!.toISOString();
+        const offsetMinutes = currentDate!.utcOffset();
+        const adjustedISOString = dayjs(valueISOString).add(offsetMinutes, 'minutes').toISOString();
+        const startDateTimeString = `${adjustedISOString.slice(0, 10)}T${startTime}:00.000Z`;
+        const endDateTimeString = `${adjustedISOString.slice(0, 10)}T${endTime}:00.000Z`;
 
         const startDate = new Date(startDateTimeString);
         const endDate = new Date(endDateTimeString);
@@ -159,15 +163,18 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     };
 
     onSelectDate = (value: Dayjs, selectInfo: SelectInfo) => {
+        const midnightValue = value.endOf('day');
+
         if (selectInfo.source === 'date') {
-            this.setState({ currentDate: value })
+            this.setState({ currentDate: midnightValue })
         }
     };
 
     formatTime = (time: string) => {
         const date = new Date(time);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
         return `${hours}:${minutes}`;
     };
 
@@ -276,6 +283,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                             value={currentDate ? currentDate : dayjs()}
                                             onSelect={this.onSelectDate}
                                             disabledDate={this.disabledDate}
+                                            onChange={(date) => this.setState({ currentDate: dayjs(date) })}
                                         />
                                     </Card>
                                 </Col>
@@ -421,44 +429,44 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                                     <Row gutter={16} wrap={false}>
                                         <Col span={24}>
-                                        <Form.Item>
-                                            <Upload.Dragger
-                                                accept=".jpeg,.jpg,.png"
-                                                name="attachments"
-                                                listType="picture"
-                                                fileList={[
-                                                    ...savedFileList.map((a, i) => ({
-                                                        uid: i + "",
-                                                        name: a.title,
-                                                        status: "done",
-                                                        url: FILES_STORE + a.url,
-                                                    })),
-                                                    ...(uploading
-                                                        ? [
-                                                            {
-                                                                uid: savedFileList.length + "",
-                                                                name: "",
-                                                                status: "uploading",
-                                                                url: "",
-                                                            },
-                                                        ]
-                                                        : []),
-                                                ] as any}
-                                                onRemove={(file) => this.removeAttachment(file.name)}
-                                                customRequest={async (data: any) => {
-                                                    this.setUploading(true);
-                                                    const res = await upload(data.file);
-                                                    const url = res.uri;
-                                                    this.setUploading(false);
-                                                    data.onSuccess(url);
-                                                    this.setSavedFileList([...savedFileList, { url, title: data.file.name }]);
-                                                }}>
-                                                <Space size={14} align="center" className="m-0">
-                                                    <p className="upload-hint-label">
-                                                        Take/upload a photo of the device/name plate if the type is not known
-                                                    </p>
-                                                </Space>
-                                            </Upload.Dragger>
+                                            <Form.Item>
+                                                <Upload.Dragger
+                                                    accept=".jpeg,.jpg,.png"
+                                                    name="attachments"
+                                                    listType="picture"
+                                                    fileList={[
+                                                        ...savedFileList.map((a, i) => ({
+                                                            uid: i + "",
+                                                            name: a.title,
+                                                            status: "done",
+                                                            url: FILES_STORE + a.url,
+                                                        })),
+                                                        ...(uploading
+                                                            ? [
+                                                                {
+                                                                    uid: savedFileList.length + "",
+                                                                    name: "",
+                                                                    status: "uploading",
+                                                                    url: "",
+                                                                },
+                                                            ]
+                                                            : []),
+                                                    ] as any}
+                                                    onRemove={(file) => this.removeAttachment(file.name)}
+                                                    customRequest={async (data: any) => {
+                                                        this.setUploading(true);
+                                                        const res = await upload(data.file);
+                                                        const url = res.uri;
+                                                        this.setUploading(false);
+                                                        data.onSuccess(url);
+                                                        this.setSavedFileList([...savedFileList, { url, title: data.file.name }]);
+                                                    }}>
+                                                    <Space size={14} align="center" className="m-0">
+                                                        <p className="upload-hint-label">
+                                                            Take/upload a photo of the device/name plate if the type is not known
+                                                        </p>
+                                                    </Space>
+                                                </Upload.Dragger>
                                             </Form.Item>
                                         </Col>
                                     </Row>

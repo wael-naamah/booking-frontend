@@ -1,4 +1,4 @@
-import { EmailConfig } from "../../Schema";
+import { EmailConfig, EmailTemplate } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
 
@@ -10,6 +10,15 @@ const DELETE_EMAIL_CONFIG = "settings/DELETE_EMAIL_CONFIG" as const;
 const DELETE_EMAIL_CONFIG_DONE = "settings/DELETE_EMAIL_CONFIG_DONE" as const;
 const ADD_EMAIL_CONFIG = "settings/ADD_EMAIL_CONFIG" as const;
 const ADD_EMAIL_CONFIG_DONE = "settings/ADD_EMAIL_CONFIG_DONE" as const;
+
+const GET_EMAIL_TEMPLATES = "settings/GET_EMAIL_TEMPLATES" as const;
+const GET_EMAIL_TEMPLATES_DONE = "settings/GET_EMAIL_TEMPLATES_DONE" as const;
+const UPDATE_EMAIL_TEMPLATE = "settings/UPDATE_EMAIL_TEMPLATE" as const;
+const UPDATE_EMAIL_TEMPLATE_DONE = "settings/UPDATE_EMAIL_TEMPLATE_DONE" as const;
+const DELETE_EMAIL_TEMPLATE = "settings/DELETE_EMAIL_TEMPLATE" as const;
+const DELETE_EMAIL_TEMPLATE_DONE = "settings/DELETE_EMAIL_TEMPLATE_DONE" as const;
+const ADD_EMAIL_TEMPLATE = "settings/ADD_EMAIL_TEMPLATE" as const;
+const ADD_EMAIL_TEMPLATE_DONE = "settings/ADD_EMAIL_TEMPLATE_DONE" as const;
 
 export const addEmailConfig = () => ({
   type: ADD_EMAIL_CONFIG,
@@ -46,6 +55,137 @@ export const getEmailConfigDone = (data: EmailConfig | null) => ({
   type: GET_EMAIL_CONFIG_DONE,
   config: data,
 });
+
+export const addEmailTemplate = () => ({
+  type: ADD_EMAIL_TEMPLATE,
+});
+
+export const addEmailTemplateDone = (template: EmailTemplate | null) => ({
+  type: ADD_EMAIL_TEMPLATE_DONE,
+  template,
+});
+
+export const deleteEmailTemplate = () => ({
+  type: DELETE_EMAIL_TEMPLATE,
+});
+
+export const deleteEmailTemplateDone = (id: string | null) => ({
+  type: DELETE_EMAIL_TEMPLATE_DONE,
+  id,
+});
+
+export const updateEmailTemplate = () => ({
+  type: UPDATE_EMAIL_TEMPLATE,
+});
+
+export const updateEmailTemplateDone = (template: EmailTemplate | null) => ({
+  type: UPDATE_EMAIL_TEMPLATE_DONE,
+  template,
+});
+
+export const getEmailTemplates = () => ({
+  type: GET_EMAIL_TEMPLATES,
+});
+
+export const getEmailTemplatesDone = (data: EmailTemplate[]) => ({
+  type: GET_EMAIL_TEMPLATES_DONE,
+  data,
+});
+
+
+export const fetchEmailTemplate = (type: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(getEmailTemplates());
+
+    try {
+      const response = await fetch(
+        `${API_URL}/mailer/template?type=${type}`
+      );
+      const data = await response.json();
+
+      if(data && data.length){
+          dispatch(getEmailTemplatesDone(data));
+          return data;
+      } else {
+        dispatch(getEmailTemplatesDone([]));
+        return null;
+      }
+
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      dispatch(getEmailTemplatesDone([]));
+    }
+  };
+};
+
+export const updateEmailTemplateRequest = (id: string, template: EmailTemplate) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(updateEmailTemplate());
+
+    try {
+      const response = await fetch(`${API_URL}/mailer/template/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(template),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      dispatch(updateEmailTemplateDone(data));
+      return data;
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+
+      dispatch(updateEmailTemplateDone(null));
+    }
+  };
+};
+
+export const deleteEmailTemplateRequest = (id: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(deleteEmailTemplate());
+
+    try {
+      const response = await fetch(`${API_URL}/mailer/template/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (data.status && data.status === "success")
+        dispatch(deleteEmailTemplateDone(id));
+      else {
+        dispatch(deleteEmailTemplateDone(null));
+      }
+      return data;
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+
+      dispatch(deleteEmailTemplateDone(null));
+    }
+  };
+};
+
+export const addEmailTemplateRequest = (template: EmailTemplate) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(addEmailTemplate());
+
+    try {
+      const response = await fetch(`${API_URL}/mailer/template`, {
+        method: "POST",
+        body: JSON.stringify(template),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      dispatch(addEmailTemplateDone(data));
+      return data;
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+
+      dispatch(addEmailTemplateDone(null));
+    }
+  };
+};
+
 
 export const fetchEmailConfig = () => {
   return async (dispatch: Dispatch) => {
@@ -149,4 +289,12 @@ export type EmailConfigAction = ReturnType<
   | typeof deleteEmailConfigDone
   | typeof addEmailConfig
   | typeof addEmailConfigDone
+  | typeof addEmailTemplate
+  | typeof addEmailTemplateDone
+  | typeof deleteEmailTemplate
+  | typeof deleteEmailTemplateDone
+  | typeof updateEmailTemplate
+  | typeof updateEmailTemplateDone
+  | typeof getEmailTemplates
+  | typeof getEmailTemplatesDone
 >;

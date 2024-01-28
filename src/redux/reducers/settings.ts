@@ -1,4 +1,4 @@
-import { EmailConfig } from "../../Schema";
+import { EmailConfig, EmailTemplate } from "../../Schema";
 import { EmailConfigAction } from "../actions";
 
 interface EmailConfigState {
@@ -7,6 +7,11 @@ interface EmailConfigState {
   updateEmailConfigLoading: boolean;
   deleteEmailConfigLoading: boolean;
   addEmailConfigLoading: boolean;
+  emailTemplates: EmailTemplate[];
+  emailTemplatesLoading: boolean;
+  updateEmailTemplateLoading: boolean;
+  deleteEmailTemplateLoading: boolean;
+  addEmailTemplateLoading: boolean;
 }
 
 const initialState: EmailConfigState = {
@@ -15,6 +20,11 @@ const initialState: EmailConfigState = {
   updateEmailConfigLoading: false,
   deleteEmailConfigLoading: false,
   addEmailConfigLoading: false,
+  emailTemplates: [],
+  emailTemplatesLoading: true,
+  updateEmailTemplateLoading: false,
+  deleteEmailTemplateLoading: false,
+  addEmailTemplateLoading: false,
 };
 
 const settingsReducer = (
@@ -81,6 +91,70 @@ const settingsReducer = (
             ...state,
             addEmailConfigLoading: false,
           };
+    }
+    case "settings/GET_EMAIL_TEMPLATES":
+      return {
+        ...state,
+        emailTemplatesLoading: true,
+      };
+    case "settings/GET_EMAIL_TEMPLATES_DONE":
+      return {
+        ...state,
+        emailTemplatesLoading: false,
+        emailTemplates: action.data,
+      };
+    case "settings/ADD_EMAIL_TEMPLATE":
+      return {
+        ...state,
+        addEmailTemplateLoading: true,
+      };
+    case "settings/ADD_EMAIL_TEMPLATE_DONE": {
+      return action.template?._id && action.template
+        ? {
+            ...state,
+            addEmailTemplateLoading: false,
+            emailTemplates: state.emailTemplates.concat([action.template]),
+          }
+        : {
+            ...state,
+            addEmailTemplateLoading: false,
+          };
+    }
+    case "settings/DELETE_EMAIL_TEMPLATE":
+      return {
+        ...state,
+        deleteEmailTemplateLoading: true,
+      };
+    case "settings/DELETE_EMAIL_TEMPLATE_DONE": {
+      let emailTemplates = state.emailTemplates;
+      if (action.id) {
+        emailTemplates = state.emailTemplates.filter(el => el._id !== action.id);
+      }
+      return {
+        ...state,
+        deleteEmailTemplateLoading: false,
+        emailTemplates: emailTemplates,
+      };
+    }
+    case "settings/UPDATE_EMAIL_TEMPLATE":
+      return {
+        ...state,
+        updateEmailTemplateLoading: true,
+      };
+    case "settings/UPDATE_EMAIL_TEMPLATE_DONE": {
+      let updatedTemplates = state.emailTemplates;
+      if (action.template && action.template._id) {
+        updatedTemplates = state.emailTemplates.map((template) =>
+          action.template && template._id === action.template._id
+            ? action.template
+            : template
+        );
+      }
+      return {
+        ...state,
+        updateEmailTemplateLoading: false,
+        emailTemplates: updatedTemplates,
+      };
     }
     default:
       return state;

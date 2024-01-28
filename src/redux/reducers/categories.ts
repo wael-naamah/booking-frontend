@@ -1,4 +1,4 @@
-import { Category } from "../../Schema";
+import { Category, Service } from "../../Schema";
 import { CategoriesAction } from "../actions";
 
 interface CategoriesState {
@@ -7,6 +7,8 @@ interface CategoriesState {
   updateCategoryLoading: boolean;
   deleteCategoryLoading: boolean;
   addCategoryLoading: boolean;
+  services: Service[];
+  servicesLoading: boolean;
 }
 
 const initialState: CategoriesState = {
@@ -15,6 +17,8 @@ const initialState: CategoriesState = {
   updateCategoryLoading: false,
   deleteCategoryLoading: false,
   addCategoryLoading: false,
+  services: [],
+  servicesLoading: true,
 };
 
 const categoriesReducer = (
@@ -88,6 +92,17 @@ const categoriesReducer = (
             addCategoryLoading: false,
           };
     }
+    case "categories/GET_SERVICES":
+      return {
+        ...state,
+        servicesLoading: true,
+      };
+    case "categories/GET_SERVICES_DONE":
+      return {
+        ...state,
+        servicesLoading: false,
+        services: action.payload,
+      };
     default:
       return state;
   }

@@ -1,4 +1,4 @@
-import { Category } from "../../Schema";
+import { Category, Service } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
 
@@ -10,6 +10,9 @@ const DELETE_CATEGORY = "categories/DELETE_ONE" as const;
 const DELETE_CATEGORY_DONE = "categories/DELETE_ONE_DONE" as const;
 const ADD_CATEGORY = "categories/ADD_ONE" as const;
 const ADD_CATEGORY_DONE = "categories/ADD_ONE_DONE" as const;
+const GET_SERVICES = "categories/GET_SERVICES" as const;
+const GET_SERVICES_DONE = "categories/GET_SERVICES_DONE" as const;
+
 
 export const addCategory = () => ({
   type: ADD_CATEGORY,
@@ -134,6 +137,34 @@ export const createCategoryRequest = (category: Category) => {
   };
 };
 
+export const getServices = () => ({
+  type: GET_SERVICES,
+});
+
+export const getServicesDone = (data: Service[]) => ({
+  type: GET_SERVICES_DONE,
+  payload: data,
+});
+
+export const fetchServices = () => {
+  return async (dispatch: Dispatch) => {
+    dispatch(getServices());
+
+    try {
+      const response = await fetch(
+        `${API_URL}/categories/services`
+      );
+      const data = await response.json();
+
+      dispatch(getServicesDone(data));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+
+      dispatch(getServicesDone([]));
+    }
+  };
+};
+
 export type CategoriesAction = ReturnType<
   | typeof getCategories
   | typeof getCategoriesDone
@@ -143,4 +174,6 @@ export type CategoriesAction = ReturnType<
   | typeof deleteCategoryDone
   | typeof addCategory
   | typeof addCategoryDone
+  | typeof getServices
+  | typeof getServicesDone
 >;

@@ -6,4 +6,5 @@ export const selectCategoriesLoading = (state: RootState) => state.categories.lo
 export const selectUpdateCategoryLoading = (state: RootState) => state.categories.updateCategoryLoading;
 export const selectDeleteCategoryLoading = (state: RootState) => state.categories.deleteCategoryLoading;
 
-
+export const selectServices = (state: RootState) => state.categories.services;
+export const selectServicesLoading = (state: RootState) => state.categories.servicesLoading;

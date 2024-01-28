@@ -6,4 +6,5 @@ export const selectEmailConfigLoading = (state: RootState) => state.settings.ema
 export const selectUpdateEmailConfigLoading = (state: RootState) => state.settings.updateEmailConfigLoading;
 export const selectDeleteEmailConfigLoading = (state: RootState) => state.settings.deleteEmailConfigLoading;
 
-
+export const selectEmailTemplates = (state: RootState) => state.settings.emailTemplates;
+export const selectEmailTemplatesLoading = (state: RootState) => state.settings.emailTemplatesLoading;

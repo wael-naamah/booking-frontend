@@ -84,15 +84,17 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
     };
 
     onSelectDate = (value: Dayjs, selectInfo: SelectInfo) => {
+        const midnightValue = value.endOf('day');
+
         if (selectInfo.source === 'date') {
-            this.setState({ currentDate: value })
+            this.setState({ currentDate: midnightValue })
         }
     };
 
     formatTime = (time: string) => {
         const date = new Date(time);
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         return `${hours}:${minutes}`;
     };
 
@@ -129,14 +131,37 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             resourceTitle: el.employee_name
         }))
 
-        const events = (appointments || []).map((el, index) => ({
-            title: "",
-            start: new Date(el.start_date),
-            end: new Date(el.end_date),
-            resourceId: el.calendar_id,
-            service: undefined,
-            ...el
-        }))
+        const events = (appointments || []).map((el, index) => {
+            const startUTC = new Date(el.start_date);
+            const endUTC = new Date(el.end_date);
+        
+            const start = new Date(startUTC.getTime() + startUTC.getTimezoneOffset() * 60000);
+            const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
+        
+            return {
+                title: "",
+                start,
+                end,
+                resourceId: el.calendar_id,
+                service: undefined,
+                ...el
+            };
+        });
+        
+        <BigCalendar
+            defaultView={Views.DAY}
+            date={currentDate ? dayjs(currentDate).toDate() : new Date()}
+            events={events}
+            localizer={localizer}
+            resourceIdAccessor="resourceId"
+            resources={resourceMap}
+            resourceTitleAccessor="resourceTitle"
+            step={60}
+            views={views}
+            popup={true}
+            onSelectEvent={(e) => handleSelectedEvent(e)}
+        />
+        
 
         const handleSelectedEvent = async (event: CalendarEvent) => {
             this.setState({
@@ -176,6 +201,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 fullscreen={false}
                                 value={currentDate ? currentDate : dayjs()}
                                 onSelect={this.onSelectDate}
+                                onChange={(date) => this.setState({ currentDate: dayjs(date) })}
                             />
                         </Card>
                         <Spin spinning={timeslotsLoading}>
