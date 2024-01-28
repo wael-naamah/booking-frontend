@@ -384,12 +384,17 @@ class AppointmentsPage extends React.Component<
               <Column
                 title="Time"
                 render={(_: any, record: ContactAppointment) => {
-                  return (
-                    <span>
-                      {dayjs(record.start_date).format("HH:mm A")} -{" "}
-                      {dayjs(record.end_date).format("HH:mm A")}
-                    </span>
-                  );
+                  const startDateTime = dayjs(record.start_date);
+                  const endDateTime = dayjs(record.end_date);
+
+                  const offsetMinutes = startDateTime.utcOffset();
+
+                  const formattedTime =
+                    startDateTime.subtract(offsetMinutes, 'minute').format("HH:mm A") +
+                    " - " +
+                    endDateTime.subtract(offsetMinutes, 'minute').format("HH:mm A");
+
+                  return <span>{formattedTime}</span>;
                 }}
               />
               <Column title="Brand" dataIndex={"brand_of_device"} />
