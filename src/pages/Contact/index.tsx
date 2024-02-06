@@ -28,6 +28,9 @@ import {
   message,
 } from "antd";
 import withRouter from "../../HOC/withRouter";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../locales/i18n";
+import withAuthorization from "../../HOC/withAuthorization";
 
 const { Column } = Table;
 const { Option } = Select;
@@ -112,9 +115,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   onDeleteContact = (id: string) => {
     this.props.deleteContactRequest(id).then((data) => {
       if (data.status && data.status === "success") {
-        message.success("Successfully deleted the contact");
+        message.success(i18n.t('successfully_deleted_the_contact'));
       } else {
-        message.error("Something went wrong. please try again");
+        message.error(i18n.t('something_went_wrong_please_try_again'));
       }
     });
   };
@@ -123,7 +126,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     const { visible, editingContactId } = this.state;
 
     const isEditing = !!editingContactId;
-    const modalTitle = isEditing ? "Edit Contact" : "New Contact";
+    const modalTitle = isEditing ? i18n.t('edit_contact') : i18n.t('new_contact');
 
     const initialValues = isEditing
       ? this.props.contacts.find((c) => c._id === editingContactId)
@@ -141,29 +144,31 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           .updateContactRequest(editingContactId, contact)
           .then((data) => {
             if (data._id) {
-              message.success("Successfully updated the contact");
+              message.success(i18n.t('successfully_updated_the_contact'));
               this.setState({ visible: false, editingContactId: null });
             } else {
-              message.error("Something went wrong. please try again");
+              if (data && data.errorValidation && data.errorValidation.fields && data.errorValidation.fields.email) {
+                message.error(data.errorValidation.fields.email)
+              }
+              else if (data && data.errorValidation && data.errorValidation.fields && data.errorValidation.fields.password) {
+                message.error(data.errorValidation.fields.password)
+              } else {
+                message.error(i18n.t('something_went_wrong_please_try_again'))
+              }
             }
           });
       } else {
         this.props.createContactRequest(contact).then((data) => {
           if (data._id) {
-            message.success("Successfully created the contact");
+            message.success(i18n.t('successfully_created_the_contact'));
             this.setState({ visible: false });
           } else {
-            message.error("Something went wrong. please try again");
+            message.error(i18n.t('something_went_wrong_please_try_again'));
           }
         });
       }
     };
 
-    const currentYear = new Date().getFullYear();
-    const years = Array.from(
-      { length: currentYear - 2003 },
-      (_, index) => currentYear - index
-    ).map(String);
 
     return (
       <Modal
@@ -186,14 +191,18 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item
-                label="Salutation"
+                label={i18n.t('salutation')}
                 name="salutation"
                 rules={[{ required: true }]}
               >
                 <Select>
-                  {Object.values(Salutation).map((salutation) => (
-                    <Option key={salutation} value={salutation}>
-                      {salutation}
+                  {[
+                    { lable: i18n.t('mr'), value: Salutation.MISTER },
+                    { lable: i18n.t('mrs'), value: Salutation.WOMAN },
+                    { lable: i18n.t('company'), value: Salutation.COMPANY },
+                  ].map((el) => (
+                    <Option key={el.lable} value={el.value}>
+                      {el.lable}
                     </Option>
                   ))}
                 </Select>
@@ -201,7 +210,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="First Name"
+                label={i18n.t('first_name')}
                 name="first_name"
                 rules={[{ required: true }]}
               >
@@ -210,7 +219,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="Last Name"
+                label={i18n.t('last_name')}
                 name="last_name"
                 rules={[{ required: true }]}
               >
@@ -222,7 +231,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item
-                label="Street/No./Stairs/Door"
+                label={i18n.t('address')}
                 name="address"
                 rules={[{ required: true }]}
               >
@@ -231,7 +240,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="ZIP CODE"
+                label={i18n.t('zip_code')}
                 name="zip_code"
                 rules={[{ required: true }]}
               >
@@ -240,7 +249,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="Location"
+                label={i18n.t('location')}
                 name="location"
                 rules={[{ required: true }]}
               >
@@ -252,7 +261,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item
-                label="Telephone"
+                label={i18n.t('telephone')}
                 name="telephone"
                 rules={[{ required: true }]}
               >
@@ -261,7 +270,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="Phone 2"
+                label={i18n.t('phone_2')}
                 name="phone_numbber_2"
                 rules={[{ required: false }]}
               >
@@ -270,7 +279,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
             </Col>
             <Col span={8}>
               <Form.Item
-                label="Phone 3"
+                label={i18n.t('phone_3')}
                 name="phone_numbber_3"
                 rules={[{ required: false }]}
               >
@@ -281,7 +290,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
-                label="Email"
+                label={i18n.t('email')}
                 name="email"
                 rules={[{ required: true, type: "email" }]}
               >
@@ -291,7 +300,18 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           </Row>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Notes" name="remarks">
+              <Form.Item
+                label={i18n.t('password')}
+                name="password"
+                rules={[{ required: false, type: "string" }]}
+              >
+                <Input type="password" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item label={i18n.t('notes')} name="remarks">
                 <Input.TextArea />
               </Form.Item>
             </Col>
@@ -299,12 +319,12 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           <Divider className="mb-2 mt-0" />
           <Row gutter={16} justify={"end"}>
             <Col span={3}>
-              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={onClose}>{i18n.t('cancel')}</Button>
             </Col>
             <Col span={3}>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Submit
+                  {i18n.t('save')}
                 </Button>
               </Form.Item>
             </Col>
@@ -322,10 +342,10 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       <>
         {this.renderNewContactModal()}
         <Card
-          title="Contacts"
+          title={i18n.t('contacts')}
           extra={
             <Button onClick={() => this.onOpen()} type="primary">
-              New Contact
+              {i18n.t('new_contact')}
             </Button>
           }
         >
@@ -345,14 +365,14 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                   );
                 }}
               />
-              <Column title="Title" dataIndex={"salutation"} />
-              <Column title="First Name" dataIndex={"first_name"} />
-              <Column title="Last Name" dataIndex={"last_name"} />
-              <Column title="Email" dataIndex={"email"} />
-              <Column title="Telephone" dataIndex={"telephone"} />
-              <Column title="Location" dataIndex={"location"} />
+              <Column title={i18n.t('title')} dataIndex={"salutation"} />
+              <Column title={i18n.t('first_name')} dataIndex={"first_name"} />
+              <Column title={i18n.t('last_name')} dataIndex={"last_name"} />
+              <Column title={i18n.t('email')} dataIndex={"email"} />
+              <Column title={i18n.t('telephone')} dataIndex={"telephone"} />
+              <Column title={i18n.t('location')} dataIndex={"location"} />
               <Column
-                title="Appointments"
+                title={i18n.t('appointments')}
                 dataIndex={""}
                 render={(_: any, record: Contact) => (
                   <Button
@@ -364,12 +384,12 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                       }
                     }}
                   >
-                    View
+                    {i18n.t('view')}
                   </Button>
                 )}
               />
               <Column
-                title="Action"
+                title={i18n.t('action')}
                 key="action"
                 render={(_: any, record: Contact) => (
                   <Row>
@@ -378,20 +398,20 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                       type="link"
                       onClick={() => this.onOpen(record._id)}
                     >
-                      Edit
+                      {i18n.t('edit')}
                     </Button>
                     <Popconfirm
-                      title="Delete this contact?"
-                      description="Are you sure you want to delete this contact?"
-                      okText="Delete It"
-                      cancelText="No"
+                      title={i18n.t('delete_this_contact')}
+                      description={i18n.t('are_you_sure_you_want_to_delete_this_contact')}
+                      okText={i18n.t('delete_it')}
+                      cancelText={i18n.t('no')}
                       okButtonProps={{
                         danger: true,
                       }}
                       onConfirm={() => this.onDeleteContact(record._id!)}
                     >
                       <Button className="self-end mr-3" type="link">
-                        Delete
+                        {i18n.t('delete')}
                       </Button>
                     </Popconfirm>
                   </Row>
@@ -433,4 +453,4 @@ const mapDispatchToProps = (
 
 export default compose(
   withRouter,
-)(connect(mapStateToProps, mapDispatchToProps)(ContactPage))
+)(connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(ContactPage))))

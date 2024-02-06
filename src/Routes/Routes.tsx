@@ -8,6 +8,8 @@ import WorkingHoursPage from '../pages/Company/Schedules';
 import LoginPage from '../pages/Login';
 import SideBar from '../pages/SideBar';
 import Contact from '../pages/Contact';
+import ContactProfile from '../pages/Contact/Profile';
+import ContactCalendar from '../pages/Contact/Calendar';
 import ContactAppointments from '../pages/Contact/Appointments';
 import Settings from '../pages/Settings';
 import EmployeePage from '../pages/Employee';
@@ -31,6 +33,8 @@ class Router extends React.Component {
         <Route path="/category" element={<CategoryPage />} />
         <Route path="/employee" element={<EmployeePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ContactProfile />} />
+        <Route path="/contact-calendar" element={<ContactCalendar />} />
       </Routes>
     );
   }

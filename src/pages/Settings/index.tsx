@@ -37,6 +37,9 @@ import {
   message,
 } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import i18n from "../../locales/i18n";
+import { withTranslation } from 'react-i18next';
+import withAuthorization from "../../HOC/withAuthorization";
 
 const { Option } = Select
 
@@ -114,7 +117,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
   onDeleteConfig = (id: string) => {
     this.props.deleteEmailConfigRequest(id).then((data) => {
       if (data.status && data.status === "success") {
-        message.success("Successfully deleted the config");
+        message.success(i18n.t('successfully_deleted_the_config'));
         this.setState({
           emailConfig: {
             _id: undefined,
@@ -127,7 +130,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
           },
         });
       } else {
-        message.error("Something went wrong. please try again");
+        message.error(i18n.t('something_went_wrong_please_try_again'));
       }
     });
   };
@@ -135,14 +138,14 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
   onDeleteTemplate = (id: string) => {
     this.props.deleteEmailTemplateRequest(id).then((data) => {
       if (data.status && data.status === "success") {
-        message.success("Successfully deleted the template");
+        message.success(i18n.t('successfully_deleted_the_template'));
         this.setState({
           emailTemplateId: null,
           subject: "",
           template: "",
         });
       } else {
-        message.error("Something went wrong. please try again");
+        message.error(i18n.t('something_went_wrong_please_try_again'));
       }
     });
   };
@@ -163,16 +166,16 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
           })
           .then((data) => {
             if (data && data._id) {
-              message.success("Successfully updated the config");
+              message.success("successfully_updated_the_config");
             } else {
-              message.error("Something went wrong. please try again");
+              message.error(i18n.t('something_went_wrong_please_try_again'));
             }
           })
         : this.props.addEmailConfigRequest(emailConfig).then((data) => {
           if (data && data._id) {
-            message.success("Successfully saved the config");
+            message.success(i18n.t('successfully_saved_the_config'));
           } else {
-            message.error("Something went wrong. please try again");
+            message.error(i18n.t('something_went_wrong_please_try_again'));
           }
         });
     };
@@ -184,17 +187,17 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
         </Button>
         {emailConfig._id ? (
           <Popconfirm
-            title="Delete email config?"
-            description="Are you sure you want to delete the email configs?"
-            okText="Delete It"
-            cancelText="No"
+            title={i18n.t('delete_email_config')}
+            description={i18n.t('are_you_sure_you_want_to_delete_the_email_configs')}
+            okText={i18n.t('delete_it')}
+            cancelText={i18n.t('no')}
             okButtonProps={{
               danger: true,
             }}
             onConfirm={() => this.onDeleteConfig(emailConfig._id!)}
           >
             <Button className="self-end ml-3" type="primary" danger>
-              Delete
+              {i18n.t('delete')}
             </Button>
           </Popconfirm>
         ) : null}
@@ -216,12 +219,12 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
     };
 
     return (
-      <Card title="Email Config" extra={this.renderExtra()}>
+      <Card title={i18n.t('email_config')} extra={this.renderExtra()}>
         <Spin spinning={loading}>
           <div className="w-full">
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>E-mail address for test e-mail</span>
+                <span>{i18n.t('email_address_for_test_email')}</span>
               </Col>
               <Col span={16}>
                 <Input
@@ -235,7 +238,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>E-mail server</span>
+                <span>{i18n.t('email_server')}</span>
               </Col>
               <Col span={16}>
                 <Input
@@ -249,7 +252,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>User name</span>
+                <span>{i18n.t('user_name')}</span>
               </Col>
               <Col span={16}>
                 <Input
@@ -263,7 +266,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>Password</span>
+                <span>{i18n.t('password')}</span>
               </Col>
               <Col span={16}>
                 <Input
@@ -278,7 +281,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>Port</span>
+                <span>{i18n.t('port')}</span>
               </Col>
               <Col span={16}>
                 <Input
@@ -293,7 +296,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>Server requires SSL encryption</span>
+                <span>{i18n.t('server_requires_ssl_encryption')}</span>
               </Col>
               <Col span={16}>
                 <Switch
@@ -318,7 +321,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
     const onTemplateTypeChange = (type: string) => {
       this.setState({ templateType: type as EmailTemplateType })
       this.props.fetchEmailTemplate(type).then(template => {
-        if(type === EmailTemplateType.Cancellation && template && template.length){
+        if (type === EmailTemplateType.Cancellation && template && template.length) {
           const data = template[0]
           this.setState({ emailTemplateId: data._id!, subject: data.subject, template: data.template })
         } else {
@@ -341,11 +344,11 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
     const renderExtra = () => {
       const onSave = () => {
         if (!templateType || !subject || !template) {
-          message.error("Please fill all data");
+          message.error(i18n.t('please_fill_all_data'));
           return;
         }
         if (templateType === EmailTemplateType.Confirmation && !serviceId) {
-          message.error("Please select the service");
+          message.error(i18n.t('please_select_the_service'));
           return;
         }
 
@@ -364,16 +367,16 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
             .updateEmailTemplateRequest(emailTemplateId, emailTemplate)
             .then((data) => {
               if (data && data._id) {
-                message.success("Successfully updated the template");
+                message.success(i18n.t('successfully_updated_the_template'));
               } else {
-                message.error("Something went wrong. please try again");
+                message.error(i18n.t('something_went_wrong_please_try_again'));
               }
             })
           : this.props.addEmailTemplateRequest(emailTemplate).then((data) => {
             if (data && data._id) {
-              message.success("Successfully saved the template");
+              message.success(i18n.t('successfully_saved_the_template'));
             } else {
-              message.error("Something went wrong. please try again");
+              message.error(i18n.t('something_went_wrong_please_try_again'));
             }
           });
       };
@@ -381,21 +384,21 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
       return (
         <>
           <Button onClick={() => onSave()} type="primary">
-            Save
+            {i18n.t('save')}
           </Button>
           {emailTemplateId ? (
             <Popconfirm
-              title="Delete email template?"
-              description="Are you sure you want to delete the email template?"
-              okText="Delete It"
-              cancelText="No"
+              title={i18n.t('delete_email_template')}
+              description={i18n.t('are_you_sure_you_want_to_delete_the_email_template')}
+              okText={i18n.t('delete_it')}
+              cancelText={i18n.t('no')}
               okButtonProps={{
                 danger: true,
               }}
               onConfirm={() => this.onDeleteTemplate(emailTemplateId)}
             >
               <Button className="self-end ml-3" type="primary" danger>
-                Delete
+                {i18n.t('delete')}
               </Button>
             </Popconfirm>
           ) : null}
@@ -408,11 +411,14 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
       <Card title="Set Email Templates" extra={renderExtra()}>
         <Row className="mb-6" gutter={[16, 16]}>
           <Col span={24}>
-            <label>Type</label>
+            <label>{i18n.t('type')}</label>
             <Select className="w-full" onChange={(value) => onTemplateTypeChange(value)}>
-              {Object.values(EmailTemplateType).map((templateType) => (
-                <Option key={templateType} value={templateType}>
-                  {templateType}
+              {[
+                { lable: i18n.t('cancellation'), value: EmailTemplateType.Cancellation },
+                { lable: i18n.t('confirmation'), value: EmailTemplateType.Confirmation },
+              ].map((el) => (
+                <Option key={el.lable} value={el.value}>
+                  {el.lable}
                 </Option>
               ))}
             </Select>
@@ -421,7 +427,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
         {templateType === EmailTemplateType.Confirmation ? <Row className="mb-6" gutter={[16, 16]}>
           <Col span={24}>
-            <label>Service</label>
+            <label>{i18n.t('service')}</label>
             <Select loading={servicesLoading} className="w-full" onChange={(value) => onServiceChange(value)}>
               {services.map((service) => (
                 <Option key={service._id} value={service._id}>
@@ -434,14 +440,14 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
 
         <Row className="mb-6" gutter={[16, 16]}>
           <Col span={24}>
-            <label>Subject</label>
+            <label>{i18n.t('subject')}</label>
             <Input value={subject} onChange={(e) => this.setState({ subject: e.target.value })} />
           </Col>
         </Row>
 
         <Row className="mb-6" gutter={[16, 16]}>
           <Col span={24}>
-            <label>Email</label>
+            <label>{i18n.t('email')}</label>
             <TextArea style={{ height: 250 }} value={template} onChange={(e) => this.setState({ template: e.target.value })} />
           </Col>
         </Row>
@@ -458,12 +464,12 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
           items={[
             {
               key: "1",
-              label: "General",
+              label: <span>{i18n.t('general')}</span>,
               children: this.renderEmailConfig(),
             },
             {
               key: "2",
-              label: "Email Tamplates",
+              label: <span>{i18n.t('email_tamplates')}</span>,
               children: this.renderEmailTamplate(),
             }
           ]}
@@ -502,4 +508,4 @@ const mapDispatchToProps = (
     dispatch(deleteEmailTemplateRequest(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SettingsPage);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(SettingsPage)));

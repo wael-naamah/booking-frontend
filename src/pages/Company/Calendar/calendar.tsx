@@ -28,6 +28,8 @@ import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -87,9 +89,16 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
         this.props.updateCalendarRequest(localCalendar._id!, updateCalendar).then(data => {
             if (data._id) {
-                message.success('Successfully updated the calendar')
+                message.success(i18n.t('successfully_updated_the_calendar'))
             } else {
-                message.error('Something went wrong. please try again')
+                if (data && data.errorValidation && data.errorValidation.fields && data.errorValidation.fields.email) {
+                    message.error(data.errorValidation.fields.email)
+                }
+                else if (data && data.errorValidation && data.errorValidation.fields && data.errorValidation.fields.password) {
+                    message.error(data.errorValidation.fields.password)
+                } else {
+                    message.error(i18n.t('something_went_wrong_please_try_again'))
+                }
             }
         })
     };
@@ -99,13 +108,56 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
         this.props.deleteCalendarRequest(localCalendar._id!).then(data => {
             if (data.status && data.status === "success") {
-                message.success('Successfully deleted the calendar')
+                message.success(i18n.t('successfully_deleted_the_calendar'))
                 this.props.onDeleteCalendar();
             } else {
-                message.error('Something went wrong. please try again')
+                message.error(i18n.t('something_went_wrong_please_try_again'))
             }
         })
     };
+
+    renderAuth = () => {
+        const { localCalendar } = this.state;
+
+        const onChange = (key: string, value: boolean | string | number) => {
+            this.setState({
+                localCalendar: {
+                    ...localCalendar,
+                    [key]: value
+                }
+            })
+        };
+
+        return (
+            <div>
+                <Row className="mb-6">
+                    <Col span={8} className="w-full">
+                        <span>{i18n.t('email')}</span>
+                    </Col>
+                    <Col span={16}>
+                        <Input
+                            onChange={(e) => {
+                                onChange('email', e.target.value)
+                            }}
+                            value={localCalendar.email} />
+                    </Col>
+                </Row>
+                <Row className="mb-6">
+                    <Col span={8} className="w-full">
+                        <span>{i18n.t('password')}</span>
+                    </Col>
+                    <Col span={16}>
+                        <Input
+                            type="password"
+                            onChange={(e) => {
+                                onChange('password', e.target.value)
+                            }}
+                            value={localCalendar.password} />
+                    </Col>
+                </Row>
+            </div>
+        )
+    }
 
     renderServices = () => {
         const { localCalendar } = this.state;
@@ -123,7 +175,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
             <div>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Show description on booking page</span>
+                        <span>{i18n.t('show_description_on_booking_page')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
@@ -131,8 +183,8 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                         }}
                             value={localCalendar.assignment_of_services} className="w-full">
                             {[
-                                { lable: "All services are bookable", value: AssignmentOfServices.ALL },
-                                { lable: "Certain services can be booked", value: AssignmentOfServices.CERTAIN },
+                                { lable: i18n.t('all_services_are_bookable'), value: AssignmentOfServices.ALL },
+                                { lable: i18n.t('certain_services_can_be_booked'), value: AssignmentOfServices.CERTAIN },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -164,7 +216,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
             <div className="w-full">
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Multiple occupancy calendar</span>
+                        <span>{i18n.t('multiple_occupancy_calendar')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.multiple_occupanc} onChange={(value) => {
@@ -175,7 +227,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>E-mail notification to employees</span>
+                        <span>{i18n.t('email_notification_to_employees')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -187,7 +239,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Also use e-mail notification address as sender address</span>
+                        <span>{i18n.t('also_use_email_notification_address_as_sender_address')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.notification_email_as_sender} onChange={(value) => {
@@ -197,7 +249,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>SMS notification to employees</span>
+                        <span>{i18n.t('sms_notification_to_employees')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.sms_notification} onChange={(value) => {
@@ -208,7 +260,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>E-mail manual appointment confirmation</span>
+                        <span>{i18n.t('email_manual_appointment_confirmation')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -221,7 +273,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Manual appointment confirmation for manually booked appointments</span>
+                        <span>{i18n.t('manual_appointment_confirmation_for_manually_booked_appointments')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.manually_confirmation_for_manually_booked_appointments} onChange={(value) => {
@@ -232,7 +284,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Limitation to a maximum appointment duration</span>
+                        <span>{i18n.t('limitation_to_a_maximum_appointment_duration')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.limit_maximum_appointment_duration} onChange={(value) => {
@@ -243,7 +295,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Calculate call/waiting number</span>
+                        <span>{i18n.t('calculate_call_waiting_number')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.call_waiting_number} onChange={(value) => {
@@ -254,7 +306,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Free/standing times are within availability times</span>
+                        <span>{i18n.t('free_standing_times_are_within_availability_times')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCalendar.advanced_settings?.within_availability_times} onChange={(value) => {
@@ -265,7 +317,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Calendar group (booking page)</span>
+                        <span>{i18n.t('calendar_group_booking_page')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -279,15 +331,18 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Calendar type</span>
+                        <span>{i18n.t('calendar_type')}</span>
                     </Col>
                     <Col span={16}>
                         <Select className="w-full" onChange={(value) => {
                             onAdvancedSettingsChange('calendar_type', value)
                         }} value={localCalendar.advanced_settings?.calendar_type}>
-                            {Object.values(CalendarType).map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                            {[
+                                { lable: i18n.t('main'), value: CalendarType.Main },
+                                { lable: i18n.t('side'), value: CalendarType.Side },
+                            ].map((el) => (
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -296,15 +351,19 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Appointment cluster</span>
+                        <span>{i18n.t('appointment_cluster')}</span>
                     </Col>
                     <Col span={16}>
                         <Select className="w-full" onChange={(value) => {
                             onAdvancedSettingsChange('appointment_cluster', value)
                         }} value={localCalendar.advanced_settings?.appointment_cluster}>
-                            {Object.values(AppointmentCluster).map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                            {[
+                                { lable: i18n.t('global_attitude'), value: AppointmentCluster.GLOBAL },
+                                { lable: i18n.t('active'), value: AppointmentCluster.ACTIVE },
+                                { lable: i18n.t('not_active'), value: AppointmentCluster.NOT_ACTIVE },
+                            ].map((el) => (
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -312,15 +371,36 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Appointment timing</span>
+                        <span>{i18n.t('appointment_timing')}</span>
                     </Col>
                     <Col span={16}>
                         <Select className="w-full" onChange={(value) => {
                             onAdvancedSettingsChange('appointment_duration', value)
                         }} value={localCalendar.advanced_settings?.appointment_duration}>
-                            {Object.values(AppointmentDuration).map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                            {[
+                                { lable: i18n.t('auto'), value: AppointmentDuration.Auto },
+                                { lable: "5 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_5 },
+                                { lable: "10 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_10 },
+                                { lable: "15 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_15 },
+                                { lable: "20 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_20 },
+                                { lable: "30 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_30 },
+                                { lable: "40 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_40 },
+                                { lable: "45 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_45 },
+                                { lable: "50 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_50 },
+                                { lable: "60 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_60 },
+                                { lable: "75 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_75 },
+                                { lable: "90 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_90 },
+                                { lable: "120 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_120 },
+                                { lable: "180 " + i18n.t('minutes'), value: AppointmentDuration.MINUTES_180 },
+                                { lable: "4 " + i18n.t('hours'), value: AppointmentDuration.HOURS_4 },
+                                { lable: "5 " + i18n.t('hours'), value: AppointmentDuration.HOURS_5 },
+                                { lable: "8 " + i18n.t('hours'), value: AppointmentDuration.HOURS_8 },
+                                { lable: "10 " + i18n.t('hours'), value: AppointmentDuration.HOURS_10 },
+                                { lable: "12 " + i18n.t('hours'), value: AppointmentDuration.HOURS_12 },
+                                { lable: "24 " + i18n.t('hours'), value: AppointmentDuration.HOURS_24 },
+                            ].map((el) => (
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -328,7 +408,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Order calendar</span>
+                        <span>{i18n.t('order_calendar')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -341,7 +421,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Appointment duration factor (%)</span>
+                        <span>{i18n.t('appointment_duration_factor')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -354,7 +434,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Reference to third-party system</span>
+                        <span>{i18n.t('reference_to_third_party_system')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -366,7 +446,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Calendar ID</span>
+                        <span>{i18n.t('calendar_id')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -398,7 +478,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
             <div className="w-full">
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Name of employee or resource</span>
+                        <span>{i18n.t('name_of_employee_or_resource')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -411,7 +491,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Description</span>
+                        <span>{i18n.t('description')}</span>
                     </Col>
                     <Col span={16}>
                         <TextArea
@@ -424,7 +504,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Show description on booking page</span>
+                        <span>{i18n.t('show_description_on_booking_page')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
@@ -432,9 +512,9 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                         }}
                             value={localCalendar.show_description} className="w-full">
                             {[
-                                { lable: "Don't show", value: DescriptionDisplayType.None },
-                                { lable: "Show as text", value: DescriptionDisplayType.Text },
-                                { lable: "Show as a tooltip", value: DescriptionDisplayType.Tooltip },
+                                { lable: i18n.t('dont_show'), value: DescriptionDisplayType.None },
+                                { lable: i18n.t('show_as_text'), value: DescriptionDisplayType.Text },
+                                { lable: i18n.t('show_as_a_tooltip'), value: DescriptionDisplayType.Tooltip },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -445,16 +525,31 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Appointment allocation clocking</span>
+                        <span>{i18n.t('appointment_allocation_clocking')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
                             onChange('appointment_scheduling', value)
                         }}
                             value={localCalendar.appointment_scheduling} className="w-full">
-                            {Object.values(AppointmentScheduling).map((item) => (
-                                <Option key={item} value={item}>
-                                    {item}
+                            {[
+                                { lable: i18n.t('appointment_length'), value: AppointmentScheduling.APPOINTMENT_LENGTH },
+                                { lable: "5 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_5 },
+                                { lable: "10 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_10 },
+                                { lable: "15 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_15 },
+                                { lable: "20 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_20 },
+                                { lable: "30 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_30 },
+                                { lable: "40 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_40 },
+                                { lable: "45 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_45 },
+                                { lable: "50 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_50 },
+                                { lable: "60 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_60 },
+                                { lable: "75 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_75 },
+                                { lable: "90 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_90 },
+                                { lable: "120 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_120 },
+                                { lable: "180 " + i18n.t('minutes'), value: AppointmentScheduling.MINUTES_180 },
+                            ].map((el) => (
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -463,7 +558,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                 {/* employee_image,  */}
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Employee / resource can be booked online and via appointment finder</span>
+                        <span>{i18n.t('employee_resource_can_be_booked_online_and_via_appointment_finder')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -482,7 +577,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
         if (!localCalendar) {
             return (
-                <Empty />
+                <Empty description={i18n.t('empty')} />
             )
         }
 
@@ -495,38 +590,44 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                             items={[
                                 {
                                     key: "1",
-                                    label: "General",
+                                    label: i18n.t('general'),
                                     children: this.renderGernal(),
                                 },
                                 {
                                     key: "2",
-                                    label: "Advanced settings",
+                                    label: i18n.t('advanced_settings'),
                                     children: this.renderAdvancedSettings(),
                                 },
                                 {
                                     key: "3",
-                                    label: "Assignment of services",
+                                    label: i18n.t('assignment_of_services'),
                                     children: this.renderServices(),
                                 },
+                                {
+                                    key: "4",
+                                    label: i18n.t('email') + " / " + i18n.t('password'),
+                                    children: this.renderAuth(),
+                                },
+
                             ]}
                         />
                     </Content>
                 </Row>
                 <Row justify={'end'}>
                     <Popconfirm
-                        title="Delete this calendar?"
-                        description="Are you sure you want to delete this calendar?"
-                        okText="Delete It"
-                        cancelText="No"
+                        title={i18n.t('delete_this_calendar')}
+                        description={i18n.t('are_you_sure_you_want_to_delete_this_calendar')}
+                        okText={i18n.t('delete_it')}
+                        cancelText={i18n.t('no')}
                         okButtonProps={{
                             danger: true,
                         }}
                         onConfirm={this.onDeleteCalendar}
                     >
-                        <Button loading={deleteCalendarLoading} className="self-end mr-3" type="primary" danger>Delete Calendar</Button>
+                        <Button loading={deleteCalendarLoading} className="self-end mr-3" type="primary" danger>{i18n.t('delete_calendar')}</Button>
 
                     </Popconfirm>
-                    <Button onClick={this.onUpdateCalendar} loading={updateCalendarLoading} className="self-end" type="primary">Save Changes</Button>
+                    <Button onClick={this.onUpdateCalendar} loading={updateCalendarLoading} className="self-end" type="primary">{i18n.t('save_changes')}</Button>
                 </Row>
             </div>
         );
@@ -551,4 +652,4 @@ const mapDispatchToProps = (
 //     withAuthorization,
 //   )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
 
-export default connect(mapStateToProps, mapDispatchToProps)(CalendarPage);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CalendarPage));

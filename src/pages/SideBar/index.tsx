@@ -7,12 +7,21 @@ import {
   ContactsOutlined,
   SettingOutlined
 } from "@ant-design/icons";
-import { Layout, Menu, Button, theme } from "antd";
+import { Layout, Menu, Button, Row, Select } from "antd";
+
+import { ThunkDispatch } from '@reduxjs/toolkit';
+import { connect } from 'react-redux';
 import "./index.css";
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/bgas-logo.png'
+import i18n from "../../locales/i18n";
+import { withTranslation } from 'react-i18next';
+import { RootState } from "../../redux/store";
+import { selectLoggedIn } from "../../redux/selectors";
+import { logoutRequest } from "../../redux/actions";
 
 const { Header, Sider, Content } = Layout;
+const {Option} = Select;
 
 const NavLink: React.FunctionComponent<{
   to: string;
@@ -37,11 +46,33 @@ const NavLink: React.FunctionComponent<{
   );
 };
 
-const SideBar: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+interface ISideBarProps {
+  loggedIn: boolean;
+  logout: () => void;
+}
+
+interface ISideBarState {
+  collapsed: boolean;
+}
+class SideBar extends React.Component<ISideBarProps, ISideBarState> {
+  constructor(props: ISideBarProps) {
+      super(props);
+      this.state = {
+        collapsed: false,
+    };
+  }
+
+
+
+  render(){
+    const {collapsed} = this.state;
+    const setCollapsed = (value: boolean) => {
+      this.setState({collapsed: value})
+    }
+
+    const onSelectLang = (lang: string) => {
+      i18n.changeLanguage(lang);
+    }
 
   return (
     <Layout className="">
@@ -66,7 +97,7 @@ const SideBar: React.FC = () => {
               label: (
                 <NavLink to={`/appointment`}>
                   <span className="title">
-                    Appointments
+                    {i18n.t('appointments')}
                   </span>
                 </NavLink>
               ),
@@ -74,13 +105,13 @@ const SideBar: React.FC = () => {
             {
               key: "2",
               icon: <DesktopOutlined />,
-              label: "Company",
+              label: <span>{i18n.t('company')}</span>,
               children: [
                 {
                   key: `sub1`,
                   label: <NavLink to={`/services`}>
                     <span className="title">
-                      Services
+                      {i18n.t('services')}
                     </span>
                   </NavLink>,
                 },
@@ -88,7 +119,7 @@ const SideBar: React.FC = () => {
                   key: `sub2`,
                   label: <NavLink to={`/calendar`}>
                     <span className="title">
-                      Calendar
+                      {i18n.t('calendar')}
                     </span>
                   </NavLink>,
                 },
@@ -96,7 +127,7 @@ const SideBar: React.FC = () => {
                   key: `sub3`,
                   label: <NavLink to={`/working-hours`}>
                     <span className="title">
-                      Working Hours
+                      {i18n.t('working_hours')}
                     </span>
                   </NavLink>,
                 }
@@ -107,7 +138,7 @@ const SideBar: React.FC = () => {
               icon: <ContactsOutlined />,
               label: <NavLink to={`/contact`}>
                 <span className="title">
-                  Contacts
+                  {i18n.t('contacts')}
                 </span>
               </NavLink>,
             },
@@ -116,7 +147,7 @@ const SideBar: React.FC = () => {
               icon: <SettingOutlined />,
               label: <NavLink to={`/settings`}>
                 <span className="title">
-                  Settings
+                  {i18n.t('settings')}
                 </span>
               </NavLink>,
             },
@@ -124,7 +155,7 @@ const SideBar: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, display: 'flex', paddingRight: 125, justifyContent: 'space-between', background: colorBgContainer }}>
+        <Header style={{ padding: 0, display: 'flex', paddingRight: 125, justifyContent: 'space-between', background: "#fff" }}>
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -135,6 +166,12 @@ const SideBar: React.FC = () => {
               height: 64,
             }}
           />
+          <Row align={'middle'}>
+            <Select defaultValue={'en'} className="mr-2" onChange={(value) => onSelectLang(value)}>
+              <Option key={'en'} value='en'>En</Option>
+              <Option key={'de'} value='de'>De</Option>
+            </Select>
+            {this.props.loggedIn ? <Button onClick={() => this.props.logout()}>{i18n.t('logout')}</Button> : <Link to="/login">{i18n.t('login')}</Link>}
           <Button
             type="link"
             onClick={() => window.open('https://booking-frontend-waels-projects-d2811c36.vercel.app/category', '_blank')}
@@ -143,22 +180,33 @@ const SideBar: React.FC = () => {
               width: 64,
               height: 64,
             }}
-          >booking page b-gas</Button>
+          >{i18n.t('booking_page_b_gas')}</Button>
+          </Row>
         </Header>
         <Content
           style={{
             margin: "24px 16px",
             padding: 24,
             minHeight: 280,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
+            background: "#fff",
+            borderRadius: 8,
           }}
         >
           <Outlet />
         </Content>
       </Layout>
     </Layout>
-  );
+  );}
 };
 
-export default SideBar;
+const mapStateToProps = (state: RootState) => ({
+  loggedIn: selectLoggedIn(state),
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<RootState, undefined, any>
+) => ({
+  logout: () => dispatch(logoutRequest()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SideBar))

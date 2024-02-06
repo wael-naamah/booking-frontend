@@ -3,7 +3,7 @@ import {
   Appointment,
   AppointmentForm,
   Calendar,
-  ContactAppointment,
+  ExtendedAppointment,
   PaginatedForm,
 } from "../../Schema";
 import { API_URL } from "../network/api";
@@ -135,7 +135,7 @@ export const getCalendarAppointments = () => ({
   type: GET_CALENDAR_APPOINTMENTS,
 });
 
-export const getCalendarAppointmentsDone = (data: ContactAppointment[]) => ({
+export const getCalendarAppointmentsDone = (data: ExtendedAppointment[]) => ({
   type: GET_CALENDAR_APPOINTMENTS_DONE,
   payload: data,
 });
@@ -163,7 +163,7 @@ export const getContactAppointments = () => ({
   type: GET_CONTACT_APPOINTMENTS,
 });
 
-export const getContactAppointmentsDone = (data: ContactAppointment[]) => ({
+export const getContactAppointmentsDone = (data: ExtendedAppointment[]) => ({
   type: GET_CONTACT_APPOINTMENTS_DONE,
   payload: data,
 });

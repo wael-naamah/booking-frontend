@@ -1,51 +1,87 @@
-import { Button, Col, Divider, Row } from 'antd';
-import { Content } from 'antd/es/layout/layout';
-import React from 'react';
-import Logo from '../assets/bgas-logo.png'
-import { selectLoggedIn } from '../redux/selectors';
-import { RootState } from '../redux/store';
-import { ThunkDispatch } from '@reduxjs/toolkit';
-import { connect } from 'react-redux';
-import { logout } from '../redux/actions';
-import { Link } from 'react-router-dom';
+import { Col, Divider, Row, Tooltip } from "antd";
+import { Content } from "antd/es/layout/layout";
+import { LogoutOutlined, LoginOutlined, UserOutlined, HomeOutlined, CalendarOutlined } from "@ant-design/icons";
+import React from "react";
+import Logo from "../assets/bgas-logo.png";
+import { selectLoggedIn, selectProfile } from "../redux/selectors";
+import { RootState } from "../redux/store";
+import { ThunkDispatch } from "@reduxjs/toolkit";
+import { connect } from "react-redux";
+import { logoutRequest } from "../redux/actions";
+import { Link } from "react-router-dom";
+import { withTranslation } from "react-i18next";
+import i18n from "../locales/i18n";
 
 interface IHeaderProps {
-    loggedIn: boolean;
-    logout: () => void;
+  loggedIn: boolean;
+  logout: () => void;
+  profile: any;
 }
 class Header extends React.Component<IHeaderProps> {
-    constructor(props: IHeaderProps) {
-        super(props);
-    }
+  constructor(props: IHeaderProps) {
+    super(props);
+  }
 
-    render() {
-        const { logout, loggedIn } = this.props;
-        return (
-            <Content>
-                <Row justify={'space-between'} className="flex items-center">
-                    <Col>
-                        <img src={Logo} width={135} height={50} />
-                    </Col>
-                    <Col>
-                    {/* {loggedIn ? <Button onClick={() => logout()} >Logout</Button> : <Link to="/login">Login</Link>} */}
-                    {!loggedIn ? null : <Button onClick={() => logout()} className="mr-1" type='link' >Logout</Button>}
-                        <span>B-GAS GmbH | 01 / 202 85 56</span>
-                    </Col>
-                </Row>
-                <Divider className='m-0 mt-5' />
-            </Content>
-        );
-    }
+  render() {
+    const { logout, loggedIn, profile } = this.props;
+    return (
+      <Content>
+        <Row justify={"space-between"} className="flex items-center">
+          <Col>
+            <img src={Logo} width={135} height={50} />
+          </Col>
+          <Col>
+            {loggedIn ? (
+              <Tooltip title={i18n.t("logout")}>
+                <LogoutOutlined style={{ color: "#08c" }} className="text-lg" onClick={() => logout()} />
+              </Tooltip>
+            ) : (
+              <Link to="/login">
+                <Tooltip title={i18n.t("login")}>
+                  <LoginOutlined style={{ color: "#08c" }} className="text-lg" />
+                </Tooltip>
+              </Link>
+            )}
+            {profile && profile.role === "contact" ? (
+              <>
+                <Link to="/profile">
+                  <Tooltip title={i18n.t("profile")}>
+                    <UserOutlined style={{ color: "#08c" }} className="text-lg ml-4" />
+                  </Tooltip>
+                </Link>
+                <Link to="/contact-calendar">
+                  <Tooltip title={i18n.t("appointments")}>
+                    <CalendarOutlined style={{ color: "#08c" }} className="text-lg ml-4" />
+                  </Tooltip>
+                </Link>
+                <Link to="/category">
+                  <Tooltip title={i18n.t("category")}>
+                    <HomeOutlined style={{ color: "#08c" }} className="text-lg ml-4" />
+                  </Tooltip>
+                </Link>
+              </>
+            ) : null}
+            <span className="ml-4">B-GAS GmbH | 01 / 202 85 56</span>
+          </Col>
+        </Row>
+        <Divider className="m-0 mt-5" />
+      </Content>
+    );
+  }
 }
 
 const mapStateToProps = (state: RootState) => ({
-    loggedIn: selectLoggedIn(state),
+  loggedIn: selectLoggedIn(state),
+  profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (
-    dispatch: ThunkDispatch<RootState, undefined, any>
+  dispatch: ThunkDispatch<RootState, undefined, any>
 ) => ({
-    logout: () => dispatch(logout()),
+  logout: () => dispatch(logoutRequest()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTranslation()(Header));

@@ -43,3 +43,9 @@ export interface LoginForm {
 export interface RefreshToken {
   refreshToken: string;
 }
+
+export interface ResetPasswordForm {
+  email: string;
+  password: string;
+  oldPassword: string;
+}

@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchCategories, fetchTimeSlots, addAppointment } from "../../redux/actions";
-import { selectCategories, selectCategoriesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
+import { selectCategories, selectCategoriesLoading, selectLoggedIn, selectProfile, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
 import { Appointment, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
@@ -14,7 +14,9 @@ import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import Header from "../../components/Header";
 import { FILES_STORE } from "../../redux/network/api";
-import { upload } from "../../utils";
+import { generatePassword, upload } from "../../utils";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../locales/i18n";
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -46,6 +48,8 @@ interface ICategoryProps {
     fetchCategories: () => Promise<any>;
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => Promise<any>;
     onSubmit: (appointment: Appointment) => Promise<any>;
+    loggedIn: boolean;
+    profile: any;
 }
 
 class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
@@ -86,6 +90,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             location: values.location,
             telephone: values.telephone,
             email: values.email,
+            password: this.props.loggedIn ? this.props.profile.password : generatePassword()
         };
 
         const appointment: Appointment = {
@@ -109,7 +114,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         this.props.onSubmit(appointment)
             .then(data => {
                 if (data && data._id) {
-                    message.success('Successfully booked the appointment');
+                    message.success(i18n.t('successfully_booked_the_appointment'));
                     this.setState({
                         selectedCategory: null,
                         selectedService: null,
@@ -123,11 +128,11 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         current: 0
                     });
                 } else {
-                    message.error('Sorry! something went wrong while booking the appointment')
+                    message.error(i18n.t('something_went_wrong_while_booking_the_appointment'))
                 }
             })
             .catch(() => {
-                message.error('Sorry! something went wrong while booking the appointment')
+                message.error(i18n.t('something_went_wrong_while_booking_the_appointment'))
             });
     };
 
@@ -213,6 +218,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     render() {
         const currentYear = new Date().getFullYear();
         const years = Array.from({ length: currentYear - 2003 }, (_, index) => currentYear - index).map(String);
+        const initialValues = this.props.profile || undefined;
 
         const { categories, loading, timeslots, timeslotsLoading } = this.props;
         const { selectedService, selectedSlot, current, currentDate, savedFileList, uploading } = this.state;
@@ -233,7 +239,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         }, []);
 
         if (loading) {
-            return <div>loading...</div>;
+            return <div>{i18n.t('loading')}...</div>;
         }
 
         return (
@@ -265,8 +271,8 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                     className="border border-gray-400 hover:border-primary transition duration-300 transform hover:scale-105"
                                                 >
                                                     <img src={service.attachment?.url ? FILES_STORE + service.attachment?.url : ServiceLogo} alt={service.name} className="mb-3" width={200} height={165} />
-                                                    <p className="text-gray-600">Duration: {service.duration} mins</p>
-                                                    <p className="text-lg text-primary font-bold">{service.price} EUR</p>
+                                                    <p className="text-gray-600">{i18n.t('duration')}: {service.duration} {i18n.t('mins')}</p>
+                                                    <p className="text-lg text-primary font-bold">{service.price} {i18n.t('eur')}</p>
                                                     <p className="text-sm">{service.description}</p>
                                                 </Card>
                                             </Col>
@@ -308,44 +314,31 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                     name="contactForm"
                                     layout="vertical"
                                     onFinish={this.onFinish}
+                                    initialValues={initialValues}
                                 >
                                     <Row gutter={16}>
                                         <Col span={8}>
-                                            <Form.Item label="Salutation" name="salutation" rules={[{ required: true }]}>
+                                            <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
                                                 <Select>
-                                                    {Object.values(Salutation).map((salutation) => (
-                                                        <Option key={salutation} value={salutation}>
-                                                            {salutation}
+                                                    {[
+                                                        { lable: i18n.t('mr'), value: Salutation.MISTER },
+                                                        { lable: i18n.t('mrs'), value: Salutation.WOMAN },
+                                                        { lable: i18n.t('company'), value: Salutation.COMPANY },
+                                                    ].map((el) => (
+                                                        <Option key={el.lable} value={el.value}>
+                                                            {el.lable}
                                                         </Option>
                                                     ))}
                                                 </Select>
                                             </Form.Item>
                                         </Col>
                                         <Col span={8}>
-                                            <Form.Item label="First Name" name="first_name" rules={[{ required: true }]}>
+                                            <Form.Item label={i18n.t('first_name')} name="first_name" rules={[{ required: true }]}>
                                                 <Input />
                                             </Form.Item>
                                         </Col>
                                         <Col span={8}>
-                                            <Form.Item label="Last Name" name="last_name" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Form.Item label="Street/No./Stairs/Door" name="address" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label="ZIP CODE" name="zip_code" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label="Location" name="location" rules={[{ required: true }]}>
+                                            <Form.Item label={i18n.t('last_name')} name="last_name" rules={[{ required: true }]}>
                                                 <Input />
                                             </Form.Item>
                                         </Col>
@@ -353,19 +346,39 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                                     <Row gutter={16}>
                                         <Col span={8}>
-                                            <Form.Item label="Telephone" name="telephone" rules={[{ required: true }]}>
+                                            <Form.Item label={i18n.t('address')} name="address" rules={[{ required: true }]}>
+                                                <Input />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={8}>
+                                            <Form.Item label={i18n.t('zip_code')} name="zip_code" rules={[{ required: true }]}>
+                                                <Input />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col span={8}>
+                                            <Form.Item label={i18n.t('location')} name="location" rules={[{ required: true }]}>
+                                                <Input />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+
+                                    <Row gutter={16}>
+                                        <Col span={8}>
+                                            <Form.Item label={i18n.t('telephone')} name="telephone" rules={[{ required: true }]}>
                                                 <Input type="tel" />
                                             </Form.Item>
                                         </Col>
                                         <Col span={8}>
-                                            <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email' }]}>
-                                                <Input />
+                                            <Form.Item label={i18n.t('email')} name="email" rules={[{ required: true, type: 'email' }]}>
+                                                <Input disabled={initialValues && initialValues.email} />
                                             </Form.Item>
                                         </Col>
                                         <Col span={8}>
-                                            <Form.Item label="Brand of Device" name="brand_of_device">
+                                            <Form.Item label={i18n.t('brand_of_device')} name="brand_of_device">
                                                 <Select>
-                                                    {['Baxi', 'Buderus', 'De Dietrich', 'To give', 'Junkers', 'Praiseworthy', 'Nordgas', 'Orange', 'Rapido', 'Saunier Duval', 'Vaillant', 'Viessmann', 'Wolf', 'Other'].map((salutation) => (
+                                                    {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
+                                                    i18n.t('praiseworthy'), i18n.t('nordgas'), i18n.t('orange'), i18n.t('rapido'),
+                                                    i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((salutation) => (
                                                         <Option key={salutation} value={salutation}>
                                                             {salutation}
                                                         </Option>
@@ -377,23 +390,23 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                                     <Row gutter={16}>
                                         <Col span={12}>
-                                            <Form.Item label="Model/Type (e.g VCW AT 174/4-5. HG 15 WK19)" name="model">
+                                            <Form.Item label={i18n.t('device_model')} name="model">
                                                 <Input />
                                             </Form.Item>
                                         </Col>
                                         <Col span={12}>
                                             <Form.Item
-                                                label="Year"
+                                                label={i18n.t('year')}
                                                 name="year"
                                                 rules={[
                                                     {
                                                         required: true,
-                                                        message: 'Please select a year',
+                                                        message: i18n.t('please_select_a_year'),
                                                     },
                                                 ]}
                                             >
-                                                <Select placeholder="Select a year">
-                                                    {['Last year', `I don't know anymore`].concat(years).map((year) => (
+                                                <Select placeholder={i18n.t('select_a_year')}>
+                                                    {[i18n.t('last_year'), i18n.t('i_dont_know_anymore')].concat(years).map((year) => (
                                                         <Option key={year} value={year}>
                                                             {year}
                                                         </Option>
@@ -405,15 +418,15 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                                     <Row gutter={16}>
                                         <Col span={24}>
-                                            <Form.Item label="Notes" name="remarks">
+                                            <Form.Item label={i18n.t('notes')} name="remarks">
                                                 <Input.TextArea />
                                             </Form.Item>
                                         </Col>
                                     </Row>
 
-                                    <Form.Item label="Do you have a maintenance agreement with us?" name="has_maintenance_agreement" rules={[{ required: true }]}>
+                                    <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
                                         <Select>
-                                            {[{ lable: 'No', value: false }, { lable: 'Yes, the prices according to the maintenance agreement apply', value: true }].map((el) => (
+                                            {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }].map((el) => (
                                                 <Option key={el.lable} value={el.value}>
                                                     {el.lable}
                                                 </Option>
@@ -421,10 +434,10 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         </Select>
                                     </Form.Item>
                                     <Form.Item name="exhaust_gas_measurement" valuePropName="checked">
-                                        <Checkbox>Exhaust Gas Measurement with test result (+ €40)</Checkbox>
+                                        <Checkbox>{i18n.t('exhaust_gas_measurement')}</Checkbox>
                                     </Form.Item>
                                     <Form.Item name="has_bgas_before" valuePropName="checked">
-                                        <Checkbox>Yes, B-GAS has been with me before</Checkbox>
+                                        <Checkbox>{i18n.t('has_bgas_before')}</Checkbox>
                                     </Form.Item>
 
                                     <Row gutter={16} wrap={false}>
@@ -463,7 +476,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                     }}>
                                                     <Space size={14} align="center" className="m-0">
                                                         <p className="upload-hint-label">
-                                                            Take/upload a photo of the device/name plate if the type is not known
+                                                            {i18n.t('Take_upload_a_photo_of_the_device_name_plate_if_the_type_is_not_known')}
                                                         </p>
                                                     </Space>
                                                 </Upload.Dragger>
@@ -475,7 +488,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         <Col span={8}>
                                             <Form.Item>
                                                 <Button type="primary" htmlType="submit">
-                                                    Submit
+                                                    {i18n.t('submit')}
                                                 </Button>
                                             </Form.Item>
                                         </Col>
@@ -494,20 +507,20 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                 className="h-350"
                                 items={[
                                     {
-                                        title: selectedService ? selectedService.name : 'Select Service',
+                                        title: selectedService ? selectedService.name : i18n.t('select_service'),
                                         description: selectedService ? selectedService.description : '',
                                     },
                                     {
-                                        title: 'Choose an Appointment',
-                                        description: !selectedService ? "please select service to continue" : !selectedSlot?.slot ? "Please select the appointment time" : selectedSlot.slot,
+                                        title: i18n.t('choose_an_appointment'),
+                                        description: !selectedService ? i18n.t('please_select_service_to_continue') : !selectedSlot?.slot ? i18n.t('please_select_the_appointment_time') : selectedSlot.slot,
                                     },
                                     {
-                                        title: 'Enter Data',
-                                        description: !selectedSlot ? "please select appointment to continue" : "please enter your data",
+                                        title: i18n.t('enter_data'),
+                                        description: !selectedSlot ? i18n.t('please_select_appointment_to_continue') : i18n.t('please_enter_your_data'),
                                     },
                                 ]}
                             />
-                            <Button className="w-full mt-5" type="primary">BOOK A MEETING</Button>
+                            <Button className="w-full mt-5" type="primary">{i18n.t('book_appointment')}</Button>
                         </Card>
                     </Col>
                 </Row>
@@ -521,6 +534,8 @@ const mapStateToProps = (state: RootState) => ({
     loading: selectCategoriesLoading(state),
     timeslots: selectTimeslots(state),
     timeslotsLoading: selectTimeslotsLoading(state),
+    loggedIn: selectLoggedIn(state),
+    profile: selectProfile(state)
 });
 
 const mapDispatchToProps = (
@@ -532,4 +547,4 @@ const mapDispatchToProps = (
         dispatch(addAppointment(appointment))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CategoryPage));

@@ -1,4 +1,4 @@
-import { Appointment, Calendar, ContactAppointment } from "../../Schema";
+import { Appointment, Calendar, ExtendedAppointment } from "../../Schema";
 import { AppointmentsAction } from "../actions";
 
 interface CategoriesState {
@@ -11,9 +11,9 @@ interface CategoriesState {
   timeslotsLoading: boolean;
   appointments: Appointment[];
   appointmentsLoading: boolean;
-  contactAppointments: ContactAppointment[];
+  contactAppointments: ExtendedAppointment[];
   contactAppointmentsLoading: boolean;
-  calendarAppointments: ContactAppointment[];
+  calendarAppointments: ExtendedAppointment[];
   calendarAppointmentsLoading: boolean;
   updateAppointmentLoading: boolean;
   deleteAppointmentLoading: boolean;

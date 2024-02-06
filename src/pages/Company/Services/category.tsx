@@ -14,7 +14,6 @@ import {
     Row,
     Col,
     Table,
-    Collapse,
     Tabs,
     Switch,
     Input,
@@ -37,8 +36,9 @@ import "./index.css";
 import { RcFile } from "antd/es/upload";
 import { upload } from "../../../utils";
 import { FILES_STORE } from "../../../redux/network/api";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
-const { Panel } = Collapse;
 const { TextArea } = Input;
 const { Column } = Table;
 const { Option } = Select;
@@ -99,9 +99,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
         this.props.updateCategoryRequest(localCategory._id!, updateCategory).then(data => {
             if (data._id) {
-                message.success('Successfully updated the category')
+                message.success(i18n.t('successfully_updated_the_category'))
             } else {
-                message.error('Something went wrong. please try again')
+                message.error(i18n.t('something_went_wrong_please_try_again'))
             }
         })
     };
@@ -111,9 +111,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
         this.props.deleteCategoryRequest(localCategory._id!).then(data => {
             if (data.status && data.status === "success") {
-                message.success('Successfully deleted the category')
+                message.success(i18n.t('successfully_deleted_the_category'))
             } else {
-                message.error('Something went wrong. please try again')
+                message.error(i18n.t('something_went_wrong_please_try_again'))
             }
         })
     };
@@ -122,7 +122,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const { localCategory, visible, newService, file, fileLoading, editingServiceIndex } = this.state;
 
         const isEditing = typeof editingServiceIndex === 'number';
-        const modelTitle = editingServiceIndex ? "Edit service" : "New service";
+        const modelTitle = editingServiceIndex ? i18n.t('edit_service') : i18n.t('new_service');
 
         const onClose = () => {
             this.setState({ 
@@ -149,23 +149,23 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
         const onSave = async () => {
             if (!newService.name) {
-                message.error('Please add service name')
+                message.error(i18n.t('please_add_service_name'))
                 return;
             }
             if (!newService.description) {
-                message.error('Please add service description')
+                message.error(i18n.t('please_add_service_description'))
                 return;
             }
             if (!newService.duration) {
-                message.error('Please add service duration')
+                message.error(i18n.t('please_add_service_duration'))
                 return;
             }
             if (!newService.price) {
-                message.error('Please add service price')
+                message.error(i18n.t('please_add_service_price'))
                 return;
             }
             if (!newService.abbreviation_id) {
-                message.error('Please add service abbreviation id')
+                message.error(i18n.t('please_add_service_abbreviation_id'))
                 return;
             }
 
@@ -280,8 +280,8 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                     title={modelTitle}
                     open={visible}
                     centered
-                    okText={'Save'}
-                    cancelText={'Cancel'}
+                    okText={i18n.t('save')}
+                    cancelText={i18n.t('cancel')}
                     closable={false}
                     onCancel={onClose}
                     onOk={onSave}
@@ -291,7 +291,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                     <Divider />
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Performance</span>
+                            <span>{i18n.t('performance')}</span>
                         </Col>
                         <Col span={16}>
                             <Input
@@ -303,7 +303,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                     </Row>
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Additional information</span>
+                            <span>{i18n.t('additional_information')}</span>
                         </Col>
                         <Col span={16}>
                             <TextArea
@@ -316,7 +316,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Duration (Min.)</span>
+                            <span>{i18n.t('duration_min')}</span>
                         </Col>
                         <Col span={16}>
                             <Input
@@ -330,7 +330,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Price</span>
+                            <span>{i18n.t('price')}</span>
                         </Col>
                         <Col span={16}>
                             <Input
@@ -344,7 +344,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Abbreviation ID</span>
+                            <span>{i18n.t('abbreviation_id')}</span>
                         </Col>
                         <Col span={16}>
                             <Input
@@ -357,7 +357,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                     <Row >
                         <Col span={8}>
-                            <span>Image</span>
+                            <span>{i18n.t('image')}</span>
                         </Col>
                         <Col span={16} className={newService.attachment ? "mb-12" : "mb-8"}>
                             <Upload.Dragger
@@ -374,12 +374,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                 }}
                             >
                                 <Space size={14} align="center" className="m-0">
-
                                     <p className="upload-hint-label">
-                                        Click or drag file to this area to
-                                        upload
+                                        {i18n.t('click_or_drag_file_to_this_area_to_upload')}
                                     </p>
-
                                 </Space>
                             </Upload.Dragger>
                             {newService.attachment && <Row className="flex items-center my-2" justify={'space-between'}>
@@ -402,17 +399,17 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                     bordered
                     footer={() => {
                         return (
-                            <Button onClick={onOpen}>New Service</Button>
+                            <Button onClick={onOpen}>{i18n.t('new_service')}</Button>
                         )
                     }}
                 >
-                    <Column title="Performance" dataIndex={"name"} />
-                    <Column title="Additional information" dataIndex={"description"} />
-                    <Column title="Duration (Min.)" dataIndex={"duration"} />
-                    <Column title="Price" dataIndex={"price"} />
-                    <Column title="Abbreviation ID" dataIndex={"abbreviation_id"} />
+                    <Column title={i18n.t('performance')} dataIndex={"name"} />
+                    <Column title={i18n.t('additional_information')} dataIndex={"description"} />
+                    <Column title={i18n.t('duration_min')} dataIndex={"duration"} />
+                    <Column title={i18n.t('price')} dataIndex={"price"} />
+                    <Column title={i18n.t('abbreviation_id')} dataIndex={"abbreviation_id"} />
                     <Column
-                        title="Action"
+                        title={i18n.t('action')}
                         key="action"
                         render={(_: any, record: any, index: number) => (
                             <>
@@ -421,20 +418,19 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                     type="link"
                                     onClick={() => onOpenEdit(index)}
                                 >
-                                    Edit
+                                    {i18n.t('edit')}
                                 </Button>
                                 <Popconfirm
-                                    title="Delete this service?"
-                                    description="Are you sure you want to delete this service?"
-                                    okText="Delete It"
-                                    cancelText="No"
+                                    title={i18n.t('delete_this_service')}
+                                    description={i18n.t('are_you_sure_you_want_to_delete_this_service')}
+                                    okText={i18n.t('delete_it')}
+                                    cancelText={i18n.t('no')}
                                     okButtonProps={{
                                         danger: true,
                                     }}
                                     onConfirm={() => onDeleteService(index)}
                                 >
-                                    <Button className="self-end mr-3" type="link">Delete</Button>
-
+                                    <Button className="self-end mr-3" type="link">{i18n.t('delete')}</Button>
                                 </Popconfirm>
                             </>
                         )}
@@ -463,16 +459,16 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             <div className="w-full">
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Sort order</span>
+                        <span>{i18n.t('sort_order')}</span>
                     </Col>
                     <Col span={16}>
                         <Select className="w-full" onChange={(value) => {
                             onAdvancedSettingsChange('sorting_order', value)
                         }} value={localCategory.advanced_settings?.sorting_order}>
                             {[
-                                { lable: "Unsorted", value: SortDirection.NONE },
-                                { lable: "Ascending", value: SortDirection.ASC },
-                                { lable: "Descending", value: SortDirection.DESC },
+                                { lable: i18n.t('unsorted'), value: SortDirection.NONE },
+                                { lable: i18n.t('ascending'), value: SortDirection.ASC },
+                                { lable: i18n.t('descending'), value: SortDirection.DESC },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -483,7 +479,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Show performance group in summary</span>
+                        <span>{i18n.t('show_performance_group_in_summary')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCategory.advanced_settings?.show_performance_in_summary} onChange={(value) => {
@@ -493,7 +489,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Show service group in e-mail confirmation to appointment provider</span>
+                        <span>{i18n.t('show_service_group_in_e_mail_confirmation_to_appointment_provider')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch value={localCategory.advanced_settings?.show_service_in_email} onChange={(value) => {
@@ -503,18 +499,18 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Additional information Display type</span>
+                        <span>{i18n.t('additional_information_Display_type')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
                             onAdvancedSettingsChange('info_display_type', value)
                         }} value={localCategory.advanced_settings?.info_display_type} className="w-full">
                             {[
-                                "Tooltip",
-                                "Text below the service group name",
+                                { lable: i18n.t('tooltip'), value: "tooltip" },
+                                { lable: i18n.t('text_below_the_service_group_name'), value: "text_below_the_service_group_name"},
                             ].map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -522,18 +518,18 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6" gutter={[16, 16]}>
                     <Col span={8} className="w-full">
-                        <span>Show performance group on</span>
+                        <span>{i18n.t('show_performance_group_on')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
                             onAdvancedSettingsChange('show_performance_on', value)
                         }} value={localCategory.advanced_settings?.show_performance_on} className="w-full">
-                            {[
-                                "Page 1",
-                                "Page 2",
+                             {[
+                                { lable: i18n.t('page_1'), value: "page_1" },
+                                { lable: i18n.t('page_2'), value: "page_2"},
                             ].map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -560,7 +556,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             <div className="w-full">
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Name</span>
+                        <span>{i18n.t('name')}</span>
                     </Col>
                     <Col span={16}>
                         <Input
@@ -573,23 +569,23 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Category</span>
+                        <span>{i18n.t('category')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
                             onChange('category', value)
                         }}
                             value={localCategory.category} className="w-full">
-                            {[
-                                "Performance group",
-                                "Text field (free text input)",
-                                "Location select",
-                                "Selection number of days",
-                                "Selection number if minutes",
-                                "Number search (postcode, customer number, etc...)"
+                                {[
+                                { lable: i18n.t('performance_group'), value: "performance_group" },
+                                { lable: i18n.t('text_field_free_text_input'), value: "text_field_free_text_input"},
+                                { lable: i18n.t('location_select'), value: "location_select"},
+                                { lable: i18n.t('selection_number_of_days'), value: "selection_number_of_days"},
+                                { lable: i18n.t('selection_number_if_minutes'), value: "selection_number_if_minutes"},
+                                { lable: i18n.t('number_search_postcode_customer_number_etc'), value: "number_search_postcode_customer_number_etc"},
                             ].map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -597,20 +593,20 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Choices</span>
+                        <span>{i18n.t('choices')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
                             onChange('choices', value)
                         }}
                             value={localCategory.choices} className="w-full">
-                            {[
-                                "Simple selection (only one entry can be selected)",
-                                "Multiple selection (multiple entries can be selected)",
-                                "Selection list (only one entry can be selected)",
+                                    {[
+                                { lable: i18n.t('simple_selection_only_one_entry_can_be_selected'), value: "simple_selection_only_one_entry_can_be_selected" },
+                                { lable: i18n.t('multiple_selection_multiple_entries_can_be_selected'), value: "multiple_selection_multiple_entries_can_be_selected"},
+                                { lable: i18n.t('selection_list_only_one_entry_can_be_selected'), value: "selection_list_only_one_entry_can_be_selected"},
                             ].map((el) => (
-                                <Option key={el} value={el}>
-                                    {el}
+                                <Option key={el.lable} value={el.value}>
+                                    {el.lable}
                                 </Option>
                             ))}
                         </Select>
@@ -618,7 +614,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Selection is optional (no entry has to be selected)</span>
+                        <span>{i18n.t('selection_is_optional_no_entry_has_to_be_selected')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -629,7 +625,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Display price</span>
+                        <span>{i18n.t('display_price')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -640,7 +636,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Show appointment duration</span>
+                        <span>{i18n.t('show_appointment_duration')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -651,7 +647,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Number of columns in the services</span>
+                        <span>{i18n.t('number_of_columns_in_the_services')}</span>
                     </Col>
                     <Col span={16}>
                         <Select onChange={(value) => {
@@ -674,7 +670,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Full-screen</span>
+                        <span>{i18n.t('full_screen')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -685,7 +681,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Service group foldable</span>
+                        <span>{i18n.t('service_group_foldable')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -696,7 +692,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Service group can be booked online</span>
+                        <span>{i18n.t('service_group_can_be_booked_online')}</span>
                     </Col>
                     <Col span={16}>
                         <Switch onChange={(value) => {
@@ -707,7 +703,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>Additional information</span>
+                        <span>{i18n.t('additional_information')}</span>
                     </Col>
                     <Col span={16}>
                         <TextArea onChange={(e) => {
@@ -718,7 +714,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                 </Row>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>ID (unique number)</span>
+                        <span>{i18n.t('id_unique_number')}</span>
                     </Col>
                     <Col span={16}>
                         <Input onChange={(e) => {
@@ -744,39 +740,37 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                             items={[
                                 {
                                     key: "1",
-                                    label: "General",
+                                    label: i18n.t('general'),
                                     children: this.renderGernal(),
                                 },
                                 {
                                     key: "2",
-                                    label: "Services",
+                                    label: i18n.t('services'),
                                     children: this.renderServices(),
                                 },
                                 {
                                     key: "3",
-                                    label: "Advanced settings",
+                                    label: i18n.t('advanced_settings'),
                                     children: this.renderAdvancedSettings(),
                                 },
                             ]}
-                        // onChange={onChange}
                         />
                     </Content>
                 </Row>
                 <Row justify={'end'}>
                     <Popconfirm
-                        title="Delete this category?"
-                        description="Are you sure you want to delete this category?"
-                        okText="Delete It"
-                        cancelText="No"
+                        title={i18n.t('delete_this_category')}
+                        description={i18n.t('are_you_sure_you_want_to_delete_this_category')}
+                        okText={i18n.t('delete_it')}
+                        cancelText={i18n.t('no')}
                         okButtonProps={{
                             danger: true,
                         }}
                         onConfirm={this.onDeleteCategory}
                     >
-                        <Button loading={deleteCategoryLoading} className="self-end mr-3" type="primary" danger>Delete Category</Button>
-
+                        <Button loading={deleteCategoryLoading} className="self-end mr-3" type="primary" danger>{i18n.t('delete_category')}</Button>
                     </Popconfirm>
-                    <Button onClick={this.onUpdateCategory} loading={updateCategoryLoading} className="self-end" type="primary">Save Changes</Button>
+                    <Button onClick={this.onUpdateCategory} loading={updateCategoryLoading} className="self-end" type="primary">{i18n.t('save_changes')}</Button>
                 </Row>
             </div>
         );
@@ -801,4 +795,4 @@ const mapDispatchToProps = (
 //     withAuthorization,
 //   )(connect(mapStateToProps, mapDispatchToProps)(CategoryPage))
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CategoryPage));

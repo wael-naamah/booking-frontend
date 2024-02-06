@@ -92,6 +92,8 @@ export interface Calendar {
   show_description?: DescriptionDisplayType;
   appointment_scheduling?: AppointmentScheduling;
   employee_image?: string;
+  email?: string;
+  password?: string;
   online_booked?: boolean;
   advanced_settings?: CalendarAdvancedSettings;
   assignment_of_services?: AssignmentOfServices;

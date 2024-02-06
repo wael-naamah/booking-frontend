@@ -1,8 +1,8 @@
-import { Button, Checkbox, Col, DatePicker, Divider, Form, Input, List, Modal, Row, Space, Spin, Tabs, Upload, message } from 'antd';
+import { Button, Checkbox, Col, DatePicker, Divider, Form, Input, List, Modal, Row, Select, Space, Spin, Tabs, Upload, message } from 'antd';
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { Appointment, Attachment, Contact, ContactAppointment } from '../Schema';
+import { Appointment, Attachment, Calendar, Contact, ExtendedAppointment } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectUpdateAppointmentLoading } from '../redux/selectors';
 import { fetchContactById, updateAppointmentRequest } from '../redux/actions';
@@ -11,13 +11,17 @@ import { download, upload } from '../utils';
 import TextArea from 'antd/es/input/TextArea';
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
+import { withTranslation } from 'react-i18next';
+import i18n from "../locales/i18n";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
     weekStart: 1
 })
 
-interface CalendarEvent extends ContactAppointment {
+const { Option } = Select;
+
+interface CalendarEvent extends ExtendedAppointment {
     title: string;
     start: Date;
     end: Date;
@@ -33,12 +37,15 @@ interface IModalProps {
         id: string,
         appointment: Appointment
     ) => Promise<any>;
+    calendars?: Calendar[];
+    isContact?: boolean;
 }
 
 interface IModalState {
     employee_remarks?: string;
     ended_at?: Date;
     savedFileList: Attachment[],
+    calendarId: string;
     uploading: boolean,
     contact: Contact | null,
     contactLoading: boolean
@@ -52,6 +59,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             uploading: false,
             contact: null,
             contactLoading: true,
+            calendarId: props.selectedEvent?.calendar_id || "",
         };
     }
 
@@ -84,28 +92,30 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             this.props.onClose();
         }
 
-            const onSave = () => {
-                const { _id, createdAt, updatedAt, service, title, start, end, ...propsToUpdate } = selectedEvent!
-                const { savedFileList, employee_remarks, ended_at } = this.state;
-    
-                this.props
-                    .updateAppointmentRequest(selectedEvent?._id!, {
-                        ...propsToUpdate,
-                        ...{
-                            employee_remarks: employee_remarks ?? undefined,
-                            ended_at: ended_at ? ended_at?.toISOString() : undefined,
-                            employee_attachments: savedFileList,
-                        }
-                    })
-                    .then((data) => {
-                        if (data._id) {
-                            message.success("Successfully updated the appointment");
-                            this.props.onSave();
-                        } else {
-                            message.error("Something went wrong. please try again");
-                        }
-                    });
-            };
+        const onSave = () => {
+            // @ts-ignore
+            const { _id, createdAt, updatedAt, service, title, start, end, sourceResource, resourceId, ...propsToUpdate } = selectedEvent!
+            const { savedFileList, employee_remarks, ended_at, calendarId } = this.state;
+
+            this.props
+                .updateAppointmentRequest(selectedEvent?._id!, {
+                    ...propsToUpdate,
+                    ...{
+                        employee_remarks: employee_remarks ?? undefined,
+                        ended_at: ended_at ? ended_at?.toISOString() : undefined,
+                        employee_attachments: savedFileList,
+                        calendar_id: calendarId
+                    }
+                })
+                .then((data) => {
+                    if (data._id) {
+                        message.success(i18n.t('successfully_updated_the_appointment'));
+                        this.props.onSave();
+                    } else {
+                        message.error(i18n.t('something_went_wrong_please_try_again'));
+                    }
+                });
+        };
 
 
 
@@ -125,7 +135,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                                 type="link"
                                                 onClick={() => download(item.title)}
                                             >
-                                                Download
+                                                {i18n.t('download')}
                                             </Button>
                                         </div>
                                     </Col>
@@ -136,6 +146,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 </>
             )
         }
+
         const renderEmployeeActions = () => {
             const { savedFileList, uploading } = this.state;
 
@@ -160,7 +171,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 <>
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Employee remarks</span>
+                            <span>{i18n.t('employee_remarks')}</span>
                         </Col>
                         <Col span={16}>
                             <TextArea
@@ -173,7 +184,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                     </Row>
                     <Row className="mb-6">
                         <Col span={8} className="w-full">
-                            <span>Ended at</span>
+                            <span>{i18n.t('ended_at')}</span>
                         </Col>
                         <Col span={16}>
                             <DatePicker
@@ -226,7 +237,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                     }}>
                                     <Space size={14} align="center" className="m-0">
                                         <p className="upload-hint-label">
-                                            upload a photo of the result if any
+                                            {i18n.t('upload_a_photo_of_the_result_if_any')}
                                         </p>
                                     </Space>
                                 </Upload.Dragger>
@@ -244,94 +255,119 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 <Spin spinning={contactLoading}>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={12} className="w-full">
-                            <label>Performance</label>
+                            <label>{i18n.t('performance')}</label>
                             <Input value={selectedEvent?.title} />
                         </Col>
                         <Col span={12}>
-                            <label>Time</label>
+                            <label>{i18n.t('time')}</label>
                             <Input value={dayjs(selectedEvent?.start_date).format("HH:mm A") + " - " + dayjs(selectedEvent?.end_date).format("HH:mm A")} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={8} className="w-full">
-                            <label>Salutation</label>
+                            <label>{i18n.t('salutation')}</label>
                             <Input value={contact?.salutation} />
                         </Col>
                         <Col span={8}>
-                            <label>Name</label>
+                            <label>{i18n.t('name')}</label>
                             <Input value={contact?.first_name + " " + contact?.last_name} />
                         </Col>
                         <Col span={8}>
-                            <label>Telephone</label>
+                            <label>{i18n.t('telephone')}</label>
                             <Input value={contact?.telephone} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={8} className="w-full">
-                            <label>Street/No./Stairs/Door</label>
+                            <label>{i18n.t('address')}</label>
                             <Input value={contact?.address} />
                         </Col>
                         <Col span={8}>
-                            <label>ZIP CODE</label>
+                            <label>{i18n.t('zip_code')}</label>
                             <Input value={contact?.zip_code} />
                         </Col>
                         <Col span={8}>
-                            <label>Location</label>
+                            <label>{i18n.t('location')}</label>
                             <Input value={contact?.location} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={12} className="w-full">
-                            <label>Email</label>
+                            <label>{i18n.t('email')}</label>
                             <Input value={contact?.email} />
                         </Col>
                         <Col span={12}>
-                            <label>Brand of Device</label>
+                            <label>{i18n.t('brand_of_device')}</label>
                             <Input value={selectedEvent?.brand_of_device} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={12} className="w-full">
-                            <label>Model/Type (e.g VCW AT 174/4-5. HG 15 WK19)</label>
+                            <label>{i18n.t('device_model')}</label>
                             <Input value={selectedEvent?.model} />
                         </Col>
                         <Col span={12}>
-                            <label>Year</label>
+                            <label>{i18n.t('year')}</label>
                             <Input value={selectedEvent?.year} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={24} className="w-full">
-                            <label>Customer Remarks</label>
+                            <label>{i18n.t('customer_remarks')}</label>
                             <TextArea value={selectedEvent?.remarks} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Checkbox checked={selectedEvent?.exhaust_gas_measurement} >
-                            Exhaust Gas Measurement with test result (+ €40)
+                            {i18n.t('exhaust_gas_measurement')}
                         </Checkbox>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Checkbox checked={selectedEvent?.has_bgas_before} >
-                            B-GAS has been with me before
+                            {i18n.t('has_bgas_before')}
                         </Checkbox>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Checkbox checked={selectedEvent?.has_maintenance_agreement} >
-                            have a maintenance agreement with us?
+                            {i18n.t('has_maintenance_agreement')}
                         </Checkbox>
                     </Row>
                 </Spin>
             )
         }
 
+        const renderAssignedCalendar = () => {
+            const { calendarId } = this.state;
+
+            const onSelectCalendar = (value: any) => {
+                this.setState({ calendarId: value })
+            }
+
+            return (
+                <Row>
+                    <Col span={24}>
+                        <label>{i18n.t('calendar')}</label>
+                        <Select className="w-full mt-3 mb-6" value={calendarId} onChange={(value) => {
+                            onSelectCalendar(value)
+                        }}>
+                            {this.props.calendars?.map((calendar) => {
+                                return (
+                                    <Option key={calendar._id} value={calendar._id}>{calendar.employee_name}</Option>
+                                )
+                            })}
+                        </Select>
+                    </Col>
+                </Row>
+            )
+        }
+
         return (
             <Modal
-                title="Appointment Details"
+                title={i18n.t('appointment_details')}
                 open={this.props.visible}
                 centered
-                okText={'Save'}
-                cancelText={'Cancel'}
+                okText={i18n.t('save')}
+                cancelText={i18n.t('cancel')}
                 closable={false}
                 onCancel={onClose}
                 onOk={onSave}
@@ -341,23 +377,29 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 <Divider />
                 <Tabs
                     defaultActiveKey="1"
+                    // @ts-ignore
                     items={[
                         {
                             key: "1",
-                            label: "Appointment overview",
+                            label: i18n.t('appointment_overview'),
                             children: appointmentOverview(),
                         },
                         {
                             key: "2",
-                            label: "Request Attachments",
+                            label: i18n.t('request_attachments'),
                             children: requestAttachments(),
                         },
-                        {
+                        this.props.isContact ? null : {
                             key: "3",
-                            label: "Notes/Files",
+                            label: i18n.t('notes_files'),
                             children: renderEmployeeActions(),
                         },
-                    ]}
+                        this.props.calendars ? {
+                            key: "4",
+                            label: i18n.t('calendar'),
+                            children: renderAssignedCalendar(),
+                        } : null
+                    ].filter(Boolean)}
                 />
             </Modal>
         )
@@ -385,4 +427,4 @@ const mapDispatchToProps = (
         dispatch(updateAppointmentRequest(id, appointment)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppointmentDetailsModal)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AppointmentDetailsModal))

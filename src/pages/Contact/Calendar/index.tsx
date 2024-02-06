@@ -1,20 +1,20 @@
 import React from "react";
 import { connect } from "react-redux";
-import { RootState } from "../../redux/store";
-import { fetchCalendarAppointments } from "../../redux/actions";
-import { selectCalendarAppointments, selectCalendarAppointmentsLoading, selectProfile } from "../../redux/selectors";
-import { ExtendedAppointment } from "../../Schema";
+import { RootState } from "../../../redux/store";
+import { fetchContactAppointments } from "../../../redux/actions";
+import { selectContactAppointments, selectContactAppointmentsLoading, selectProfile } from "../../../redux/selectors";
+import { ExtendedAppointment } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Row, Col, Spin } from "antd";
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../../HOC/withAuthorization";
+import withAuthorization from "../../../HOC/withAuthorization";
 import './index.css';
-import Header from "../../components/Header";
+import Header from "../../../components/Header";
 import { Content } from "antd/es/layout/layout";
-import AppointmentDetailsModal from "../../components/AppointmentDetailsModal";
+import AppointmentDetailsModal from "../../../components/AppointmentDetailsModal";
 
 
 interface CalendarEvent extends ExtendedAppointment {
@@ -23,20 +23,20 @@ interface CalendarEvent extends ExtendedAppointment {
     end: Date;
 }
 
-interface IEmployeeState {
+interface IContactCalendarState {
     selectedEvent: CalendarEvent | null;
     modalState: boolean;
 }
 
-interface IEmployeeProps {
+interface IContactCalendarProps {
     loading: boolean;
-    fetchCalendarAppointments: (id: string) => Promise<any>;
+    fetchContactAppointments: (id: string) => Promise<any>;
     appointments: ExtendedAppointment[];
     profile: any
 }
 
-class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
-    constructor(props: IEmployeeProps) {
+class ContactCalendarPage extends React.Component<IContactCalendarProps, IContactCalendarState> {
+    constructor(props: IContactCalendarProps) {
         super(props);
         this.state = {
             selectedEvent: null,
@@ -47,7 +47,7 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
 
     componentDidMount() {
         if(this.props.profile?._id)
-        this.props.fetchCalendarAppointments(this.props.profile?._id);
+        this.props.fetchContactAppointments(this.props.profile?._id);
     }
 
     renderEventModal = () => {
@@ -58,11 +58,11 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
 
         const onSave = () => {
             if(this.props.profile?._id)
-            this.props.fetchCalendarAppointments(this.props.profile?._id);
+            this.props.fetchContactAppointments(this.props.profile?._id);
             this.setState({ modalState: false, selectedEvent: null });
         };
 
-        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
+        return <AppointmentDetailsModal isContact={true} selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
     }
 
     render() {
@@ -111,16 +111,16 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    appointments: selectCalendarAppointments(state),
-    loading: selectCalendarAppointmentsLoading(state),
+    appointments: selectContactAppointments(state),
+    loading: selectContactAppointmentsLoading(state),
     profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (
     dispatch: ThunkDispatch<RootState, undefined, any>
 ) => ({
-    fetchCalendarAppointments: (id: string) => dispatch(fetchCalendarAppointments(id)),
+    fetchContactAppointments: (id: string) => dispatch(fetchContactAppointments(id)),
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(withAuthorization(EmployeePage))
+export default connect(mapStateToProps, mapDispatchToProps)(withAuthorization(ContactCalendarPage))

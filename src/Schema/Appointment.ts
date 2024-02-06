@@ -41,6 +41,6 @@ export interface TimeSlotsForm {
   service_id?: string;
 }
 
-export interface ContactAppointment extends Appointment {
+export interface ExtendedAppointment extends Appointment {
   service?: Service;
 }

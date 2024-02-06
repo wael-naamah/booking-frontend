@@ -35,6 +35,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
 import WeekdaySelector from "./components/WeekdaySelector";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
 const { Column } = Table;
 
@@ -169,9 +171,9 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             })
             .then((data) => {
               if (data._id) {
-                message.success("Successfully updated the schedule");
+                message.success(i18n.t('successfully_updated_the_schedule'));
               } else {
-                message.error("Something went wrong. please try again");
+                message.error(i18n.t('something_went_wrong_please_try_again'));
               }
             });
         } else {
@@ -210,9 +212,9 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             })
             .then((data) => {
               if (data._id) {
-                message.success("Successfully updated the schedule");
+                message.success(i18n.t('successfully_updated_the_schedule'));
               } else {
-                message.error("Something went wrong. please try again");
+                message.error(i18n.t('something_went_wrong_please_try_again'));
               }
             });
         } else {
@@ -235,9 +237,9 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
     const onDeleteSchedule = (id: string) => {
       this.props.deleteScheduleRequest(id).then((data) => {
         if (data.status && data.status === "success") {
-          message.success("Successfully deleted the schedule");
+          message.success(i18n.t('successfully_deleted_the_schedule'));
         } else {
-          message.error("Something went wrong. please try again");
+          message.error(i18n.t('something_went_wrong_please_try_again'));
         }
       });
     };
@@ -264,7 +266,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
       <div>
         {visible ? (
           <Modal
-            title="New Schedule"
+            title={i18n.t('new_schedule')}
             open={visible}
             centered
             closable={false}
@@ -275,7 +277,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             <Divider />
             {type === ScheduleType.Weekly ? (
               <Row className="mb-6">
-                <p>Select Weekdays</p>
+                <p>{i18n.t('select_weekdays')}</p>
                 <WeekdaySelector
                   selectedDays={this.state.selectedDays}
                   setSelectedDays={handleSelectedDaysChange}
@@ -286,7 +288,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
               <>
                 <Row className="mb-6">
                   <Col span={8} className="w-full">
-                    <span>Date from</span>
+                    <span>{i18n.t('date_from')}</span>
                   </Col>
                   <Col span={16}>
                     <DatePicker
@@ -302,7 +304,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
                 </Row>
                 <Row className="mb-6">
                   <Col span={8} className="w-full">
-                    <span>Date to</span>
+                    <span>{i18n.t('date_to')}</span>
                   </Col>
                   <Col span={16}>
                     <DatePicker
@@ -320,7 +322,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             )}
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>Time from</span>
+                <span>{i18n.t('time_from')}</span>
               </Col>
               <Col span={16}>
                 <DatePicker.TimePicker
@@ -334,7 +336,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             </Row>
             <Row className="mb-6">
               <Col span={8} className="w-full">
-                <span>Time to</span>
+                <span>{i18n.t('time_to')}</span>
               </Col>
               <Col span={16}>
                 <DatePicker.TimePicker
@@ -349,7 +351,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             {type === ScheduleType.Certain && (
               <Row className="mb-6">
                 <Col span={8} className="w-full">
-                  <span>reason</span>
+                  <span>{i18n.t('reason')}</span>
                 </Col>
                 <Col span={16}>
                   <Input
@@ -363,7 +365,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             )}
             <Row className="mb-6" gutter={[16, 16]}>
               <Col span={8} className="w-full">
-                <span>Working hours are active and bookable</span>
+                <span>{i18n.t('working_hours_are_active_and_bookable')}</span>
               </Col>
               <Col span={16}>
                 <Switch
@@ -376,7 +378,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             </Row>
             <Row className="mb-6" gutter={[16, 16]}>
               <Col span={8} className="w-full">
-                <span>Only bookable internally</span>
+                <span>{i18n.t('only_bookable_internally')}</span>
               </Col>
               <Col span={16}>
                 <Switch
@@ -396,43 +398,43 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
           rowKey="_id"
           bordered
           footer={() => {
-            return <Button onClick={onOpen}>New Schedule</Button>;
+            return <Button onClick={onOpen}>{i18n.t('new_schedule')}</Button>;
           }}
         >
           <Column
-            title="Active"
+            title={i18n.t('active')}
             dataIndex={"active"}
             render={(value) =>
               value ? (
-                <Tag color="green">Active</Tag>
+                <Tag color="green">{i18n.t('active')}</Tag>
               ) : (
-                <Tag color="red">Not Active</Tag>
+                <Tag color="red">{i18n.t('not_active')}</Tag>
               )
             }
           />
           {type === ScheduleType.Weekly && (
-            <Column title="Day" dataIndex={"weekday"} />
+            <Column title={i18n.t('day')} dataIndex={"weekday"} />
           )}
           {type === ScheduleType.Certain && (
             <>
               <Column
-                title="Date of"
+                title={i18n.t('date_from')}
                 dataIndex={"date_from"}
                 render={(text) => dayjs(text).format("DD/MM/YYYY")}
               />
               <Column
-                title="Date until"
+                title={i18n.t('date_to')}
                 dataIndex={"date_to"}
                 render={(text) => dayjs(text).format("DD/MM/YYYY")}
               />
             </>
           )}
-          <Column title="Time of" dataIndex={"time_from"} />
-          <Column title="Time until" dataIndex={"time_to"} />
+          <Column title={i18n.t('time_from')} dataIndex={"time_from"} />
+          <Column title={i18n.t('time_to')} dataIndex={"time_to"} />
           {type === ScheduleType.Certain && (
             <>
               <Column
-                title="Duration"
+                title={i18n.t('duration')}
                 dataIndex={""}
                 render={(_: any, record: Schedule) => (
                   <span>
@@ -446,41 +448,41 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
                         "hours"
                       )
                     )}{" "}
-                    hours
+                    {i18n.t('hours')}
                   </span>
                 )}
               />
-              <Column title="Reason" dataIndex={"reason"} />
+              <Column title={i18n.t('reason')} dataIndex={"reason"} />
             </>
           )}
           <Column
-            title="SERVICES"
+            title={i18n.t('services')}
             dataIndex={"restricted_to_services"}
             render={(value) =>
               value.length ? (
-                <Tag>For some services</Tag>
+                <Tag>{i18n.t('for_some_services')}</Tag>
               ) : (
-                <Tag>For all services</Tag>
+                <Tag>{i18n.t('for_all_services')}</Tag>
               )
             }
           />
           <Column
-            title="Action"
+            title={i18n.t('action')}
             key="action"
             render={(_: any, record: Schedule) => (
               <Row>
                 <Popconfirm
-                  title="Delete this schedule?"
-                  description="Are you sure you want to delete this schedule?"
-                  okText="Delete It"
-                  cancelText="No"
+                  title={i18n.t('delete_this_schedule')}
+                  description={i18n.t('are_you_sure_you_want_to_delete_this_schedule')}
+                  okText={i18n.t('delete_it')}
+                  cancelText={i18n.t('no')}
                   okButtonProps={{
                     danger: true,
                   }}
                   onConfirm={() => onDeleteSchedule(record._id!)}
                 >
                   <Button className="self-end mr-3" type="link">
-                    Delete
+                    {i18n.t('delete')}
                   </Button>
                 </Popconfirm>
                 <Button
@@ -488,7 +490,7 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
                   type="link"
                   onClick={() => onEditSchedule(record)}
                 >
-                  Edit
+                  {i18n.t('edit')}
                 </Button>
               </Row>
             )}
@@ -513,11 +515,11 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
               items={[
                 {
                   key: "1",
-                  label: "Working hours",
+                  label: i18n.t('working_hours'),
                 },
                 {
                   key: "2",
-                  label: "Working hours (certain days) / One-time appointment",
+                  label: i18n.t('working_hours_certain_days_One_time_appointment'),
                 },
               ]}
             />
@@ -551,4 +553,4 @@ const mapDispatchToProps = (
 //     withAuthorization,
 //   )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
 
-export default connect(mapStateToProps, mapDispatchToProps)(SchedulePage);
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SchedulePage));

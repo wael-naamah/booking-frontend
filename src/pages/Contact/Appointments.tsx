@@ -12,7 +12,7 @@ import {
   selectDeleteAppointmentLoading,
   selectUpdateAppointmentLoading,
 } from "../../redux/selectors";
-import { Appointment, ContactAppointment, Service } from "../../Schema";
+import { Appointment, ExtendedAppointment, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { compose } from "redux";
 import {
@@ -37,6 +37,8 @@ import dayjs from "dayjs";
 import withRouter, { RouteParams } from "../../HOC/withRouter";
 import { FILES_STORE } from "../../redux/network/api";
 import { download } from "../../utils";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../locales/i18n";
 
 const { Column } = Table;
 const { Option } = Select;
@@ -49,7 +51,7 @@ interface IAppointmentsState {
 
 interface IAppointmentsProps {
   loading: boolean;
-  appointments: ContactAppointment[];
+  appointments: ExtendedAppointment[];
   updateAppointmentLoading: boolean;
   deleteAppointmentLoading: boolean;
   fetchContactAppointments: (contactId: string) => Promise<any>;
@@ -101,9 +103,9 @@ class AppointmentsPage extends React.Component<
   onDeleteAppointment = (id: string) => {
     this.props.deleteAppointmentRequest(id).then((data) => {
       if (data.status && data.status === "success") {
-        message.success("Successfully deleted the appointment");
+        message.success(i18n.t('successfully_deleted_the_appointment'));
       } else {
-        message.error("Something went wrong. please try again");
+        message.error(i18n.t('something_went_wrong_please_try_again'));
       }
     });
   };
@@ -121,7 +123,7 @@ class AppointmentsPage extends React.Component<
 
     return (
       <Modal
-        title={"Attachments"}
+        title={i18n.t('attachments')}
         open={Boolean(attachmentModelId)}
         centered
         closable={true}
@@ -143,7 +145,7 @@ class AppointmentsPage extends React.Component<
                       type="link"
                       onClick={() => download(item.title)}
                     >
-                      Download
+                      {i18n.t('download')}
                     </Button>
                   </div>
                 </Col>
@@ -176,10 +178,10 @@ class AppointmentsPage extends React.Component<
         .updateAppointmentRequest(editingAppointmentId!, { ...propsToUpdate, ...appointment })
         .then((data) => {
           if (data._id) {
-            message.success("Successfully updated the appointment");
+            message.success(i18n.t('successfully_updated_the_appointment'));
             this.setState({ visible: false, editingAppointmentId: null });
           } else {
-            message.error("Something went wrong. please try again");
+            message.error(i18n.t('something_went_wrong_please_try_again'));
           }
         });
     };
@@ -192,7 +194,7 @@ class AppointmentsPage extends React.Component<
 
     return (
       <Modal
-        title={"Edit Appointment Details"}
+        title={i18n.t('edit_appointment_details')}
         open={visible}
         centered
         closable={false}
@@ -211,7 +213,7 @@ class AppointmentsPage extends React.Component<
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
-                label="Model/Type (e.g VCW AT 174/4-5. HG 15 WK19)"
+                label={i18n.t('device_model')}
                 name="model"
               >
                 <Input />
@@ -221,24 +223,11 @@ class AppointmentsPage extends React.Component<
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Brand of Device" name="brand_of_device">
+              <Form.Item label={i18n.t('brand_of_device')} name="brand_of_device">
                 <Select>
-                  {[
-                    "Baxi",
-                    "Buderus",
-                    "De Dietrich",
-                    "To give",
-                    "Junkers",
-                    "Praiseworthy",
-                    "Nordgas",
-                    "Orange",
-                    "Rapido",
-                    "Saunier Duval",
-                    "Vaillant",
-                    "Viessmann",
-                    "Wolf",
-                    "Other",
-                  ].map((salutation) => (
+                  {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
+                  i18n.t('praiseworthy'), i18n.t('nordgas'), i18n.t('orange'), i18n.t('rapido'),
+                  i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((salutation) => (
                     <Option key={salutation} value={salutation}>
                       {salutation}
                     </Option>
@@ -248,17 +237,17 @@ class AppointmentsPage extends React.Component<
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Year"
+                label={i18n.t('year')}
                 name="year"
                 rules={[
                   {
                     required: true,
-                    message: "Please select a year",
+                    message: i18n.t('please_select_a_year'),
                   },
                 ]}
               >
-                <Select placeholder="Select a year">
-                  {["Last year", `I don't know anymore`]
+                <Select placeholder={i18n.t('select_a_year')}>
+                  {[i18n.t('last_year'), i18n.t('i_dont_know_anymore')]
                     .concat(years)
                     .map((year) => (
                       <Option key={year} value={year}>
@@ -271,23 +260,22 @@ class AppointmentsPage extends React.Component<
           </Row>
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Notes" name="remarks">
+              <Form.Item label={i18n.t('notes')} name="remarks">
                 <Input.TextArea />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item
-            label="Do you have a maintenance agreement with us?"
+            label={i18n.t('has_maintenance_agreement')}
             name="has_maintenance_agreement"
             rules={[{ required: true }]}
           >
             <Select>
               {[
-                { lable: "No", value: false },
+                { lable: i18n.t('no'), value: false },
                 {
-                  lable:
-                    "Yes, the prices according to the maintenance agreement apply",
+                  lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'),
                   value: true,
                 },
               ].map((el) => (
@@ -298,22 +286,20 @@ class AppointmentsPage extends React.Component<
             </Select>
           </Form.Item>
           <Form.Item name="exhaust_gas_measurement" valuePropName="checked">
-            <Checkbox>
-              Exhaust Gas Measurement with test result (+ €40)
-            </Checkbox>
+            <Checkbox>{i18n.t('exhaust_gas_measurement')}</Checkbox>
           </Form.Item>
           <Form.Item name="has_bgas_before" valuePropName="checked">
-            <Checkbox>Yes, B-GAS has been with me before</Checkbox>
+            <Checkbox>{i18n.t('has_bgas_before')}</Checkbox>
           </Form.Item>
 
           <Row gutter={16} justify={"end"}>
             <Col span={3}>
-              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={onClose}>{i18n.t('cancel')}</Button>
             </Col>
             <Col span={3}>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
-                  Submit
+                  {i18n.t('submit')}
                 </Button>
               </Form.Item>
             </Col>
@@ -331,7 +317,7 @@ class AppointmentsPage extends React.Component<
         {this.renderUpdateAppointmentModal()}
         {this.renderAttachmentsModal()}
         <Card
-          title={"Appointments"}
+          title={i18n.t('appointments')}
           extra={
             <Button
               onClick={() => {
@@ -341,7 +327,7 @@ class AppointmentsPage extends React.Component<
               }}
               type="link"
             >
-              Go back to contacts
+              {i18n.t('go_back_to_contacts')}
             </Button>
           }
         >
@@ -353,37 +339,37 @@ class AppointmentsPage extends React.Component<
               pagination={false}
             >
               <Column
-                title="Service"
+                title={i18n.t('services')}
                 dataIndex={"service"}
                 render={(service: Service) => {
                   return <span>{service.name}</span>;
                 }}
               />
               <Column
-                title="Duration"
+                title={i18n.t('duration')}
                 dataIndex={"service"}
                 render={(service: Service) => {
-                  return <span>{service.duration} mins</span>;
+                  return <span>{service.duration} {i18n.t('mins')}</span>;
                 }}
               />
               <Column
-                title="Price"
+                title={i18n.t('price')}
                 dataIndex={"service"}
                 render={(service: Service) => {
-                  return <span>{service.price} EUR</span>;
+                  return <span>{service.price} {i18n.t('eur')}</span>;
                 }}
               />
               <Column
-                title="Date"
-                render={(_: any, record: ContactAppointment) => {
+                title={i18n.t('date')}
+                render={(_: any, record: ExtendedAppointment) => {
                   return (
                     <span>{dayjs(record.start_date).format("YYYY-MM-DD")}</span>
                   );
                 }}
               />
               <Column
-                title="Time"
-                render={(_: any, record: ContactAppointment) => {
+                title={i18n.t('time')}
+                render={(_: any, record: ExtendedAppointment) => {
                   const startDateTime = dayjs(record.start_date);
                   const endDateTime = dayjs(record.end_date);
 
@@ -397,10 +383,10 @@ class AppointmentsPage extends React.Component<
                   return <span>{formattedTime}</span>;
                 }}
               />
-              <Column title="Brand" dataIndex={"brand_of_device"} />
-              <Column title="Model" dataIndex={"model"} />
+              <Column title={i18n.t('brand')} dataIndex={"brand_of_device"} />
+              <Column title={i18n.t('model')} dataIndex={"model"} />
               <Column
-                title="Action"
+                title={i18n.t('action')}
                 key="action"
                 render={(_: any, record: Appointment) => (
                   <Row>
@@ -409,13 +395,13 @@ class AppointmentsPage extends React.Component<
                       type="link"
                       onClick={() => this.onOpen(record._id)}
                     >
-                      Edit
+                      {i18n.t('edit')}
                     </Button>
                     <Popconfirm
-                      title="Delete this appointment?"
-                      description="Are you sure you want to delete this appointment?"
-                      okText="Delete It"
-                      cancelText="No"
+                      title={i18n.t('delete_this_appointment')}
+                      description={i18n.t('are_you_sure_you_want_to_delete_this_appointment')}
+                      okText={i18n.t('delete_it')}
+                      cancelText={i18n.t('no')}
                       okButtonProps={{
                         danger: true,
                       }}
@@ -426,7 +412,7 @@ class AppointmentsPage extends React.Component<
                         type="link"
                         loading={deleteAppointmentLoading}
                       >
-                        Delete
+                        {i18n.t('delete')}
                       </Button>
                     </Popconfirm>
                   </Row>
@@ -442,7 +428,7 @@ class AppointmentsPage extends React.Component<
                       type="link"
                       onClick={() => this.onOpenAttachmentModel(record._id)}
                     >
-                      View
+                      {i18n.t('view')}
                     </Button> : null}
                   </Row>
                 )}
@@ -474,5 +460,5 @@ const mapDispatchToProps = (
 });
 
 export default compose(withRouter)(
-  connect(mapStateToProps, mapDispatchToProps)(AppointmentsPage)
+  connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AppointmentsPage))
 );

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button } from 'antd';
 import { WeekDay } from "../../../../Schema";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../../locales/i18n";
 
 interface WeekdaySelectorProps {
   selectedDays: WeekDay[];
@@ -28,6 +30,16 @@ const WeekdaySelector: React.FC<WeekdaySelectorProps> = ({ selectedDays, setSele
     }
   };
 
+  const mapping = {
+      Monday: i18n.t('monday'),
+      Tuesday: i18n.t('tuesday'),
+      Wednesday: i18n.t('wednesday'),
+      Thursday: i18n.t('thursday'),
+      Friday: i18n.t('friday'),
+      Saturday: i18n.t('saturday'),
+      Sunday: i18n.t('sunday'),
+  }
+
   return (
     <div>
       {Object.values(WeekDay).map((day, index) => (
@@ -37,7 +49,7 @@ const WeekdaySelector: React.FC<WeekdaySelectorProps> = ({ selectedDays, setSele
           type={selectedDays.includes(day) ? 'primary' : 'default'}
           onClick={() => disabled ? {} : handleDayClick(day)}
         >
-          {day}
+          {mapping[day]}
         </Button>
       ))}
       <Button
@@ -45,10 +57,10 @@ const WeekdaySelector: React.FC<WeekdaySelectorProps> = ({ selectedDays, setSele
         onClick={() => disabled ? {} : handleAllDaysClick()}
         className="mx-1"
       >
-        All Days
+        {i18n.t('all_days')}
       </Button>
     </div>
   );
 };
 
-export default WeekdaySelector;
+export default withTranslation()(WeekdaySelector);

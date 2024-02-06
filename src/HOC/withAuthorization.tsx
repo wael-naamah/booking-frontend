@@ -1,46 +1,42 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { selectLoginLoading, selectProfile } from '../redux/selectors';
 import { Spin } from 'antd';
+import { RootState } from '../redux/store';
 
 interface AuthorizationProps {}
 
-const checkUserAccess = (profile: any, allowedRoles: string[] = []) => {
-    if(!profile){
-        return false;
+const checkUserAccess = (profile: any) => {
+    if(profile && profile._id){
+        return true;
     }
-    if (allowedRoles.length) {
-        const userRole = profile.role;
-        return allowedRoles.includes(userRole);
-    } else {
-        return true
-    }
+  
+    return false
 
 }
 
 const withAuthorization = <P extends AuthorizationProps>(
     Component: ComponentType<P>,
-    allowedRoles?: string[]
 ) => {
     const WithAuthorization: React.FC<P> = (props) => {
         const navigate = useNavigate();
+        const profile = useSelector((state: RootState) => selectProfile(state));
+        const [hasAccess, setHasAccess] = useState<boolean>(false)
 
-        const profile = useSelector(selectProfile);
-        const loading = useSelector(selectLoginLoading);
+        useEffect(() => {
+            let profile = null;
+            const loginResponse = localStorage.getItem("profile");
+            if(loginResponse) profile = JSON.parse(loginResponse);
+            const access = checkUserAccess(profile);
+            setHasAccess(access)
 
+            if (!access) {
+                navigate('/login', { replace: true }); 
+            }
+        }, [profile])
 
-        if (loading) {
-            return <Spin spinning={loading} />;
-        }
-
-        const hasAccess = checkUserAccess(profile, allowedRoles);
-        if (!hasAccess) {
-            navigate('/login', { replace: true }); // Or redirect to an unauthorized page
-            // return null; // You can also render an unauthorized message or component
-        }
-
-        return <Component {...props} />;
+        return hasAccess ? <Component {...props} /> : <Spin spinning={true} />;
     };
 
     return WithAuthorization;

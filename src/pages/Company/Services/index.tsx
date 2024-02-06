@@ -5,11 +5,13 @@ import { fetchCategories, createCategoryRequest } from "../../../redux/actions";
 import { selectCategories, selectCategoriesLoading } from "../../../redux/selectors";
 import { Category as CategoryType, DisplayStatus, SortDirection } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Button, Collapse, Popconfirm, Row, message } from "antd";
+import { Button, Collapse, Popconfirm, message } from "antd";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import './index.css'
-import Category from './category'
+import Category from './category';
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
 const { Panel } = Collapse;
 
@@ -54,9 +56,9 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
 
     onCreateCategory = () => {
         const newCategory: CategoryType = {
-            name: "New Category",
-            category: "Performance group",
-            choices: "Simple selection (only one entry can be selected)",
+            name: i18n.t('new_category'),
+            category: i18n.t('performance_group'),
+            choices: i18n.t('simple_selection_only_one_entry_can_be_selected'),
             selection_is_optional: false,
             show_price: false,
             show_appointment_duration: false,
@@ -74,10 +76,10 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         };
         this.props.createCategoryRequest(newCategory).then(data => {
             if (data._id) {
-                message.success('Successfully created the category');
+                message.success(i18n.t('successfully_created_the_category'));
                 this.setState({ activeKey: [`${this.props.categories.length - 1}`] })
             } else {
-                message.error('Something went wrong. please try again');
+                message.error(i18n.t('something_went_wrong_please_try_again'));
             }
         })
     }
@@ -88,19 +90,19 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         const { activeKey } = this.state;
 
         if (loading) {
-            return <div>loading...</div>;
+            return <div>{i18n.t('loading')}...</div>;
         }
 
         return (
             <div className="w-full">
                 <Popconfirm
-                    title="create new category?"
-                    description="Are you sure you want to create new category?"
-                    okText="Create It"
-                    cancelText="No"
+                    title={i18n.t('create_new_category')}
+                    description={i18n.t('are_you_sure_you_want_to_create_new_category')}
+                    okText={i18n.t('create_it')}
+                    cancelText={i18n.t('no')}
                     onConfirm={this.onCreateCategory}
                 >
-                    <Button loading={false} className="mb-3" type="primary">New Category</Button>
+                    <Button loading={false} className="mb-3" type="primary">{i18n.t('new_category')}</Button>
                 </Popconfirm>
                 <Collapse accordion activeKey={`${activeKey}`} onChange={this.onChangeActiveKey} defaultActiveKey={["0"]}>
                     {categories.map((el, index) => (
@@ -127,8 +129,5 @@ const mapDispatchToProps = (
     createCategoryRequest: (category: CategoryType) => dispatch(createCategoryRequest(category)),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(ServicesPage))
 
-export default connect(mapStateToProps, mapDispatchToProps)(ServicesPage)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(ServicesPage)))

@@ -10,6 +10,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import './index.css'
 import SchedulePage from './schedule'
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
 const { Option } = Select;
 
@@ -28,7 +30,7 @@ interface ICalendarProps {
     fetchCalendars: () => Promise<any>;
 }
 
-class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
+class SchedulesPage extends React.Component<ICalendarProps, ICalendarState> {
     constructor(props: ICalendarProps) {
         super(props);
         this.state = {
@@ -40,7 +42,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
     componentDidMount() {
         this.props.fetchCalendars().then((res) => {
             if (res?.data && res.data.length) {
-                const value = `${res.data[0].employee_name} ${res.data[0].active ? '' : '(not activated)'}`
+                const value = `${res.data[0].employee_name} ${res.data[0].active ? '' : `(${i18n.t('not_activated')})`}`
                 this.setState({ selectedCalendar: value })
                 this.props.fetchSchedulesByCalendarId(res.data[0]._id)
             }
@@ -58,7 +60,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         const { calendars } = this.props;
 
         if (this.props.calendars.length) {
-            const value = `${calendars[0].employee_name} ${calendars[0].active ? '' : '(not activated)'}`
+            const value = `${calendars[0].employee_name} ${calendars[0].active ? '' : `(${i18n.t('not_activated')})`}`
             this.setState({ selectedCalendar: value, activeIndex: 0 })
         }
     }
@@ -72,11 +74,11 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         const { selectedCalendar, activeIndex } = this.state;
 
         if (calendarsLoading) {
-            return <div>loading...</div>;
+            return <div>{i18n.t('loading')}...</div>;
         }
 
         if (!calendars.length) {
-            return <Empty />
+            return <Empty description={i18n.t('empty')}/>
         }
 
         return (
@@ -87,7 +89,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
                             this.onSelectCalendar(value, record)
                         }}>
                             {calendars.map((calendar, index) => {
-                                const value = `${calendar.employee_name} ${calendar.active ? '' : '(not activated)'}`
+                                const value = `${calendar.employee_name} ${calendar.active ? '' : `(${i18n.t('not_activated')})`}`
                                 return (
                                     <Option key={index} value={value}>{value}</Option>
                                 )
@@ -123,8 +125,4 @@ const mapDispatchToProps = (
     fetchCalendars: () => dispatch(fetchCalendars()),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(ServicesPage))
-
-export default connect(mapStateToProps, mapDispatchToProps)(ServicesPage)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(SchedulesPage)))

@@ -5,13 +5,14 @@ import { fetchCalendars, createCalendarRequest } from "../../../redux/actions";
 import { selectCalendars, selectCalendarsLoading } from "../../../redux/selectors";
 import { Calendar as CalendarType } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Button, Col, Collapse, Empty, Popconfirm, Row, Select, message } from "antd";
+import { Button, Col, Empty, Popconfirm, Row, Select, message } from "antd";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import './index.css'
 import Calendar from './calendar'
+import { withTranslation } from 'react-i18next';
+import i18n from "../../../locales/i18n";
 
-const { Panel } = Collapse;
 const { Option } = Select;
 
 
@@ -27,7 +28,7 @@ interface ICalendarProps {
     calendars: CalendarType[];
 }
 
-class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
+class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
     constructor(props: ICalendarProps) {
         super(props);
         this.state = {
@@ -39,7 +40,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
     componentDidMount() {
         this.props.fetchCalendars().then((res) => {
             if (res?.data && res.data.length) {
-                const value = `${res.data[0].employee_name} ${res.data[0].active ? '' : '(not activated)'}`
+                const value = `${res.data[0].employee_name} ${res.data[0].active ? '' : `(${i18n.t('not_activated')})`}`
                 this.setState({ selectedCalendar: value })
             }
         });
@@ -53,7 +54,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         const { calendars } = this.props;
 
         if (this.props.calendars.length) {
-            const value = `${calendars[0].employee_name} ${calendars[0].active ? '' : '(not activated)'}`
+            const value = `${calendars[0].employee_name} ${calendars[0].active ? '' : `(${i18n.t('not_activated')})`}`
             this.setState({ selectedCalendar: value, activeIndex: 0 })
         }
     }
@@ -64,15 +65,15 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
 
     onCreateCalendar = () => {
         const newCalendar: CalendarType = {
-            employee_name: "New Calendar",
+            employee_name: i18n.t('new_calendar'),
             active: true,
         };
         this.props.createCalendarRequest(newCalendar).then(data => {
             if (data._id) {
-                message.success('Successfully created the calendar');
+                message.success(i18n.t('successfully_created_the_calendar'));
                 this.setState({ activeIndex: this.props.calendars.length - 1, selectedCalendar: data.employee_name })
             } else {
-                message.error('Something went wrong. please try again');
+                message.error(i18n.t('something_went_wrong_please_try_again'));
             }
         })
     }
@@ -82,11 +83,11 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
         const { selectedCalendar, activeIndex } = this.state;
 
         if (loading) {
-            return <div>loading...</div>;
+            return <div>{i18n.t('loading')}...</div>;
         }
 
         if(!calendars.length){
-            return <Empty />
+            return <Empty description={i18n.t('empty')}/>
         }
 
         return (
@@ -97,7 +98,7 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
                             this.onSelectCalendar(value, record)
                         }}>
                             {calendars.map((calendar, index) => {
-                                const value = `${calendar.employee_name} ${calendar.active ? '' : '(not activated)'}`
+                                const value = `${calendar.employee_name} ${calendar.active ? '' : `(${i18n.t('not_activated')})`}`
                                 return (
                                     <Option key={index} value={value}>{value}</Option>
                                 )
@@ -106,13 +107,13 @@ class ServicesPage extends React.Component<ICalendarProps, ICalendarState> {
                     </Col>
                     <Col span={6}>
                         <Popconfirm
-                            title="create new calendar?"
-                            description="Are you sure you want to create new calendar?"
-                            okText="Create It"
-                            cancelText="No"
+                            title={i18n.t('create_new_calendar')}
+                            description={i18n.t('are_you_sure_you_want_to_create_new_calendar')}
+                            okText={i18n.t('create_it')}
+                            cancelText={i18n.t('no')}
                             onConfirm={this.onCreateCalendar}
                         >
-                            <Button loading={false} className="mb-3" type="primary">New Calendar</Button>
+                            <Button loading={false} className="mb-3" type="primary">{i18n.t('new_calendar')}</Button>
                         </Popconfirm>
                     </Col>
                 </Row>
@@ -136,8 +137,4 @@ const mapDispatchToProps = (
     createCalendarRequest: (calendar: CalendarType) => dispatch(createCalendarRequest(calendar)),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(ServicesPage))
-
-export default connect(mapStateToProps, mapDispatchToProps)(ServicesPage)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(CalendarsPage)))

@@ -3,12 +3,11 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/actions";
 import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Appointment, AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm, ContactAppointment } from "../../Schema";
+import { AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm, ExtendedAppointment } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Row, Col, Card, Calendar, Spin } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
-import { compose } from 'redux'
 
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -17,13 +16,15 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../HOC/withAuthorization";
 import './index.css'
 import AppointmentDetailsModal from "../../components/AppointmentDetailsModal";
+import { withTranslation } from 'react-i18next';
+import i18n from "../../locales/i18n";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
     weekStart: 1
 })
 
-interface CalendarEvent extends ContactAppointment {
+interface CalendarEvent extends ExtendedAppointment {
     title: string;
     start: Date;
     end: Date;
@@ -46,7 +47,7 @@ interface IAppointmentProps {
     timeslotsLoading: boolean;
     fetchAppointments: (form: AppointmentForm) => Promise<any>;
     fetchTimeSlots: (form: TimeSlotsForm) => Promise<any>;
-    appointments: Appointment[];
+    appointments: ExtendedAppointment[];
     employees: CalendarType[];
     employeesLoading: boolean;
     fetchEmployees: (form: PaginatedForm) => Promise<any>;
@@ -118,7 +119,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             this.setState({ modalState: false, selectedEvent: null });
         };
 
-        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
+        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} calendars={this.props.employees}/>
     }
 
     render() {
@@ -139,7 +140,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
         
             return {
-                title: "",
+                title: el.service?.name || '',
                 start,
                 end,
                 resourceId: el.calendar_id,
@@ -188,7 +189,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             }, []);
 
         if (loading) {
-            return <div>loading...</div>;
+            return <div>{i18n.t('loading')}...</div>;
         }
 
         return (
@@ -255,8 +256,5 @@ const mapDispatchToProps = (
     fetchEmployees: (form: PaginatedForm) => dispatch(fetchEmployees(form)),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(AppointmentPage))
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppointmentPage)
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withAuthorization(AppointmentPage)))

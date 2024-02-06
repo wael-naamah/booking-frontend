@@ -44,3 +44,24 @@ export const download = async (filename: string) => {
   a.click();
   document.body.removeChild(a);
 };
+
+export const generatePassword = () => {
+  const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
+  const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const specialChars = '!@#$%^&*()_-+=<>?';
+  const numericChars = '0123456789';
+
+  const getRandomChar = (characters: string | any[]) =>
+    characters[Math.floor(Math.random() * characters.length)];
+
+  const getRandomPassword = () =>
+    getRandomChar(lowerCaseChars) +
+    getRandomChar(upperCaseChars) +
+    getRandomChar(specialChars) +
+    getRandomChar(numericChars) +
+    Array.from({ length: 6 }, () =>
+      getRandomChar(lowerCaseChars + upperCaseChars + specialChars + numericChars)
+    ).join('');
+
+  return getRandomPassword();
+};
