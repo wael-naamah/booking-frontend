@@ -166,7 +166,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
           })
           .then((data) => {
             if (data && data._id) {
-              message.success("successfully_updated_the_config");
+              message.success(i18n.t('successfully_updated_the_config'));
             } else {
               message.error(i18n.t('something_went_wrong_please_try_again'));
             }
