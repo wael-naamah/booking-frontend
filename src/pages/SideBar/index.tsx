@@ -167,7 +167,7 @@ class SideBar extends React.Component<ISideBarProps, ISideBarState> {
             }}
           />
           <Row align={'middle'}>
-            <Select defaultValue={'en'} className="mr-2" onChange={(value) => onSelectLang(value)}>
+            <Select defaultValue={'de'} className="mr-2" onChange={(value) => onSelectLang(value)}>
               <Option key={'en'} value='en'>En</Option>
               <Option key={'de'} value='de'>De</Option>
             </Select>

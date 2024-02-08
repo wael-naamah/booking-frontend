@@ -1,4 +1,4 @@
-import { Col, Divider, Row, Tooltip } from "antd";
+import { Col, Divider, Row, Select, Tooltip } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { LogoutOutlined, LoginOutlined, UserOutlined, HomeOutlined, CalendarOutlined } from "@ant-design/icons";
 import React from "react";
@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { withTranslation } from "react-i18next";
 import i18n from "../locales/i18n";
 
+const { Option } = Select;
 interface IHeaderProps {
   loggedIn: boolean;
   logout: () => void;
@@ -24,6 +25,10 @@ class Header extends React.Component<IHeaderProps> {
 
   render() {
     const { logout, loggedIn, profile } = this.props;
+    const onSelectLang = (lang: string) => {
+      i18n.changeLanguage(lang);
+    }
+    
     return (
       <Content>
         <Row justify={"space-between"} className="flex items-center">
@@ -61,6 +66,10 @@ class Header extends React.Component<IHeaderProps> {
                 </Link>
               </>
             ) : null}
+            <Select defaultValue={'de'} className="ml-2" onChange={(value) => onSelectLang(value)}>
+              <Option key={'en'} value='en'>En</Option>
+              <Option key={'de'} value='de'>De</Option>
+            </Select>
             <span className="ml-4">B-GAS GmbH | 01 / 202 85 56</span>
           </Col>
         </Row>
