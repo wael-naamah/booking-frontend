@@ -183,7 +183,7 @@ class SettingsPage extends React.Component<ISettingsProps, ISettingsState> {
     return (
       <>
         <Button onClick={() => onSave()} type="primary">
-          Save
+          {i18n.t('save')}
         </Button>
         {emailConfig._id ? (
           <Popconfirm
