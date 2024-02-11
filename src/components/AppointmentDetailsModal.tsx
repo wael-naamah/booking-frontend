@@ -39,6 +39,7 @@ interface IModalProps {
     ) => Promise<any>;
     calendars?: Calendar[];
     isContact?: boolean;
+    disabled?: boolean;
 }
 
 interface IModalState {
@@ -366,11 +367,16 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 title={i18n.t('appointment_details')}
                 open={this.props.visible}
                 centered
-                okText={i18n.t('save')}
-                cancelText={i18n.t('cancel')}
-                closable={false}
-                onCancel={onClose}
-                onOk={onSave}
+                footer={() => {
+                    return this.props.disabled ? null : (
+                        <>
+                            <Button onClick={onClose}>{i18n.t('cancel')}</Button>
+                            <Button type="primary" onClick={onSave}>{i18n.t('save')}</Button>
+                        </>
+                    )
+                }}
+                closable={true}
+                onCancel={() => onClose()}
                 confirmLoading={this.props.updateLoading}
                 width={800}
             >

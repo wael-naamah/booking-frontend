@@ -12,6 +12,8 @@ const GET_TIME_SLOTS = "appointments/GET_TIME_SLOTS" as const;
 const GET_TIME_SLOTS_DONE = "appointments/GET_TIME_SLOTS_DONE" as const;
 const GET_APPOINTMENTS = "appointments/GET_APPOINTMENTS" as const;
 const GET_APPOINTMENTS_DONE = "appointments/GET_APPOINTMENTS_DONE" as const;
+const ADD_APPOINTMENT = "appointments/ADD_APPOINTMENT" as const;
+const ADD_APPOINTMENT_DONE = "appointments/ADD_APPOINTMENT_DONE" as const;
 const UPDATE_APPOINTMENT = "appointments/UPDATE_APPOINTMENT" as const;
 const UPDATE_APPOINTMENT_DONE = "appointments/UPDATE_APPOINTMENT_DONE" as const;
 const DELETE_APPOINTMENT = "appointments/DELETE_APPOINTMENT" as const;
@@ -106,6 +108,15 @@ export const updateAppointment = () => ({
 
 export const updateAppointmentDone = (appointment: Appointment | null) => ({
   type: UPDATE_APPOINTMENT_DONE,
+  appointment,
+});
+
+export const addAppointment = () => ({
+  type: ADD_APPOINTMENT,
+});
+
+export const addAppointmentDone = (appointment: Appointment | null) => ({
+  type: ADD_APPOINTMENT_DONE,
   appointment,
 });
 
@@ -219,10 +230,10 @@ export const fetchAppointments = (form: AppointmentForm) => {
   };
 };
 
-export const addAppointment = (
-  appointment: Appointment,
-) => {
-  return async () => {
+export const addAppointmentRequest = (appointment: Appointment) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(addAppointment());
+
     try {
       const response = await fetch(`${API_URL}/appointments`, {
         method: "POST",
@@ -231,10 +242,12 @@ export const addAppointment = (
       });
       const data = await response.json();
 
+      dispatch(addAppointmentDone(data));
       return data;
     } catch (error) {
       console.error("Error fetching categories:", error);
-      return null;
+
+      dispatch(addAppointmentDone(null));
     }
   };
 };
@@ -287,4 +300,6 @@ export type AppointmentsAction = ReturnType<
   | typeof deleteAppointmentDone
   | typeof getCalendarAppointments
   | typeof getCalendarAppointmentsDone
+  | typeof addAppointment
+  | typeof addAppointmentDone
 >;

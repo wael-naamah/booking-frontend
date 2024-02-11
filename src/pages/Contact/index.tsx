@@ -335,12 +335,12 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   };
 
   render() {
-    const { pageNum, totalCount, currentPage, pageCount } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible } = this.state;
     const { loading, contacts } = this.props;
 
     return (
       <>
-        {this.renderNewContactModal()}
+        {visible ? this.renderNewContactModal() : null}
         <Card
           title={i18n.t('contacts')}
           extra={

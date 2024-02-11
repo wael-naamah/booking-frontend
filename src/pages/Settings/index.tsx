@@ -20,7 +20,7 @@ import {
   selectServices,
   selectServicesLoading,
 } from "../../redux/selectors";
-import { EmailConfig, EmailTemplate, EmailTemplateType, Service } from "../../Schema";
+import { EmailConfig, EmailTemplate, EmailTemplateType, ExtendedService } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import {
@@ -55,7 +55,7 @@ interface ISettingsState {
 interface ISettingsProps {
   loading: boolean;
   config: EmailConfig | null;
-  services: Service[];
+  services: ExtendedService[];
   servicesLoading: boolean;
   emailTemplates: EmailTemplate[];
   emailTemplatesLoading: boolean;

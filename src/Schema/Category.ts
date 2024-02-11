@@ -29,6 +29,10 @@ export interface Service {
   attachment?: Attachment;
 }
 
+export interface ExtendedService extends Service {
+  category_id: string;
+}
+
 export interface Category {
   _id?: string;
   name: string;

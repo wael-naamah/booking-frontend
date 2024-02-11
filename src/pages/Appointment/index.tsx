@@ -18,6 +18,7 @@ import './index.css'
 import AppointmentDetailsModal from "../../components/AppointmentDetailsModal";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
+import CreateAppointmentModal from "../../components/CreateAppointmentModal";
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
@@ -34,6 +35,8 @@ interface IAppointmentState {
     views: ['day', 'work_week'];
     selectedEvent: CalendarEvent | null;
     modalState: boolean;
+    newAppointmentModal: boolean;
+    selectedSlot: any
 }
 
 interface IAppointmentProps {
@@ -61,6 +64,8 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             views: ['day', 'work_week'],
             selectedEvent: null,
             modalState: false,
+            newAppointmentModal: false,
+            selectedSlot: null
         };
     }
 
@@ -122,9 +127,26 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} calendars={this.props.employees}/>
     }
 
+    renderNewAppointmentModal = () => {
+        const firstDateOfMonth = dayjs().startOf('month');
+        const lastDateOfMonth = dayjs().endOf('month');
+        const { selectedSlot, newAppointmentModal } = this.state;
+        const onClose = () => {
+            this.setState({ newAppointmentModal: false, selectedSlot: null })
+        }
+
+        const onSave = () => {
+            this.props.fetchAppointments({ start: firstDateOfMonth.toISOString(), end: lastDateOfMonth.toISOString() });
+            this.setState({ newAppointmentModal: false, selectedSlot: null });
+        };
+
+        return <CreateAppointmentModal selectedSlot={selectedSlot} visible={newAppointmentModal} onClose={onClose} onSave={onSave} calendars={this.props.employees}/>
+    }
+
+
     render() {
         const { loading, timeslots, timeslotsLoading, appointments, employees } = this.props;
-        const { currentDate, views, modalState } = this.state;
+        const { currentDate, views, modalState, newAppointmentModal } = this.state;
         const localizer = momentLocalizer(moment);
 
         const resourceMap = (employees || []).map(el => ({
@@ -148,20 +170,6 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                 ...el
             };
         });
-        
-        <BigCalendar
-            defaultView={Views.DAY}
-            date={currentDate ? dayjs(currentDate).toDate() : new Date()}
-            events={events}
-            localizer={localizer}
-            resourceIdAccessor="resourceId"
-            resources={resourceMap}
-            resourceTitleAccessor="resourceTitle"
-            step={60}
-            views={views}
-            popup={true}
-            onSelectEvent={(e) => handleSelectedEvent(e)}
-        />
         
 
         const handleSelectedEvent = async (event: CalendarEvent) => {
@@ -195,6 +203,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         return (
             <>
                 {modalState ? this.renderEventModal() : null}
+                {newAppointmentModal ? this.renderNewAppointmentModal() : null}
                 <Row gutter={16} justify={'space-around'} className="calendar-container">
                     <Col span={6} xs={24} md={6}>
                         <Card className="calendar-card">
@@ -227,6 +236,13 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 resources={resourceMap}
                                 resourceTitleAccessor="resourceTitle"
                                 step={60}
+                                selectable
+                                onSelectSlot={(slot) => {                            
+                                    this.setState({
+                                        selectedSlot: slot,
+                                        newAppointmentModal: true
+                                    })
+                                }}
                                 views={views}
                                 popup={true}
                                 onSelectEvent={(e) => handleSelectedEvent(e)}

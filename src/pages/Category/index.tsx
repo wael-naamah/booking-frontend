@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
-import { fetchCategories, fetchTimeSlots, addAppointment } from "../../redux/actions";
+import { fetchCategories, fetchTimeSlots, addAppointmentRequest } from "../../redux/actions";
 import { selectCategories, selectCategoriesLoading, selectLoggedIn, selectProfile, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
 import { Appointment, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
@@ -544,7 +544,7 @@ const mapDispatchToProps = (
     fetchCategories: () => dispatch(fetchCategories()),
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => dispatch(fetchTimeSlots(date, categoryId, serviceId)),
     onSubmit: (appointment: Appointment): Promise<any> =>
-        dispatch(addAppointment(appointment))
+        dispatch(addAppointmentRequest(appointment))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CategoryPage));

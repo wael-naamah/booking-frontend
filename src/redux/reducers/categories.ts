@@ -1,4 +1,4 @@
-import { Category, Service } from "../../Schema";
+import { Category, ExtendedService } from "../../Schema";
 import { CategoriesAction } from "../actions";
 
 interface CategoriesState {
@@ -7,7 +7,7 @@ interface CategoriesState {
   updateCategoryLoading: boolean;
   deleteCategoryLoading: boolean;
   addCategoryLoading: boolean;
-  services: Service[];
+  services: ExtendedService[];
   servicesLoading: boolean;
 }
 

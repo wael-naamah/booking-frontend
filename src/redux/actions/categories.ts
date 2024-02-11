@@ -1,4 +1,4 @@
-import { Category, Service } from "../../Schema";
+import { Category, ExtendedService } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
 
@@ -141,7 +141,7 @@ export const getServices = () => ({
   type: GET_SERVICES,
 });
 
-export const getServicesDone = (data: Service[]) => ({
+export const getServicesDone = (data: ExtendedService[]) => ({
   type: GET_SERVICES_DONE,
   payload: data,
 });

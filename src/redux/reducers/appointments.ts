@@ -16,6 +16,7 @@ interface CategoriesState {
   calendarAppointments: ExtendedAppointment[];
   calendarAppointmentsLoading: boolean;
   updateAppointmentLoading: boolean;
+  addAppointmentLoading: boolean;
   deleteAppointmentLoading: boolean;
   employees: Calendar[];
   employeesLoading: boolean;
@@ -31,6 +32,7 @@ const initialState: CategoriesState = {
   calendarAppointments: [],
   calendarAppointmentsLoading: true,
   updateAppointmentLoading: false,
+  addAppointmentLoading: false,
   deleteAppointmentLoading: false,
   employees: [],
   employeesLoading: true,
@@ -128,6 +130,16 @@ const categoriesReducer = (
       return {
         ...state,
         updateAppointmentLoading: false,
+      };
+      case "appointments/ADD_APPOINTMENT":
+      return {
+        ...state,
+        addAppointmentLoading: true,
+      };
+    case "appointments/ADD_APPOINTMENT_DONE":
+      return {
+        ...state,
+        addAppointmentLoading: false,
       };
     default:
       return state;

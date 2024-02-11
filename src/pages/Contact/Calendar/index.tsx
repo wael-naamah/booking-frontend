@@ -46,23 +46,28 @@ class ContactCalendarPage extends React.Component<IContactCalendarProps, IContac
 
 
     componentDidMount() {
-        if(this.props.profile?._id)
-        this.props.fetchContactAppointments(this.props.profile?._id);
+        if (this.props.profile?._id)
+            this.props.fetchContactAppointments(this.props.profile?._id);
     }
 
     renderEventModal = () => {
         const { selectedEvent, modalState } = this.state;
+        const currentDate = new Date();
+        const futureDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000); // 24 hours ahead
+        const eventStartDate = selectedEvent ? new Date(selectedEvent.start_date) : null;
+        const isDisabled = eventStartDate ? eventStartDate < futureDate : false;
+
         const onClose = () => {
             this.setState({ modalState: false, selectedEvent: null })
         }
 
         const onSave = () => {
-            if(this.props.profile?._id)
-            this.props.fetchContactAppointments(this.props.profile?._id);
+            if (this.props.profile?._id)
+                this.props.fetchContactAppointments(this.props.profile?._id);
             this.setState({ modalState: false, selectedEvent: null });
         };
 
-        return <AppointmentDetailsModal isContact={true} selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
+        return <AppointmentDetailsModal isContact={true} disabled={isDisabled} selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} />
     }
 
     render() {

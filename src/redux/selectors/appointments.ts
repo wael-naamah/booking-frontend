@@ -7,6 +7,7 @@ export const selectTimeslotsLoading = (state: RootState) => state.appointments.t
 export const selectAppointments = (state: RootState) => state.appointments.appointments;
 export const selectAppointmentsLoading = (state: RootState) => state.appointments.appointmentsLoading;
 export const selectUpdateAppointmentLoading = (state: RootState) => state.appointments.updateAppointmentLoading;
+export const selectAddAppointmentLoading = (state: RootState) => state.appointments.addAppointmentLoading;
 export const selectDeleteAppointmentLoading = (state: RootState) => state.appointments.deleteAppointmentLoading;
 
 export const selectContactAppointments = (state: RootState) => state.appointments.contactAppointments;
