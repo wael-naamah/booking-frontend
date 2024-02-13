@@ -8,6 +8,7 @@ import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Row, Col, Card, Calendar, Spin } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
+import 'moment/locale/de'
 
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -124,7 +125,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             this.setState({ modalState: false, selectedEvent: null });
         };
 
-        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} calendars={this.props.employees}/>
+        return <AppointmentDetailsModal selectedEvent={selectedEvent} visible={modalState} onClose={onClose} onSave={onSave} calendars={this.props.employees} />
     }
 
     renderNewAppointmentModal = () => {
@@ -140,7 +141,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             this.setState({ newAppointmentModal: false, selectedSlot: null });
         };
 
-        return <CreateAppointmentModal selectedSlot={selectedSlot} visible={newAppointmentModal} onClose={onClose} onSave={onSave} calendars={this.props.employees}/>
+        return <CreateAppointmentModal selectedSlot={selectedSlot} visible={newAppointmentModal} onClose={onClose} onSave={onSave} calendars={this.props.employees} />
     }
 
 
@@ -157,10 +158,10 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         const events = (appointments || []).map((el, index) => {
             const startUTC = new Date(el.start_date);
             const endUTC = new Date(el.end_date);
-        
+
             const start = new Date(startUTC.getTime() + startUTC.getTimezoneOffset() * 60000);
             const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
-        
+
             return {
                 title: el.service?.name || '',
                 start,
@@ -170,7 +171,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                 ...el
             };
         });
-        
+
 
         const handleSelectedEvent = async (event: CalendarEvent) => {
             this.setState({
@@ -231,13 +232,14 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 defaultView={Views.DAY}
                                 date={currentDate ? dayjs(currentDate).toDate() : new Date()}
                                 events={events}
+                                culture={i18n.language}
                                 localizer={localizer}
                                 resourceIdAccessor="resourceId"
                                 resources={resourceMap}
                                 resourceTitleAccessor="resourceTitle"
                                 step={60}
                                 selectable
-                                onSelectSlot={(slot) => {                            
+                                onSelectSlot={(slot) => {
                                     this.setState({
                                         selectedSlot: slot,
                                         newAppointmentModal: true
@@ -246,6 +248,22 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 views={views}
                                 popup={true}
                                 onSelectEvent={(e) => handleSelectedEvent(e)}
+                                messages={{
+                                    next: i18n.t('next'),
+                                    previous: i18n.t('previous'),
+                                    today: i18n.t('today'),
+                                    month: i18n.t('month'),
+                                    week: i18n.t('week'),
+                                    day: i18n.t('day'),
+                                    work_week: i18n.t('work_week'),
+                                    allDay: i18n.t('all_day'),
+                                    yesterday: i18n.t('yesterday'),
+                                    tomorrow: i18n.t('tomorrow'),
+                                    noEventsInRange: i18n.t('no_events_in_range'),
+                                    showMore: function showMore(total) {
+                                        return '+' + total + i18n.t('events');
+                                    }
+                                }}
                             />
                         </div>
                     </Col>

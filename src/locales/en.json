@@ -264,5 +264,17 @@
   "old_password": "Old Password",
   "new_password": "New Password",
   "reset_password": "Reset Password",
-  "successfully_updated_the_data": "Successfully updated the data"
+  "successfully_updated_the_data": "Successfully updated the data",
+  "next": "Next",
+  "back": "Back",
+  "month": "Month",
+  "week": "Week",
+  "previous": "Previous",
+  "today": "Today",
+  "work_week": "Work Week",
+  "all_day": "All Day",
+  "yesterday": "Yesterday",
+  "tomorrow": "Tomorrow",
+  "no_events_in_range": "No events found in the current period.",
+  "events": "events"
 }

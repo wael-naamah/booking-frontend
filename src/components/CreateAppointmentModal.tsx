@@ -1,4 +1,4 @@
-import { Button, Checkbox, Col, Divider, Form, Input, Modal, Row, Select, Space, Tabs, Upload, message } from 'antd';
+import { Button, Card, Checkbox, Col, Divider, Form, Input, Modal, Row, Select, Space, Tabs, Upload, message } from 'antd';
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
@@ -67,6 +67,12 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
     componentDidMount() {
         this.fetchData();
     }
+
+    onFinishFrom = () => {
+        if (this.formRef.current) {
+            this.formRef.current.submit();
+        }
+    };
 
     renderEventModal = () => {
         const { selectedSlot } = this.props
@@ -153,7 +159,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             }
 
             return (
-                <>
+                <Card bordered={false}>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col span={12} className="w-full">
                             <label>{i18n.t('performance')}</label>
@@ -362,7 +368,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             </Col>
                         </Row>
                     </Form>
-                </>
+                </Card>
             )
         }
 
@@ -374,20 +380,35 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             }
 
             return (
-                <Row>
-                    <Col span={24}>
-                        <label>{i18n.t('calendar')}</label>
-                        <Select className="w-full mt-3 mb-6" value={calendarId} onChange={(value) => {
-                            onSelectCalendar(value)
-                        }}>
-                            {this.props.calendars.map((calendar) => {
-                                return (
-                                    <Option key={calendar._id} value={calendar._id}>{calendar.employee_name}</Option>
-                                )
-                            })}
-                        </Select>
-                    </Col>
-                </Row>
+                <Card bordered={false}>
+                    <Row>
+                        <Col span={24}>
+                            <label>{i18n.t('calendar')}</label>
+                            <Select className="w-full mt-3 mb-6" value={calendarId} onChange={(value) => {
+                                onSelectCalendar(value)
+                            }}>
+                                {this.props.calendars.map((calendar) => {
+                                    return (
+                                        <Option key={calendar._id} value={calendar._id}>{calendar.employee_name}</Option>
+                                    )
+                                })}
+                            </Select>
+                        </Col>
+                    </Row>
+                    <Row gutter={16} justify={'end'}>
+                        <Col span={3}>
+                            <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
+                                {i18n.t('cancel')}
+                            </Button>
+                        </Col>
+                        <Col span={3}>
+                            <Button type="primary" onClick={() => onFinish(this.formRef?.current?.getFieldsValue())} loading={this.props.loading}>
+                                {i18n.t('submit')}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Card>
+
             )
         }
 
