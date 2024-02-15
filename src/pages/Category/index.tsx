@@ -90,7 +90,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             location: values.location,
             telephone: values.telephone,
             email: values.email,
-            password: this.props.loggedIn ? this.props.profile.password : generatePassword()
+            password: generatePassword()
         };
 
         const appointment: Appointment = {

@@ -354,18 +354,14 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Row>
 
                         <Row gutter={16} justify={'end'}>
-                            <Col span={3}>
-                                <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
-                                    {i18n.t('cancel')}
+                            <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
+                                {i18n.t('cancel')}
+                            </Button>
+                            <Form.Item>
+                                <Button type="primary" className='ml-2' htmlType="submit" loading={this.props.loading}>
+                                    {i18n.t('submit')}
                                 </Button>
-                            </Col>
-                            <Col span={3}>
-                                <Form.Item>
-                                    <Button type="primary" htmlType="submit" loading={this.props.loading}>
-                                        {i18n.t('submit')}
-                                    </Button>
-                                </Form.Item>
-                            </Col>
+                            </Form.Item>
                         </Row>
                     </Form>
                 </Card>
@@ -396,16 +392,12 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Col>
                     </Row>
                     <Row gutter={16} justify={'end'}>
-                        <Col span={3}>
-                            <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
-                                {i18n.t('cancel')}
-                            </Button>
-                        </Col>
-                        <Col span={3}>
-                            <Button type="primary" onClick={() => onFinish(this.formRef?.current?.getFieldsValue())} loading={this.props.loading}>
-                                {i18n.t('submit')}
-                            </Button>
-                        </Col>
+                        <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
+                            {i18n.t('cancel')}
+                        </Button>
+                        <Button type="primary" className='ml-2' onClick={() => onFinish(this.formRef?.current?.getFieldsValue())} loading={this.props.loading}>
+                            {i18n.t('submit')}
+                        </Button>
                     </Row>
                 </Card>
 

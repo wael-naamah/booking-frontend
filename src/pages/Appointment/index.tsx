@@ -5,7 +5,7 @@ import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/a
 import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
 import { AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm, ExtendedAppointment } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Row, Col, Card, Calendar, Spin } from "antd";
+import { Row, Col, Card, Calendar, Spin, message } from "antd";
 import { Calendar as BigCalendar, Views, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
 import 'moment/locale/de'
@@ -240,10 +240,15 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 step={60}
                                 selectable
                                 onSelectSlot={(slot) => {
-                                    this.setState({
-                                        selectedSlot: slot,
-                                        newAppointmentModal: true
-                                    })
+                                    const currentDate = new Date();
+                                    if (slot.start < currentDate) {
+                                        message.error(i18n.t('book_appointment_in_past_error'))
+                                    } else {
+                                        this.setState({
+                                            selectedSlot: slot,
+                                            newAppointmentModal: true
+                                        })
+                                    }
                                 }}
                                 views={views}
                                 popup={true}
