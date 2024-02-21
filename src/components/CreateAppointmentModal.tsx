@@ -7,7 +7,7 @@ import { RootState } from '../redux/store';
 import { selectAddAppointmentLoading, selectServices, selectServicesLoading } from '../redux/selectors';
 import { addAppointmentRequest, fetchServices } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
-import { upload } from '../utils';
+import { generatePassword, upload } from '../utils';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { withTranslation } from 'react-i18next';
@@ -92,7 +92,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 location: values.location,
                 telephone: values.telephone,
                 email: values.email,
-                password: undefined
+                password: generatePassword()
             };
 
             const appointment: Appointment = {
@@ -110,6 +110,8 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 year: values.year,
                 attachments: savedFileList.length ? savedFileList : undefined,
                 remarks: values.remarks || undefined,
+                company_remarks: values.company_remarks || undefined,
+                created_by: values.created_by || undefined
             }
 
 
@@ -293,6 +295,24 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             </Col>
                         </Row>
 
+                        <Row gutter={16}>
+                            <Col span={24}>
+                                <Form.Item label={i18n.t('company_remarks')} name="company_remarks">
+                                    <Input.TextArea />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+
+                        <Form.Item label={i18n.t('employee')} name="created_by" rules={[{ required: true }]}>
+                            <Select>
+                                {[{ lable: 'Daniela', value: 'Daniela' }, { lable: 'Sabina', value: 'Sabina' }, { lable: 'Sonia', value: 'Sonia' }].map((el) => (
+                                    <Option key={el.lable} value={el.value}>
+                                        {el.lable}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+
                         <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
                             <Select>
                                 {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }].map((el) => (
@@ -354,7 +374,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Row>
 
                         <Row gutter={16} justify={'end'}>
-                            <Button onClick={() => this.props.onClose()} htmlType="submit" loading={this.props.loading}>
+                            <Button onClick={() => this.props.onClose()} htmlType="submit">
                                 {i18n.t('cancel')}
                             </Button>
                             <Form.Item>

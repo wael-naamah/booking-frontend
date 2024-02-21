@@ -176,6 +176,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Col>
                         <Col span={16}>
                             <TextArea
+                                disabled={this.props.isContact}
                                 onChange={(e) => {
                                     this.setState({ employee_remarks: e.target.value });
                                 }}
@@ -197,6 +198,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                 disabledDate={(current) =>
                                     current && current.isAfter(dayjs(), "day")
                                 }
+                                disabled={this.props.isContact}
                                 value={this.state.ended_at ? dayjs(this.state.ended_at) : null}
                             />
                         </Col>
@@ -209,6 +211,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                     accept=".jpeg,.jpg,.png"
                                     name="attachments"
                                     listType="picture"
+                                    disabled={this.props.isContact}
                                     fileList={[
                                         ...savedFileList.map((a, i) => ({
                                             uid: i + "",
@@ -318,6 +321,18 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             <TextArea value={selectedEvent?.remarks} />
                         </Col>
                     </Row>
+                    {!this.props.isContact ? <Row className="mb-6" gutter={[16, 16]}>
+                        <Col span={24} className="w-full">
+                            <label>{i18n.t('company_remarks')}</label>
+                            <TextArea value={selectedEvent?.company_remarks} />
+                        </Col>
+                    </Row> : null}
+                    {!this.props.isContact ? <Row className="mb-6" gutter={[16, 16]}>
+                        <Col span={24} className="w-full">
+                            <label>{i18n.t('employee')}</label>
+                            <Input value={selectedEvent?.created_by} />
+                        </Col>
+                    </Row> : null}
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Checkbox checked={selectedEvent?.exhaust_gas_measurement} >
                             {i18n.t('exhaust_gas_measurement')}
@@ -395,7 +410,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             label: i18n.t('request_attachments'),
                             children: requestAttachments(),
                         },
-                        this.props.isContact ? null : {
+                        {
                             key: "3",
                             label: i18n.t('notes_files'),
                             children: renderEmployeeActions(),

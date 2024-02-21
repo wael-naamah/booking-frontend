@@ -21,6 +21,8 @@ export interface Appointment {
   remarks?: string;
   employee_attachments?: Attachment[];
   employee_remarks?: string;
+  company_remarks?: string;
+  created_by?: string;
   ended_at?: string;
   createdAt?: Date;
   updatedAt?: Date;

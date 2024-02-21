@@ -277,5 +277,7 @@
   "tomorrow": "Tomorrow",
   "no_events_in_range": "No events found in the current period.",
   "events": "events",
-  "book_appointment_in_past_error": "You can't book an appointment before the current date and time."
+  "book_appointment_in_past_error": "You can't book an appointment before the current date and time.",
+  "company_remarks": "Company remarks",
+  "employee": "Employee"
 }

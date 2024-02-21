@@ -277,6 +277,8 @@
   "tomorrow": "Morgen",
   "no_events_in_range": "Im aktuellen Zeitraum wurden keine Veranstaltungen gefunden.",
   "events": "Veranstaltungen",
-  "book_appointment_in_past_error": "Sie können keinen Termin vor dem aktuellen Datum und der aktuellen Uhrzeit buchen."
+  "book_appointment_in_past_error": "Sie können keinen Termin vor dem aktuellen Datum und der aktuellen Uhrzeit buchen.",
+  "company_remarks": "Firmennotizen",
+  "employee": "Mitarbeiter"
 }
 
