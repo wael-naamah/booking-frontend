@@ -2,6 +2,16 @@ import { Service } from "./Category";
 import { Attachment } from "./Common";
 import { Contact } from "./Contact";
 
+export enum ControlPointsValues {
+  IN_ORDER = 1,
+  ERROR = 2,
+  DOES_NOT_APPLY = 3,
+}
+
+export interface ControlPoints {
+  title: string;
+  value?: ControlPointsValues;
+}
 export interface Appointment {
   _id?: string;
   category_id: string;
@@ -24,6 +34,7 @@ export interface Appointment {
   company_remarks?: string;
   created_by?: string;
   ended_at?: string;
+  control_points?: ControlPoints[],
   createdAt?: Date;
   updatedAt?: Date;
 }

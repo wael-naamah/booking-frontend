@@ -1,4 +1,4 @@
-import { Contact } from "../../Schema";
+import { Contact, PaginatedForm } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
 
@@ -47,13 +47,18 @@ export const getContactsDone = (data: Contact[]) => ({
   payload: data,
 });
 
-export const fetchContacts = (page: number = 1, limit: number = 10) => {
+export const fetchContacts = (form: PaginatedForm) => {
   return async (dispatch: Dispatch) => {
     dispatch(getContacts());
 
+    const queryparams = new URLSearchParams();
+      form.page && queryparams.append("page", form.page.toString());
+      form.limit && queryparams.append("limit", form.limit.toString());
+      form.search && queryparams.append("search", form.search.toString());
+
     try {
       const response = await fetch(
-        `${API_URL}/contacts?page=${page}&limit=${limit}`
+        `${API_URL}/contacts?${queryparams.toString()}`
       );
       const data = await response.json();
 

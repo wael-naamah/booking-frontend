@@ -1,4 +1,5 @@
 import React from "react";
+import { debounce } from "lodash";
 import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import {
@@ -8,7 +9,7 @@ import {
   updateContactRequest,
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
-import { Contact, Salutation } from "../../Schema";
+import { Contact, PaginatedForm, Salutation } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { compose } from 'redux'
 import {
@@ -42,11 +43,12 @@ interface IContactState {
   pageCount: number;
   currentPage: number;
   editingContactId: string | null;
+  search: string;
 }
 
 interface IContactProps {
   loading: boolean;
-  fetchContacts: (page: number, limit: number) => Promise<any>;
+  fetchContacts: (form: PaginatedForm) => Promise<any>;
   createContactRequest: (contact: Contact) => Promise<any>;
   deleteContactRequest: (id: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
@@ -64,16 +66,17 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       pageCount: 10,
       currentPage: 1,
       editingContactId: null,
+      search: ''
     };
   }
 
   formRef = React.createRef<any>();
 
   fetchData = () => {
-    const { pageNum, pageCount } = this.state;
+    const { pageNum, pageCount, search } = this.state;
 
-    this.props.fetchContacts(pageNum, pageCount).then((data) => {
-      if (data.metaData && data.metaData.totalItems) {
+    this.props.fetchContacts({page: pageNum, limit: pageCount, search}).then((data) => {
+      if (data?.metaData?.totalItems) {
         this.setState({
           totalCount: data.metaData.totalItems,
           pageNum: data.metaData.currentPage,
@@ -98,6 +101,13 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     ) {
       this.fetchData();
     }
+  }
+  debounceSearch = debounce((value: string) => {
+    this.fetchData();
+  }, 1000);
+  onSearch = (value: string) => {
+    this.setState({ pageNum: 1, search: value });
+    this.debounceSearch(value);
   }
 
   onOpen = (contactId: string | null = null) => {
@@ -335,7 +345,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   };
 
   render() {
-    const { pageNum, totalCount, currentPage, pageCount, visible } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible, search } = this.state;
     const { loading, contacts } = this.props;
 
     return (
@@ -344,9 +354,20 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
         <Card
           title={i18n.t('contacts')}
           extra={
-            <Button onClick={() => this.onOpen()} type="primary">
-              {i18n.t('new_contact')}
-            </Button>
+            <>
+              <Input.Search
+                placeholder={i18n.t('search_contacts')}
+                style={{ width: '350px' }}
+                value={search}
+                onChange={(e) => {
+                  this.onSearch(e.target.value);
+                }}
+                className="machine-list-search"
+              />
+              <Button onClick={() => this.onOpen()} type="primary">
+                {i18n.t('new_contact')}
+              </Button>
+            </>
           }
         >
           <Spin spinning={loading}>
@@ -442,8 +463,8 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<RootState, undefined, any>
 ) => ({
-  fetchContacts: (page: number, limit: number) =>
-    dispatch(fetchContacts(page, limit)),
+  fetchContacts: (form: PaginatedForm) =>
+    dispatch(fetchContacts(form)),
   createContactRequest: (contact: Contact) =>
     dispatch(createContactRequest(contact)),
   deleteContactRequest: (id: string) => dispatch(deleteContactRequest(id)),

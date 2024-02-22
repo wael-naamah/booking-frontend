@@ -2,7 +2,9 @@ import { Button, Checkbox, Col, DatePicker, Divider, Form, Input, List, Modal, R
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { Appointment, Attachment, Calendar, Contact, ExtendedAppointment } from '../Schema';
+import { CheckCircleOutlined, CloseCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+
+import { Appointment, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectUpdateAppointmentLoading } from '../redux/selectors';
 import { fetchContactById, updateAppointmentRequest } from '../redux/actions';
@@ -49,7 +51,8 @@ interface IModalState {
     calendarId: string;
     uploading: boolean,
     contact: Contact | null,
-    contactLoading: boolean
+    contactLoading: boolean,
+    controlPoints: ControlPoints[]
 }
 
 class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> {
@@ -61,6 +64,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             contact: null,
             contactLoading: true,
             calendarId: props.selectedEvent?.calendar_id || "",
+            controlPoints: props.selectedEvent?.control_points || [],
         };
     }
 
@@ -105,7 +109,8 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         employee_remarks: employee_remarks ?? undefined,
                         ended_at: ended_at ? ended_at?.toISOString() : undefined,
                         employee_attachments: savedFileList,
-                        calendar_id: calendarId
+                        calendar_id: calendarId,
+                        control_points: this.state.controlPoints
                     }
                 })
                 .then((data) => {
@@ -249,6 +254,109 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Col>
                     </Row>
                 </>
+            )
+        }
+
+        const renderControlPoint = () => {
+            const { controlPoints } = this.state;
+
+            const handleChange = (value: ControlPointsValues, key: string) => {
+                if (!controlPoints.find(item => item.title === key)) {
+                    this.setState({
+                        controlPoints: [
+                            ...controlPoints,
+                            {
+                                title: key,
+                                value
+                            }
+                        ]
+                    });
+                } else {
+                    this.setState({
+                        controlPoints: controlPoints.map((item) => {
+                            if (item.title === key) {
+                                return {
+                                    ...item,
+                                    value,
+                                };
+                            }
+                            return item;
+                        }),
+                    });
+                }
+            };
+
+            const checkListKeys = [
+                "functional_check_of_the_gas_appliance",
+                "burner_cleaned",
+                "lamella_block_washed",
+                "electrodes_renewed",
+                "exhaust_gas_monitoring",
+                "combustion_chamber_insulation",
+                "inlet_pressure_of_the_expansion_vessel",
+                "safety_valve",
+                "quick_air_vent",
+                "leaks",
+                "exhaust_flap",
+                "exhaust_pipes_condition_connection_direction",
+                "heating_water_pressure",
+                "gas_setting", ,
+                "date_of_the_next_exhaust_gas_measurement",
+                "flow_assurance",
+                "condensing_boilers_condensation_water_siphon",
+                "radiator_vented",
+                "required_repairs_discussed_with_customer"
+            ]
+
+            const mapping = {
+                1: i18n.t('in_order'),
+                2: i18n.t('error'),
+                3: i18n.t('does_not_apply')
+            }
+
+            return (
+                <div>
+                    {checkListKeys.map((key, index) => {
+                        const existingItem = controlPoints.find(item => item.title === key);
+                        const title = i18n.t(`${key}`);
+
+                        return (
+                            <div key={index} style={{ marginBottom: '10px' }}>
+                                <Row>
+                                    <Col span={16}>
+                                        <span>{title}</span>
+                                    </Col>
+                                    <Col span={8}>
+                                        {this.props.isContact ? <Input value={existingItem ? mapping[existingItem.value!] : ''} /> : <Select
+                                            defaultValue={existingItem ? existingItem.value : undefined}
+                                            onChange={(value) => handleChange(value, key!)}
+                                            className='w-full'
+                                        >
+                                            <Option value={ControlPointsValues.IN_ORDER}>
+                                                <Space>
+                                                    <CheckCircleOutlined />
+                                                    {i18n.t('in_order')}
+                                                </Space>
+                                            </Option>
+                                            <Option value={ControlPointsValues.ERROR}>
+                                                <Space>
+                                                    <CloseCircleOutlined />
+                                                    {i18n.t('error')}
+                                                </Space>
+                                            </Option>
+                                            <Option value={ControlPointsValues.DOES_NOT_APPLY}>
+                                                <Space>
+                                                    <MinusCircleOutlined />
+                                                    {i18n.t('does_not_apply')}
+                                                </Space>
+                                            </Option>
+                                        </Select>}
+                                    </Col>
+                                </Row>
+                            </div>
+                        );
+                    })}
+                </div>
             )
         }
 
@@ -415,8 +523,13 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             label: i18n.t('notes_files'),
                             children: renderEmployeeActions(),
                         },
-                        this.props.calendars ? {
+                        {
                             key: "4",
+                            label: i18n.t('control_point'),
+                            children: renderControlPoint(),
+                        },
+                        this.props.calendars ? {
+                            key: "5",
                             label: i18n.t('calendar'),
                             children: renderAssignedCalendar(),
                         } : null
