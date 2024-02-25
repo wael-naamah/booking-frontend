@@ -1,5 +1,5 @@
 import { RcFile } from "antd/es/upload";
-import { API_URL, FILES_STORE } from "./redux/network/api";
+import { API_URL } from "./redux/network/api";
 
 export const upload = async (file: RcFile) => {
   const imageName = file.name;

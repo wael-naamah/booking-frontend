@@ -303,5 +303,9 @@
   "condensing_boilers_condensation_water_siphon": "Condensing boilers / condensation water siphon",
   "radiator_vented": "Radiator vented",
   "required_repairs_discussed_with_customer": "Required repairs discussed with customer",
-  "search_contacts": "Search Contacts"
+  "search_contacts": "Search Contacts",
+  "invoice_number": "Invoice",
+  "contract_number": "Contract Number",
+  "import_contacts": "Import Contacts",
+  "please_select_a_file": "Please select a file"
 }

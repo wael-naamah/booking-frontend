@@ -27,6 +27,10 @@ export interface Appointment {
   has_bgas_before?: boolean;
   year?: string;
   invoice_number?: number;
+  contract_number?: number;
+  imported_service_name?: string,
+  imported_service_duration?: string,
+  imported_service_price?: string,
   attachments?: Attachment[];
   remarks?: string;
   employee_attachments?: Attachment[];

@@ -303,5 +303,9 @@
   "condensing_boilers_condensation_water_siphon": "Brennwertgeräte / Kondenswassersiphon",
   "radiator_vented": "Heizkörper entlüftet",
   "required_repairs_discussed_with_customer": "Erforderliche Reparaturen mit Kunden besprochen",
-  "search_contacts": "Kontakte durchsuchen"
+  "search_contacts": "Kontakte durchsuchen",
+  "invoice_number": "Rechnungsnummer",
+  "contract_number": "Kundennummer",
+  "import_contacts": "Kontakte importieren",
+  "please_select_a_file": "Bitte wählen Sie eine Datei aus"
 }

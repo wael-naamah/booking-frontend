@@ -337,26 +337,27 @@ class AppointmentsPage extends React.Component<
               style={{ marginTop: 20 }}
               rowKey="_id"
               pagination={false}
+              scroll={{ x: true }} 
             >
               <Column
                 title={i18n.t('services')}
                 dataIndex={"service"}
-                render={(service: Service) => {
-                  return <span>{service.name}</span>;
+                render={(service: Service, record: ExtendedAppointment) => {
+                  return <span>{service?.name || record?.imported_service_name || '--'}</span>;
                 }}
               />
               <Column
                 title={i18n.t('duration')}
                 dataIndex={"service"}
-                render={(service: Service) => {
-                  return <span>{service.duration} {i18n.t('mins')}</span>;
+                render={(service: Service, record: ExtendedAppointment) => {
+                  return <span>{service?.duration || record.imported_service_duration || '--'} {service?.duration ? i18n.t('mins') : ''}</span>;
                 }}
               />
               <Column
                 title={i18n.t('price')}
                 dataIndex={"service"}
-                render={(service: Service) => {
-                  return <span>{service.price} {i18n.t('eur')}</span>;
+                render={(service: Service, record: ExtendedAppointment) => {
+                  return <span>{service?.price || record?.imported_service_price || '--'} {service?.price ? i18n.t('eur') : ''}</span>;
                 }}
               />
               <Column
@@ -385,6 +386,8 @@ class AppointmentsPage extends React.Component<
               />
               <Column title={i18n.t('brand')} dataIndex={"brand_of_device"} />
               <Column title={i18n.t('model')} dataIndex={"model"} />
+              <Column title={i18n.t('invoice_number')} dataIndex={"invoice_number"} />
+              <Column title={i18n.t('contract_number')} dataIndex={"contract_number"} />
               <Column
                 title={i18n.t('action')}
                 key="action"

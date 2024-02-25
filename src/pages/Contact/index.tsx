@@ -7,6 +7,7 @@ import {
   createContactRequest,
   deleteContactRequest,
   updateContactRequest,
+  importContactsRequest,
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
 import { Contact, PaginatedForm, Salutation } from "../../Schema";
@@ -24,14 +25,17 @@ import {
   Popconfirm,
   Row,
   Select,
+  Space,
   Spin,
   Table,
+  Upload,
   message,
 } from "antd";
 import withRouter from "../../HOC/withRouter";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
 import withAuthorization from "../../HOC/withAuthorization";
+import { RcFile } from "antd/es/upload";
 
 const { Column } = Table;
 const { Option } = Select;
@@ -44,6 +48,9 @@ interface IContactState {
   currentPage: number;
   editingContactId: string | null;
   search: string;
+  importModelVisible: boolean;
+  importLoading: boolean;
+  file?: RcFile;
 }
 
 interface IContactProps {
@@ -66,7 +73,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       pageCount: 10,
       currentPage: 1,
       editingContactId: null,
-      search: ''
+      search: '',
+      importModelVisible: false,
+      importLoading: false,
     };
   }
 
@@ -75,7 +84,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   fetchData = () => {
     const { pageNum, pageCount, search } = this.state;
 
-    this.props.fetchContacts({page: pageNum, limit: pageCount, search}).then((data) => {
+    this.props.fetchContacts({ page: pageNum, limit: pageCount, search }).then((data) => {
       if (data?.metaData?.totalItems) {
         this.setState({
           totalCount: data.metaData.totalItems,
@@ -112,6 +121,10 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 
   onOpen = (contactId: string | null = null) => {
     this.setState({ visible: true, editingContactId: contactId });
+  };
+
+  onOpenImportModel = () => {
+    this.setState({ importModelVisible: true });
   };
 
   handlePageChange = (value: number) => {
@@ -344,13 +357,93 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     );
   };
 
+  renderImportContactsModel = () => {
+    const { importModelVisible, file } = this.state;
+
+    const onClose = () => {
+      this.setState({ importModelVisible: false });
+    };
+
+    const onFinish = () => {
+      if (!this.state.file) return message.error(i18n.t('please_select_a_file'));
+
+      this.setState({ importLoading: true });
+      importContactsRequest(this.state.file).then((data) => {
+        if (data.status && data.status === "success") {
+          message.success(data.message);
+        } else {
+          message.error(i18n.t('something_went_wrong_please_try_again'));
+        }
+      }).finally(() => {
+        this.setState({ importModelVisible: false, importLoading: false });
+      });
+    };
+
+    const setFile = (file?: RcFile) => {
+      this.setState({ file })
+    }
+
+    return (
+      <Modal
+        title={i18n.t('import_contacts')}
+        open={importModelVisible}
+        centered
+        closable={false}
+        footer={() => null}
+        width={800}
+      >
+        <Divider />
+
+        <Form
+          ref={this.formRef}
+          name="contactForm"
+          layout="vertical"
+          onFinish={onFinish}
+        >
+          <Row gutter={16}>
+            <Col span={24}>
+              <Upload.Dragger
+                fileList={file ? [file] : []}
+                maxCount={1}
+                multiple={false}
+                onRemove={() => {
+                  setFile(undefined);
+                }}
+                beforeUpload={(file) => {
+                  setFile(file);
+                  return false;
+                }}
+              >
+                <Space size={14} align="center" className="m-0">
+                  <p className="upload-hint-label">
+                    {i18n.t('import_contacts')}
+                  </p>
+                </Space>
+              </Upload.Dragger>
+            </Col>
+          </Row>
+          <Divider className="mb-4 mt-2" />
+          <Row gutter={16} justify={"end"}>
+            <Button onClick={onClose}>{i18n.t('cancel')}</Button>
+            <Form.Item>
+              <Button type="primary" className="ml-2" htmlType="submit">
+                {i18n.t('save')}
+              </Button>
+            </Form.Item>
+          </Row>
+        </Form>
+      </Modal>
+    );
+  }
+
   render() {
-    const { pageNum, totalCount, currentPage, pageCount, visible, search } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, search } = this.state;
     const { loading, contacts } = this.props;
 
     return (
       <>
         {visible ? this.renderNewContactModal() : null}
+        {importModelVisible ? this.renderImportContactsModel() : null}
         <Card
           title={i18n.t('contacts')}
           extra={
@@ -364,7 +457,10 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                 }}
                 className="machine-list-search"
               />
-              <Button onClick={() => this.onOpen()} type="primary">
+              <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
+                {i18n.t('import_contacts')}
+              </Button>
+              <Button className="ml-2" onClick={() => this.onOpen()} type="primary">
                 {i18n.t('new_contact')}
               </Button>
             </>

@@ -1,6 +1,7 @@
 import { Contact, PaginatedForm } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
+import { RcFile } from "antd/es/upload";
 
 const GET_CONTACTS = "contacts/GET_ALL" as const;
 const GET_CONTACTS_DONE = "contacts/GET_ALL_DONE" as const;
@@ -52,9 +53,9 @@ export const fetchContacts = (form: PaginatedForm) => {
     dispatch(getContacts());
 
     const queryparams = new URLSearchParams();
-      form.page && queryparams.append("page", form.page.toString());
-      form.limit && queryparams.append("limit", form.limit.toString());
-      form.search && queryparams.append("search", form.search.toString());
+    form.page && queryparams.append("page", form.page.toString());
+    form.limit && queryparams.append("limit", form.limit.toString());
+    form.search && queryparams.append("search", form.search.toString());
 
     try {
       const response = await fetch(
@@ -75,15 +76,29 @@ export const fetchContacts = (form: PaginatedForm) => {
 
 export const fetchContactById = async (id: string) => {
   try {
-    const response = await fetch(
-      `${API_URL}/contacts/${id}`
-    );
+    const response = await fetch(`${API_URL}/contacts/${id}`);
     const data = await response.json();
 
     return data;
   } catch (error) {
-    return null
+    return null;
   }
+};
+
+export const importContactsRequest = async (file: RcFile) => {
+  try {
+  const uploadFileData = new FormData();
+  uploadFileData.append("file", file);
+  const result = await fetch(`${API_URL}/files/upload-contacts-file`, {
+    method: "POST",
+    body: uploadFileData,
+  });
+  const data = await result.json();
+
+  return data;
+} catch (error) {
+  return null;
+}
 };
 
 export const updateContactRequest = (id: string, contact: Contact) => {
