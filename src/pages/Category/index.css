@@ -1,0 +1,11 @@
+@media screen and (max-width: 800px) {
+    .category .ant-layout-content {
+        padding: 5px 10px !important;
+    }
+    .category .slots {
+        margin-top: 20px;
+    }
+    .category .steps {
+        margin-top: 20px;
+    }
+}

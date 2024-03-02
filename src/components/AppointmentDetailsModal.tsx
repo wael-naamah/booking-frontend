@@ -176,10 +176,10 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             return (
                 <>
                     <Row className="mb-6">
-                        <Col span={8} className="w-full">
+                        <Col md={8} xs={24} className="w-full">
                             <span>{i18n.t('employee_remarks')}</span>
                         </Col>
-                        <Col span={16}>
+                        <Col md={16} xs={24}>
                             <TextArea
                                 disabled={this.props.isContact}
                                 onChange={(e) => {
@@ -190,10 +190,10 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Col>
                     </Row>
                     <Row className="mb-6">
-                        <Col span={8} className="w-full">
+                        <Col md={8} xs={24} className="w-full">
                             <span>{i18n.t('ended_at')}</span>
                         </Col>
-                        <Col span={16}>
+                        <Col md={16} xs={24}>
                             <DatePicker
                                 onChange={(value) => {
                                     this.setState({ ended_at: dayjs(value).toDate() });
@@ -210,7 +210,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                     </Row>
 
                     <Row gutter={16} wrap={false}>
-                        <Col span={24}>
+                        <Col md={24} xs={24}>
                             <Form.Item>
                                 <Upload.Dragger
                                     accept=".jpeg,.jpg,.png"
@@ -244,7 +244,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                         data.onSuccess(url);
                                         setSavedFileList([...savedFileList, { url, title: data.file.name }]);
                                     }}>
-                                    <Space size={14} align="center" className="m-0">
+                                    <Space size={14} align="center" className="m-0 items-center">
                                         <p className="upload-hint-label">
                                             {i18n.t('upload_a_photo_of_the_result_if_any')}
                                         </p>
@@ -323,10 +323,10 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         return (
                             <div key={index} style={{ marginBottom: '10px' }}>
                                 <Row>
-                                    <Col span={16}>
+                                    <Col md={16} xs={19}>
                                         <span>{title}</span>
                                     </Col>
-                                    <Col span={8}>
+                                    <Col md={8} xs={5} >
                                         {this.props.isContact ? <Input value={existingItem ? mapping[existingItem.value!] : ''} /> : <Select
                                             defaultValue={existingItem ? existingItem.value : undefined}
                                             onChange={(value) => handleChange(value, key!)}
@@ -366,59 +366,59 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             return (
                 <Spin spinning={contactLoading}>
                     <Row className="mb-6" gutter={[16, 16]}>
-                        <Col span={12} className="w-full">
+                        <Col md={12} xs={24} className="w-full">
                             <label>{i18n.t('performance')}</label>
                             <Input value={selectedEvent?.title} />
                         </Col>
-                        <Col span={12}>
+                        <Col md={12} xs={24}>
                             <label>{i18n.t('time')}</label>
                             <Input value={dayjs(selectedEvent?.start_date).format("HH:mm A") + " - " + dayjs(selectedEvent?.end_date).format("HH:mm A")} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
-                        <Col span={8} className="w-full">
+                        <Col md={8} xs={24} className="w-full">
                             <label>{i18n.t('salutation')}</label>
                             <Input value={contact?.salutation} />
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <label>{i18n.t('name')}</label>
                             <Input value={contact?.first_name + " " + contact?.last_name} />
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <label>{i18n.t('telephone')}</label>
                             <Input value={contact?.telephone} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
-                        <Col span={8} className="w-full">
+                        <Col md={8} xs={24} className="w-full">
                             <label>{i18n.t('address')}</label>
                             <Input value={contact?.address} />
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <label>{i18n.t('zip_code')}</label>
                             <Input value={contact?.zip_code} />
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <label>{i18n.t('location')}</label>
                             <Input value={contact?.location} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
-                        <Col span={12} className="w-full">
+                        <Col md={12} xs={24} className="w-full">
                             <label>{i18n.t('email')}</label>
                             <Input value={contact?.email} />
                         </Col>
-                        <Col span={12}>
+                        <Col md={12} xs={24}>
                             <label>{i18n.t('brand_of_device')}</label>
                             <Input value={selectedEvent?.brand_of_device} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
-                        <Col span={12} className="w-full">
+                        <Col md={12} xs={24} className="w-full">
                             <label>{i18n.t('device_model')}</label>
                             <Input value={selectedEvent?.model} />
                         </Col>
-                        <Col span={12}>
+                        <Col md={12} xs={24}>
                             <label>{i18n.t('year')}</label>
                             <Input value={selectedEvent?.year} />
                         </Col>

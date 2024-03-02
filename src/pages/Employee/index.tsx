@@ -15,7 +15,7 @@ import './index.css';
 import Header from "../../components/Header";
 import { Content } from "antd/es/layout/layout";
 import AppointmentDetailsModal from "../../components/AppointmentDetailsModal";
-
+import "./CalendarMobile.scss";
 
 interface CalendarEvent extends ExtendedAppointment {
     title: string;
@@ -46,8 +46,8 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
 
 
     componentDidMount() {
-        if(this.props.profile?._id)
-        this.props.fetchCalendarAppointments(this.props.profile?._id);
+        if (this.props.profile?._id)
+            this.props.fetchCalendarAppointments(this.props.profile?._id);
     }
 
     renderEventModal = () => {
@@ -57,8 +57,8 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
         }
 
         const onSave = () => {
-            if(this.props.profile?._id)
-            this.props.fetchCalendarAppointments(this.props.profile?._id);
+            if (this.props.profile?._id)
+                this.props.fetchCalendarAppointments(this.props.profile?._id);
             this.setState({ modalState: false, selectedEvent: null });
         };
 
@@ -86,26 +86,23 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
         }
 
         return (
-            <Content>
-                {modalState ? this.renderEventModal() : null}
-                <Header />
-                <Spin spinning={loading}>
-                    <Row gutter={16} justify={'space-around'} className="calendar-container">
-                        <Col span={24} xs={24} md={18}>
-                            <div style={{ height: 600 }}>
-                                <BigCalendar
-                                    localizer={localizer}
-                                    events={events}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    popup={true}
-                                    onSelectEvent={(e) => handleSelectedEvent(e)}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
-                </Spin>
-            </Content>
+            <div className="employee-calendar">
+                <Content>
+                    {modalState ? this.renderEventModal() : null}
+                    <Header />
+                    <Spin spinning={loading}>
+                        <BigCalendar
+                            localizer={localizer}
+                            events={events}
+                            startAccessor="start"
+                            endAccessor="end"
+                            popup={true}
+                            onSelectEvent={(e) => handleSelectedEvent(e)}
+                            style={{ minHeight: 800 }}
+                        />
+                    </Spin>
+                </Content>
+            </div>
         );
     }
 }

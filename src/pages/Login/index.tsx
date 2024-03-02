@@ -1,14 +1,16 @@
 import React, { ChangeEvent } from "react";
 import { connect } from "react-redux";
-import { RootState } from "../redux/store";
-import { loginRequest } from "../redux/actions";
-import { selectLoginLoading } from "../redux/selectors";
+import { RootState } from "../../redux/store";
+import { loginRequest } from "../../redux/actions";
+import { selectLoginLoading } from "../../redux/selectors";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Input, Button, Form, message } from 'antd';
-import withRouter from "../HOC/withRouter";
+import withRouter from "../../HOC/withRouter";
 import { compose } from 'redux'
-import i18n from "../locales/i18n";
+import i18n from "../../locales/i18n";
 import { withTranslation } from 'react-i18next';
+import "./index.css";
+
 interface ILoginState {
     email: string;
     password: string;
@@ -51,25 +53,28 @@ class LoginPage extends React.Component<ILoginProps, ILoginState> {
         const { loading } = this.props;
 
         return (
-            <div className="flex items-center justify-center h-screen">
-            <Form
-              layout="vertical"
-              onFinish={this.handleLogin}
-              className="bg-white-100 p-12 rounded shadow-md w-1/3"
-            >
-              <Form.Item label={i18n.t('email')} rules={[{ required: true, message: i18n.t('Please_input_your_email') }]}>
-                <Input type="email" value={email} name="email" onChange={this.handleInputChange} className="w-full p-3" />
-              </Form.Item>
-              <Form.Item label={i18n.t('password')}  rules={[{ required: true, message: i18n.t('Please_input_your_password') }]}>
-                <Input type="password" name="password" value={password} onChange={this.handleInputChange} className="w-full p-3" />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit" loading={loading} className="w-full py-3 flex items-center justify-center">
-                {i18n.t('login')}
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
+            <div className="login-container">
+                <div className="login-content">
+                    <h2 className="login-title">{i18n.t('Login')}</h2>
+                    <Form
+                      layout="vertical"
+                      onFinish={this.handleLogin}
+                      className="login-form"
+                    >
+                      <Form.Item label={i18n.t('email')} rules={[{ required: true, message: i18n.t('Please_input_your_email') }]}>
+                        <Input type="email" value={email} name="email" onChange={this.handleInputChange} />
+                      </Form.Item>
+                      <Form.Item label={i18n.t('password')}  rules={[{ required: true, message: i18n.t('Please_input_your_password') }]}>
+                        <Input.Password name="password" value={password} onChange={this.handleInputChange} />
+                      </Form.Item>
+                      <Form.Item>
+                        <Button type="primary" htmlType="submit" loading={loading} className="login-button">
+                        {i18n.t('login')}
+                        </Button>
+                      </Form.Item>
+                    </Form>
+                </div>
+            </div>
         );
     }
 }

@@ -11,7 +11,6 @@ import withAuthorization from "../../HOC/withAuthorization";
 import './index.css'
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
-import { Content } from "antd/es/layout/layout";
 import Header from "../../components/Header";
 
 const { Option } = Select;
@@ -67,7 +66,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
         };
 
         return (
-            <Content>
+            <div>
                 <Form
                     ref={this.formRef}
                     name="contactForm"
@@ -76,7 +75,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                     initialValues={initialValues}
                 >
                     <Row gutter={16}>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('salutation')}
                                 name="salutation"
@@ -95,7 +94,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('first_name')}
                                 name="first_name"
@@ -104,7 +103,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 <Input />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('last_name')}
                                 name="last_name"
@@ -116,7 +115,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                     </Row>
 
                     <Row gutter={16}>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('address')}
                                 name="address"
@@ -125,7 +124,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 <Input />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('zip_code')}
                                 name="zip_code"
@@ -134,7 +133,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 <Input />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('location')}
                                 name="location"
@@ -146,7 +145,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                     </Row>
 
                     <Row gutter={16}>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('telephone')}
                                 name="telephone"
@@ -155,7 +154,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 <Input type="tel" />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('phone_2')}
                                 name="phone_numbber_2"
@@ -164,7 +163,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                                 <Input />
                             </Form.Item>
                         </Col>
-                        <Col span={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 label={i18n.t('phone_3')}
                                 name="phone_numbber_3"
@@ -175,7 +174,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                         </Col>
                     </Row>
                     <Row gutter={16}>
-                        <Col span={24}>
+                        <Col md={24} xs={24}>
                             <Form.Item
                                 label={i18n.t('email')}
                                 name="email"
@@ -199,7 +198,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                         </Col>
                     </Row>
                 </Form>
-            </Content>
+            </div>
         )
     }
 
@@ -232,7 +231,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
 
 
         return (
-            <Content>
+            <div>
                 <Form
                     ref={this.resetFormRef}
                     name="resetPasswordForm"
@@ -292,7 +291,7 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                         </Col>
                     </Row>
                 </Form>
-            </Content>
+            </div>
         )
     }
 
@@ -300,9 +299,9 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
 
 
         return (
-            <>
+            <div className="profile">
                 <Header />
-                <Content>
+                <div className="m-2">
                     <Card>
                         <Tabs
                             defaultActiveKey="1"
@@ -320,8 +319,8 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                             ]}
                         />
                     </Card>
-                </Content>
-            </>
+                </div>
+            </div>
         );
     }
 }

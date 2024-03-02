@@ -17,6 +17,7 @@ import { FILES_STORE } from "../../redux/network/api";
 import { generatePassword, upload } from "../../utils";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
+import './index.css';
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -243,288 +244,292 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         }
 
         return (
-            <Content>
-                <Header />
-                <Row gutter={16}>
-                    <Col xs={24} sm={18}>
-                        {current === 0 ? <Collapse defaultActiveKey={["0"]}>
-                            {categories.map((el, index) => (
-                                <Panel header={<span className="font-bold text-lg">{el.name}</span>} key={`${index}`}>
-                                    <Row gutter={[16, 16]}>
-                                        {el.services.map((service) => (
-                                            <Col key={service._id} xs={24} sm={16} md={12} lg={8} xl={6}>
-                                                <Card
-                                                    title={service.name}
-                                                    onClick={() => {
-                                                        this.setState({
-                                                            selectedCategory: el._id!,
-                                                            selectedService: service,
-                                                            current: 1,
-                                                            currentDate:
-                                                                dayjs().day() === 0
-                                                                    ? dayjs().add(1, "day").startOf("day")
-                                                                    : dayjs().day() === 6
-                                                                        ? dayjs().add(2, "day").startOf("day")
-                                                                        : dayjs(),
-                                                        });
-                                                    }}
-                                                    className="border border-gray-400 hover:border-primary transition duration-300 transform hover:scale-105"
-                                                >
-                                                    <img src={service.attachment?.url ? FILES_STORE + service.attachment?.url : ServiceLogo} alt={service.name} className="mb-3" width={200} height={165} />
-                                                    <p className="text-gray-600">{i18n.t('duration')}: {service.duration} {i18n.t('mins')}</p>
-                                                    <p className="text-lg text-primary font-bold">{service.price} {i18n.t('eur')}</p>
-                                                    <p className="text-sm">{service.description}</p>
-                                                </Card>
-                                            </Col>
-                                        ))}
-                                    </Row>
-                                </Panel>
-                            ))}
-                        </Collapse> : current === 1 ?
-                            <Row gutter={16} justify={'space-around'}>
-                                <Col span={16}>
-                                    <Card className="border border-gray-300 w-full h-96 rounded-md">
-                                        <Calendar
-                                            fullscreen={false}
-                                            value={currentDate ? currentDate : dayjs()}
-                                            onSelect={this.onSelectDate}
-                                            disabledDate={this.disabledDate}
-                                            onChange={(date) => this.setState({ currentDate: dayjs(date) })}
-                                        />
-                                    </Card>
-                                </Col>
-                                <Col span={8}>
-                                    <Spin spinning={timeslotsLoading}>
-                                        <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="border border-gray-300 w-full h-96 rounded-md overflow-y-auto">
-                                            {formattedSlots.map((el) => (
-                                                <div onClick={() => {
-                                                    this.setState({ selectedSlot: el, current: 2 })
-                                                }} className="p-4 m-3 flex items-center justify-center border border-gray-300 rounded-md bg-gray-100">
-                                                    <span>{el.slot}</span>
-                                                </div>
+            <div className="category">
+                <Content>
+                    <Header />
+                    <Row gutter={16}>
+                        <Col xl={18} lg={16} xs={24}>
+                            {current === 0 ? <Collapse defaultActiveKey={["0"]}>
+                                {categories.map((el, index) => (
+                                    <Panel header={<span className="font-bold text-lg">{el.name}</span>} key={`${index}`}>
+                                        <Row gutter={[16, 16]}>
+                                            {el.services.map((service) => (
+                                                <Col key={service._id} xs={24} sm={16} md={12} lg={12} xl={6}>
+                                                    <Card
+                                                        title={service.name}
+                                                        onClick={() => {
+                                                            this.setState({
+                                                                selectedCategory: el._id!,
+                                                                selectedService: service,
+                                                                current: 1,
+                                                                currentDate:
+                                                                    dayjs().day() === 0
+                                                                        ? dayjs().add(1, "day").startOf("day")
+                                                                        : dayjs().day() === 6
+                                                                            ? dayjs().add(2, "day").startOf("day")
+                                                                            : dayjs(),
+                                                            });
+                                                        }}
+                                                        className="border border-gray-400 hover:border-primary transition duration-300 transform hover:scale-105"
+                                                    >
+                                                        <div className="flex justify-center items-center">
+                                                            <img src={service.attachment?.url ? FILES_STORE + service.attachment?.url : ServiceLogo} alt={service.name} className="mb-3" width={200} height={165} />
+                                                        </div>
+                                                        <p className="text-gray-600">{i18n.t('duration')}: {service.duration} {i18n.t('mins')}</p>
+                                                        <p className="text-lg text-primary font-bold">{service.price} {i18n.t('eur')}</p>
+                                                        <p className="text-sm">{service.description}</p>
+                                                    </Card>
+                                                </Col>
                                             ))}
+                                        </Row>
+                                    </Panel>
+                                ))}
+                            </Collapse> : current === 1 ?
+                                <Row gutter={16} justify={'space-around'}>
+                                    <Col md={16} xs={24}>
+                                        <Card className="border border-gray-300 w-full h-96 rounded-md">
+                                            <Calendar
+                                                fullscreen={false}
+                                                value={currentDate ? currentDate : dayjs()}
+                                                onSelect={this.onSelectDate}
+                                                disabledDate={this.disabledDate}
+                                                onChange={(date) => this.setState({ currentDate: dayjs(date) })}
+                                            />
                                         </Card>
-                                    </Spin>
-                                </Col>
-                            </Row>
-                            :
-                            <Card className="border border-gray-300" >
-                                <Form
-                                    ref={this.formRef}
-                                    name="contactForm"
-                                    layout="vertical"
-                                    onFinish={this.onFinish}
-                                    initialValues={initialValues}
-                                >
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
-                                                <Select>
-                                                    {[
-                                                        { lable: i18n.t('mr'), value: Salutation.MISTER },
-                                                        { lable: i18n.t('mrs'), value: Salutation.WOMAN },
-                                                        { lable: i18n.t('company'), value: Salutation.COMPANY },
-                                                    ].map((el) => (
-                                                        <Option key={el.lable} value={el.value}>
-                                                            {el.lable}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('first_name')} name="first_name" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('last_name')} name="last_name" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                    </Col>
+                                    <Col md={8} xs={24}>
+                                        <Spin spinning={timeslotsLoading}>
+                                            <Card title={currentDate ? dayjs(currentDate).format('dddd DD-MM-YYYY') : ""} className="slots border border-gray-300 w-full h-96 rounded-md overflow-y-auto">
+                                                {formattedSlots.map((el) => (
+                                                    <div onClick={() => {
+                                                        this.setState({ selectedSlot: el, current: 2 })
+                                                    }} className="p-4 m-3 flex items-center justify-center border border-gray-300 rounded-md bg-gray-100">
+                                                        <span>{el.slot}</span>
+                                                    </div>
+                                                ))}
+                                            </Card>
+                                        </Spin>
+                                    </Col>
+                                </Row>
+                                :
+                                <Card className="border border-gray-300" >
+                                    <Form
+                                        ref={this.formRef}
+                                        name="contactForm"
+                                        layout="vertical"
+                                        onFinish={this.onFinish}
+                                        initialValues={initialValues}
+                                    >
+                                        <Row gutter={16}>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
+                                                    <Select>
+                                                        {[
+                                                            { lable: i18n.t('mr'), value: Salutation.MISTER },
+                                                            { lable: i18n.t('mrs'), value: Salutation.WOMAN },
+                                                            { lable: i18n.t('company'), value: Salutation.COMPANY },
+                                                        ].map((el) => (
+                                                            <Option key={el.lable} value={el.value}>
+                                                                {el.lable}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('first_name')} name="first_name" rules={[{ required: true }]}>
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('last_name')} name="last_name" rules={[{ required: true }]}>
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('address')} name="address" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('zip_code')} name="zip_code" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('location')} name="location" rules={[{ required: true }]}>
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                        <Row gutter={16}>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('address')} name="address" rules={[{ required: true }]}>
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('zip_code')} name="zip_code" rules={[{ required: true }]}>
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('location')} name="location" rules={[{ required: true }]}>
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('telephone')} name="telephone" rules={[{ required: true }]}>
-                                                <Input type="tel" />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('email')} name="email" rules={[{ required: true, type: 'email' }]}>
-                                                <Input disabled={initialValues && initialValues.email} />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={8}>
-                                            <Form.Item label={i18n.t('brand_of_device')} name="brand_of_device">
-                                                <Select>
-                                                    {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
-                                                    i18n.t('praiseworthy'), i18n.t('nordgas'), i18n.t('orange'), i18n.t('rapido'),
-                                                    i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((salutation) => (
-                                                        <Option key={salutation} value={salutation}>
-                                                            {salutation}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                        <Row gutter={16}>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('telephone')} name="telephone" rules={[{ required: true }]}>
+                                                    <Input type="tel" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('email')} name="email" rules={[{ required: true, type: 'email' }]}>
+                                                    <Input disabled={initialValues && initialValues.email} />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item label={i18n.t('brand_of_device')} name="brand_of_device">
+                                                    <Select>
+                                                        {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
+                                                        i18n.t('praiseworthy'), i18n.t('nordgas'), i18n.t('orange'), i18n.t('rapido'),
+                                                        i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((salutation) => (
+                                                            <Option key={salutation} value={salutation}>
+                                                                {salutation}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Row gutter={16}>
-                                        <Col span={12}>
-                                            <Form.Item label={i18n.t('device_model')} name="model">
-                                                <Input />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Form.Item
-                                                label={i18n.t('year')}
-                                                name="year"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: i18n.t('please_select_a_year'),
-                                                    },
-                                                ]}
-                                            >
-                                                <Select placeholder={i18n.t('select_a_year')}>
-                                                    {[i18n.t('last_year'), i18n.t('i_dont_know_anymore')].concat(years).map((year) => (
-                                                        <Option key={year} value={year}>
-                                                            {year}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                        <Row gutter={16}>
+                                            <Col md={12} xs={24}>
+                                                <Form.Item label={i18n.t('device_model')} name="model">
+                                                    <Input />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col md={12} xs={24}>
+                                                <Form.Item
+                                                    label={i18n.t('year')}
+                                                    name="year"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: i18n.t('please_select_a_year'),
+                                                        },
+                                                    ]}
+                                                >
+                                                    <Select placeholder={i18n.t('select_a_year')}>
+                                                        {[i18n.t('last_year'), i18n.t('i_dont_know_anymore')].concat(years).map((year) => (
+                                                            <Option key={year} value={year}>
+                                                                {year}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Row gutter={16}>
-                                        <Col span={24}>
-                                            <Form.Item label={i18n.t('notes')} name="remarks">
-                                                <Input.TextArea />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                        <Row gutter={16}>
+                                            <Col md={24} xs={24}>
+                                                <Form.Item label={i18n.t('notes')} name="remarks">
+                                                    <Input.TextArea />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
-                                        <Select>
-                                            {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }].map((el) => (
-                                                <Option key={el.lable} value={el.value}>
-                                                    {el.lable}
-                                                </Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
-                                    <Form.Item name="exhaust_gas_measurement" valuePropName="checked">
-                                        <Checkbox>{i18n.t('exhaust_gas_measurement')}</Checkbox>
-                                    </Form.Item>
-                                    <Form.Item name="has_bgas_before" valuePropName="checked">
-                                        <Checkbox>{i18n.t('has_bgas_before')}</Checkbox>
-                                    </Form.Item>
+                                        <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
+                                            <Select>
+                                                {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }].map((el) => (
+                                                    <Option key={el.lable} value={el.value}>
+                                                        {el.lable}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item name="exhaust_gas_measurement" valuePropName="checked">
+                                            <Checkbox>{i18n.t('exhaust_gas_measurement')}</Checkbox>
+                                        </Form.Item>
+                                        <Form.Item name="has_bgas_before" valuePropName="checked">
+                                            <Checkbox>{i18n.t('has_bgas_before')}</Checkbox>
+                                        </Form.Item>
 
-                                    <Row gutter={16} wrap={false}>
-                                        <Col span={24}>
-                                            <Form.Item>
-                                                <Upload.Dragger
-                                                    accept=".jpeg,.jpg,.png"
-                                                    name="attachments"
-                                                    listType="picture"
-                                                    fileList={[
-                                                        ...savedFileList.map((a, i) => ({
-                                                            uid: i + "",
-                                                            name: a.title,
-                                                            status: "done",
-                                                            url: FILES_STORE + a.url,
-                                                        })),
-                                                        ...(uploading
-                                                            ? [
-                                                                {
-                                                                    uid: savedFileList.length + "",
-                                                                    name: "",
-                                                                    status: "uploading",
-                                                                    url: "",
-                                                                },
-                                                            ]
-                                                            : []),
-                                                    ] as any}
-                                                    onRemove={(file) => this.removeAttachment(file.name)}
-                                                    customRequest={async (data: any) => {
-                                                        this.setUploading(true);
-                                                        const res = await upload(data.file);
-                                                        const url = res.uri;
-                                                        this.setUploading(false);
-                                                        data.onSuccess(url);
-                                                        this.setSavedFileList([...savedFileList, { url, title: data.file.name }]);
-                                                    }}>
-                                                    <Space size={14} align="center" className="m-0">
-                                                        <p className="upload-hint-label">
-                                                            {i18n.t('Take_upload_a_photo_of_the_device_name_plate_if_the_type_is_not_known')}
-                                                        </p>
-                                                    </Space>
-                                                </Upload.Dragger>
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
+                                        <Row gutter={16} wrap={false}>
+                                            <Col md={24}>
+                                                <Form.Item>
+                                                    <Upload.Dragger
+                                                        accept=".jpeg,.jpg,.png"
+                                                        name="attachments"
+                                                        listType="picture"
+                                                        fileList={[
+                                                            ...savedFileList.map((a, i) => ({
+                                                                uid: i + "",
+                                                                name: a.title,
+                                                                status: "done",
+                                                                url: FILES_STORE + a.url,
+                                                            })),
+                                                            ...(uploading
+                                                                ? [
+                                                                    {
+                                                                        uid: savedFileList.length + "",
+                                                                        name: "",
+                                                                        status: "uploading",
+                                                                        url: "",
+                                                                    },
+                                                                ]
+                                                                : []),
+                                                        ] as any}
+                                                        onRemove={(file) => this.removeAttachment(file.name)}
+                                                        customRequest={async (data: any) => {
+                                                            this.setUploading(true);
+                                                            const res = await upload(data.file);
+                                                            const url = res.uri;
+                                                            this.setUploading(false);
+                                                            data.onSuccess(url);
+                                                            this.setSavedFileList([...savedFileList, { url, title: data.file.name }]);
+                                                        }}>
+                                                        <Space size={14} align="center" className="m-0">
+                                                            <p className="upload-hint-label">
+                                                                {i18n.t('Take_upload_a_photo_of_the_device_name_plate_if_the_type_is_not_known')}
+                                                            </p>
+                                                        </Space>
+                                                    </Upload.Dragger>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
 
-                                    <Row gutter={16} justify={'start'}>
-                                        <Col span={8}>
-                                            <Form.Item>
-                                                <Button type="primary" htmlType="submit">
-                                                    {i18n.t('submit')}
-                                                </Button>
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                </Form>
+                                        <Row gutter={16} justify={'start'}>
+                                            <Col md={8} xs={24}>
+                                                <Form.Item>
+                                                    <Button type="primary" htmlType="submit">
+                                                        {i18n.t('submit')}
+                                                    </Button>
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Card>
+
+                            }
+                        </Col>
+                        <Col xl={6} lg={8} xs={24}>
+                            <Card className="steps border border-gray-300 h-96">
+                                <Steps
+                                    current={current}
+                                    onChange={this.onChange}
+                                    direction="vertical"
+                                    className="h-350"
+                                    items={[
+                                        {
+                                            title: selectedService ? selectedService.name : i18n.t('select_service'),
+                                            description: selectedService ? selectedService.description : '',
+                                        },
+                                        {
+                                            title: i18n.t('choose_an_appointment'),
+                                            description: !selectedService ? i18n.t('please_select_service_to_continue') : !selectedSlot?.slot ? i18n.t('please_select_the_appointment_time') : selectedSlot.slot,
+                                        },
+                                        {
+                                            title: i18n.t('enter_data'),
+                                            description: !selectedSlot ? i18n.t('please_select_appointment_to_continue') : i18n.t('please_enter_your_data'),
+                                        },
+                                    ]}
+                                />
+                                <Button className="w-full mt-5" type="primary">{i18n.t('book_appointment')}</Button>
                             </Card>
-
-                        }
-                    </Col>
-                    <Col xs={24} sm={6}>
-                        <Card className="border border-gray-300 h-96">
-                            <Steps
-                                current={current}
-                                onChange={this.onChange}
-                                direction="vertical"
-                                className="h-350"
-                                items={[
-                                    {
-                                        title: selectedService ? selectedService.name : i18n.t('select_service'),
-                                        description: selectedService ? selectedService.description : '',
-                                    },
-                                    {
-                                        title: i18n.t('choose_an_appointment'),
-                                        description: !selectedService ? i18n.t('please_select_service_to_continue') : !selectedSlot?.slot ? i18n.t('please_select_the_appointment_time') : selectedSlot.slot,
-                                    },
-                                    {
-                                        title: i18n.t('enter_data'),
-                                        description: !selectedSlot ? i18n.t('please_select_appointment_to_continue') : i18n.t('please_enter_your_data'),
-                                    },
-                                ]}
-                            />
-                            <Button className="w-full mt-5" type="primary">{i18n.t('book_appointment')}</Button>
-                        </Card>
-                    </Col>
-                </Row>
-            </Content>
+                        </Col>
+                    </Row>
+                </Content>
+            </div>
         );
     }
 }

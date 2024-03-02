@@ -15,7 +15,7 @@ import './index.css';
 import Header from "../../../components/Header";
 import { Content } from "antd/es/layout/layout";
 import AppointmentDetailsModal from "../../../components/AppointmentDetailsModal";
-
+import "./CalendarMobile.scss";
 
 interface CalendarEvent extends ExtendedAppointment {
     title: string;
@@ -91,26 +91,23 @@ class ContactCalendarPage extends React.Component<IContactCalendarProps, IContac
         }
 
         return (
-            <Content>
-                {modalState ? this.renderEventModal() : null}
-                <Header />
-                <Spin spinning={loading}>
-                    <Row gutter={16} justify={'space-around'} className="calendar-container">
-                        <Col span={24} xs={24} md={18}>
-                            <div style={{ height: 600 }}>
-                                <BigCalendar
-                                    localizer={localizer}
-                                    events={events}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    popup={true}
-                                    onSelectEvent={(e) => handleSelectedEvent(e)}
-                                />
-                            </div>
-                        </Col>
-                    </Row>
-                </Spin>
-            </Content>
+            <div className="contact-calendar">
+                <Content>
+                    {modalState ? this.renderEventModal() : null}
+                    <Header />
+                    <Spin spinning={loading}>
+                        <BigCalendar
+                            localizer={localizer}
+                            events={events}
+                            startAccessor="start"
+                            endAccessor="end"
+                            popup={true}
+                            onSelectEvent={(e) => handleSelectedEvent(e)}
+                            style={{ minHeight: 800 }}
+                        />
+                    </Spin>
+                </Content>
+            </div>
         );
     }
 }
