@@ -21,9 +21,11 @@ import {
   Checkbox,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
   List,
+  Menu,
   Modal,
   Popconfirm,
   Row,
@@ -39,6 +41,7 @@ import { FILES_STORE } from "../../redux/network/api";
 import { download } from "../../utils";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
+import { EllipsisOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 const { Option } = Select;
@@ -293,16 +296,12 @@ class AppointmentsPage extends React.Component<
           </Form.Item>
 
           <Row gutter={16} justify={"end"}>
-            <Col span={3}>
-              <Button onClick={onClose}>{i18n.t('cancel')}</Button>
-            </Col>
-            <Col span={3}>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  {i18n.t('submit')}
-                </Button>
-              </Form.Item>
-            </Col>
+            <Button className="mr-3" onClick={onClose}>{i18n.t('cancel')}</Button>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                {i18n.t('submit')}
+              </Button>
+            </Form.Item>
           </Row>
         </Form>
       </Modal>
@@ -337,7 +336,7 @@ class AppointmentsPage extends React.Component<
               style={{ marginTop: 20 }}
               rowKey="_id"
               pagination={false}
-              scroll={{ x: true }} 
+              scroll={{ x: true }}
             >
               <Column
                 title={i18n.t('services')}
@@ -392,33 +391,37 @@ class AppointmentsPage extends React.Component<
                 title={i18n.t('action')}
                 key="action"
                 render={(_: any, record: Appointment) => (
-                  <Row>
-                    <Button
-                      className="self-end mr-3"
-                      type="link"
-                      onClick={() => this.onOpen(record._id)}
-                    >
-                      {i18n.t('edit')}
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="edit" onClick={() => this.onOpen(record._id)}>
+                          {i18n.t('edit')}
+                        </Menu.Item>
+                        <Menu.Item key="delete">
+                          <Popconfirm
+                            title={i18n.t('delete_this_appointment')}
+                            description={i18n.t('are_you_sure_you_want_to_delete_this_appointment')}
+                            okText={i18n.t('delete_it')}
+                            cancelText={i18n.t('no')}
+                            okButtonProps={{
+                              danger: true,
+                            }}
+                            onConfirm={() => this.onDeleteAppointment(record._id!)}
+                          >
+                            <Button type="link" loading={deleteAppointmentLoading}>
+                              {i18n.t('delete')}
+                            </Button>
+                          </Popconfirm>
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    placement="bottomRight"
+                    trigger={['click']}
+                  >
+                    <Button>
+                      <EllipsisOutlined />
                     </Button>
-                    <Popconfirm
-                      title={i18n.t('delete_this_appointment')}
-                      description={i18n.t('are_you_sure_you_want_to_delete_this_appointment')}
-                      okText={i18n.t('delete_it')}
-                      cancelText={i18n.t('no')}
-                      okButtonProps={{
-                        danger: true,
-                      }}
-                      onConfirm={() => this.onDeleteAppointment(record._id!)}
-                    >
-                      <Button
-                        className="self-end mr-3"
-                        type="link"
-                        loading={deleteAppointmentLoading}
-                      >
-                        {i18n.t('delete')}
-                      </Button>
-                    </Popconfirm>
-                  </Row>
+                  </Dropdown>
                 )}
               />
               <Column

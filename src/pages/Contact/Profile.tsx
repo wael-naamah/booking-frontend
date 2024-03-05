@@ -186,16 +186,11 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                     </Row>
                     <Divider className="mb-6 mt-2" />
                     <Row gutter={16} justify={"end"}>
-                        <Col>
-                            <Button>{i18n.t('cancel')}</Button>
-                        </Col>
-                        <Col>
-                            <Form.Item>
-                                <Button type="primary" loading={loading} htmlType="submit">
-                                    {i18n.t('save')}
-                                </Button>
-                            </Form.Item>
-                        </Col>
+                        <Form.Item>
+                            <Button type="primary" loading={loading} htmlType="submit">
+                                {i18n.t('save')}
+                            </Button>
+                        </Form.Item>
                     </Row>
                 </Form>
             </div>
@@ -279,16 +274,11 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
 
                     <Divider className="mb-6 mt-2" />
                     <Row gutter={16} justify={"end"}>
-                        <Col>
-                            <Button>{i18n.t('cancel')}</Button>
-                        </Col>
-                        <Col>
-                            <Form.Item>
-                                <Button type="primary" loading={resetPasswordLoading} htmlType="submit">
-                                    {i18n.t('save')}
-                                </Button>
-                            </Form.Item>
-                        </Col>
+                        <Form.Item>
+                            <Button type="primary" loading={resetPasswordLoading} htmlType="submit">
+                                {i18n.t('save')}
+                            </Button>
+                        </Form.Item>
                     </Row>
                 </Form>
             </div>

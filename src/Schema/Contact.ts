@@ -21,6 +21,7 @@ export interface Contact {
   newsletter?: boolean;
   categories_permission?: string[];
   remarks?: string;
+  imported?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

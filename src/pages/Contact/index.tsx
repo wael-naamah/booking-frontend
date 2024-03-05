@@ -8,6 +8,7 @@ import {
   deleteContactRequest,
   updateContactRequest,
   importContactsRequest,
+  sendCredentialsRequest
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
 import { Contact, PaginatedForm, Salutation } from "../../Schema";
@@ -18,8 +19,10 @@ import {
   Card,
   Col,
   Divider,
+  Dropdown,
   Form,
   Input,
+  Menu,
   Modal,
   Pagination,
   Popconfirm,
@@ -36,6 +39,8 @@ import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
 import withAuthorization from "../../HOC/withAuthorization";
 import { RcFile } from "antd/es/upload";
+import { API_URL } from "../../redux/network/api";
+import { EllipsisOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 const { Option } = Select;
@@ -58,6 +63,7 @@ interface IContactProps {
   fetchContacts: (form: PaginatedForm) => Promise<any>;
   createContactRequest: (contact: Contact) => Promise<any>;
   deleteContactRequest: (id: string) => Promise<any>;
+  sendCredentialsRequest: (id: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
   contacts: Contact[];
   navigate?: (route: string) => void;
@@ -127,6 +133,10 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     this.setState({ importModelVisible: true });
   };
 
+  onExportContacts = () => {
+    window.open(`${API_URL}/files/export-contacts-file`, '_blank');
+  }
+
   handlePageChange = (value: number) => {
     this.setState({ pageNum: value });
   };
@@ -139,6 +149,20 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     this.props.deleteContactRequest(id).then((data) => {
       if (data.status && data.status === "success") {
         message.success(i18n.t('successfully_deleted_the_contact'));
+      } else {
+        message.error(i18n.t('something_went_wrong_please_try_again'));
+      }
+    });
+  };
+
+  onSendCredentials = (id: string) => {
+    this.props.sendCredentialsRequest(id).then((data) => {
+      if (data?.messege) {
+        if (data.messege === "Credentials sent") {
+          message.success("Credentials sent");
+        } else {
+          message.error(data.messege);
+        }
       } else {
         message.error(i18n.t('something_went_wrong_please_try_again'));
       }
@@ -341,16 +365,12 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
           </Row>
           <Divider className="mb-2 mt-0" />
           <Row gutter={16} justify={"end"}>
-            <Col span={3}>
-              <Button onClick={onClose}>{i18n.t('cancel')}</Button>
-            </Col>
-            <Col span={3}>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  {i18n.t('save')}
-                </Button>
-              </Form.Item>
-            </Col>
+            <Button className="mr-3" onClick={onClose}>{i18n.t('cancel')}</Button>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                {i18n.t('save')}
+              </Button>
+            </Form.Item>
           </Row>
         </Form>
       </Modal>
@@ -460,6 +480,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
+              <Button className="ml-2" loading={importLoading} onClick={() => this.onExportContacts()} type="primary">
+                {i18n.t('export_contacts')}
+              </Button>
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">
                 {i18n.t('new_contact')}
               </Button>
@@ -509,29 +532,49 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                 title={i18n.t('action')}
                 key="action"
                 render={(_: any, record: Contact) => (
-                  <Row>
-                    <Button
-                      className="self-end mr-3"
-                      type="link"
-                      onClick={() => this.onOpen(record._id)}
-                    >
-                      {i18n.t('edit')}
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item key="edit" onClick={() => this.onOpen(record._id)}>
+                          {i18n.t('edit')}
+                        </Menu.Item>
+                        <Menu.Item key="delete">
+                          <Popconfirm
+                            title={i18n.t('delete_this_contact')}
+                            description={i18n.t('are_you_sure_you_want_to_delete_this_contact')}
+                            okText={i18n.t('delete_it')}
+                            cancelText={i18n.t('no')}
+                            okButtonProps={{
+                              danger: true,
+                            }}
+                            onConfirm={() => this.onDeleteContact(record._id!)}
+                          >
+                            <span>{i18n.t('delete')}</span>
+                          </Popconfirm>
+                        </Menu.Item>
+                        <Menu.Item key="sendCredentials">
+                          <Popconfirm
+                            title={i18n.t('send_credentials_to_this_contact')}
+                            description={i18n.t('are_you_sure_you_want_to_send_credentials_to_this_contact')}
+                            okText={i18n.t('send_it')}
+                            cancelText={i18n.t('no')}
+                            okButtonProps={{
+                              danger: true,
+                            }}
+                            onConfirm={() => this.onSendCredentials(record._id!)}
+                          >
+                            <span>{i18n.t('send_credentials')}</span>
+                          </Popconfirm>
+                        </Menu.Item>
+                      </Menu>
+                    }
+                    placement="bottomRight"
+                    trigger={['click']}
+                  >
+                    <Button>
+                      <EllipsisOutlined />
                     </Button>
-                    <Popconfirm
-                      title={i18n.t('delete_this_contact')}
-                      description={i18n.t('are_you_sure_you_want_to_delete_this_contact')}
-                      okText={i18n.t('delete_it')}
-                      cancelText={i18n.t('no')}
-                      okButtonProps={{
-                        danger: true,
-                      }}
-                      onConfirm={() => this.onDeleteContact(record._id!)}
-                    >
-                      <Button className="self-end mr-3" type="link">
-                        {i18n.t('delete')}
-                      </Button>
-                    </Popconfirm>
-                  </Row>
+                  </Dropdown>
                 )}
               />
             </Table>
@@ -564,6 +607,7 @@ const mapDispatchToProps = (
   createContactRequest: (contact: Contact) =>
     dispatch(createContactRequest(contact)),
   deleteContactRequest: (id: string) => dispatch(deleteContactRequest(id)),
+  sendCredentialsRequest: (id: string) => dispatch(sendCredentialsRequest(id)),
   updateContactRequest: (id: string, contact: Contact) =>
     dispatch(updateContactRequest(id, contact)),
 });

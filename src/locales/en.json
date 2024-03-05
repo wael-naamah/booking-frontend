@@ -307,5 +307,10 @@
   "invoice_number": "Invoice",
   "contract_number": "Contract Number",
   "import_contacts": "Import Contacts",
-  "please_select_a_file": "Please select a file"
+  "export_contacts": "Export Contacts",
+  "please_select_a_file": "Please select a file",
+  "send_credentials": "Send Credentials",
+  "send_credentials_to_this_contact": "Send credentials to this contact",
+  "are_you_sure_you_want_to_send_credentials_to_this_contact": "Are you sure you want to send credentials to this contact?",
+  "send_it": "Send It"
 }

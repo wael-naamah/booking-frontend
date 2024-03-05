@@ -25,19 +25,21 @@ import {
     Divider,
     Upload,
     Space,
+    Dropdown,
+    Menu,
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
 import { RcFile } from "antd/es/upload";
 import { upload } from "../../../utils";
 import { FILES_STORE } from "../../../redux/network/api";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../../locales/i18n";
+import { EllipsisOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 const { Column } = Table;
@@ -125,7 +127,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const modelTitle = editingServiceIndex ? i18n.t('edit_service') : i18n.t('new_service');
 
         const onClose = () => {
-            this.setState({ 
+            this.setState({
                 visible: false,
                 newService: {
                     name: '',
@@ -171,7 +173,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
 
             let url = '';
             if (file) {
-                this.setState({fileLoading: true});
+                this.setState({ fileLoading: true });
                 const res = await upload(file);
                 url = res.uri;
             }
@@ -412,27 +414,35 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         title={i18n.t('action')}
                         key="action"
                         render={(_: any, record: any, index: number) => (
-                            <>
-                                <Button
-                                    className="self-end mr-3"
-                                    type="link"
-                                    onClick={() => onOpenEdit(index)}
-                                >
-                                    {i18n.t('edit')}
+                            <Dropdown
+                                overlay={
+                                    <Menu>
+                                        <Menu.Item key="edit" onClick={() => onOpenEdit(index)}>
+                                            {i18n.t('edit')}
+                                        </Menu.Item>
+                                        <Menu.Item key="delete">
+                                            <Popconfirm
+                                                title={i18n.t('delete_this_service')}
+                                                description={i18n.t('are_you_sure_you_want_to_delete_this_service')}
+                                                okText={i18n.t('delete_it')}
+                                                cancelText={i18n.t('no')}
+                                                okButtonProps={{
+                                                    danger: true,
+                                                }}
+                                                onConfirm={() => onDeleteService(index)}
+                                            >
+                                                <span>{i18n.t('delete')}</span>
+                                            </Popconfirm>
+                                        </Menu.Item>
+                                    </Menu>
+                                }
+                                placement="bottomRight"
+                                trigger={['click']}
+                            >
+                                <Button>
+                                    <EllipsisOutlined />
                                 </Button>
-                                <Popconfirm
-                                    title={i18n.t('delete_this_service')}
-                                    description={i18n.t('are_you_sure_you_want_to_delete_this_service')}
-                                    okText={i18n.t('delete_it')}
-                                    cancelText={i18n.t('no')}
-                                    okButtonProps={{
-                                        danger: true,
-                                    }}
-                                    onConfirm={() => onDeleteService(index)}
-                                >
-                                    <Button className="self-end mr-3" type="link">{i18n.t('delete')}</Button>
-                                </Popconfirm>
-                            </>
+                            </Dropdown>
                         )}
                     />
                 </Table>
@@ -507,7 +517,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         }} value={localCategory.advanced_settings?.info_display_type} className="w-full">
                             {[
                                 { lable: i18n.t('tooltip'), value: "tooltip" },
-                                { lable: i18n.t('text_below_the_service_group_name'), value: "text_below_the_service_group_name"},
+                                { lable: i18n.t('text_below_the_service_group_name'), value: "text_below_the_service_group_name" },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -524,9 +534,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         <Select onChange={(value) => {
                             onAdvancedSettingsChange('show_performance_on', value)
                         }} value={localCategory.advanced_settings?.show_performance_on} className="w-full">
-                             {[
+                            {[
                                 { lable: i18n.t('page_1'), value: "page_1" },
-                                { lable: i18n.t('page_2'), value: "page_2"},
+                                { lable: i18n.t('page_2'), value: "page_2" },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -576,13 +586,13 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                             onChange('category', value)
                         }}
                             value={localCategory.category} className="w-full">
-                                {[
+                            {[
                                 { lable: i18n.t('performance_group'), value: "performance_group" },
-                                { lable: i18n.t('text_field_free_text_input'), value: "text_field_free_text_input"},
-                                { lable: i18n.t('location_select'), value: "location_select"},
-                                { lable: i18n.t('selection_number_of_days'), value: "selection_number_of_days"},
-                                { lable: i18n.t('selection_number_if_minutes'), value: "selection_number_if_minutes"},
-                                { lable: i18n.t('number_search_postcode_customer_number_etc'), value: "number_search_postcode_customer_number_etc"},
+                                { lable: i18n.t('text_field_free_text_input'), value: "text_field_free_text_input" },
+                                { lable: i18n.t('location_select'), value: "location_select" },
+                                { lable: i18n.t('selection_number_of_days'), value: "selection_number_of_days" },
+                                { lable: i18n.t('selection_number_if_minutes'), value: "selection_number_if_minutes" },
+                                { lable: i18n.t('number_search_postcode_customer_number_etc'), value: "number_search_postcode_customer_number_etc" },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -600,10 +610,10 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                             onChange('choices', value)
                         }}
                             value={localCategory.choices} className="w-full">
-                                    {[
+                            {[
                                 { lable: i18n.t('simple_selection_only_one_entry_can_be_selected'), value: "simple_selection_only_one_entry_can_be_selected" },
-                                { lable: i18n.t('multiple_selection_multiple_entries_can_be_selected'), value: "multiple_selection_multiple_entries_can_be_selected"},
-                                { lable: i18n.t('selection_list_only_one_entry_can_be_selected'), value: "selection_list_only_one_entry_can_be_selected"},
+                                { lable: i18n.t('multiple_selection_multiple_entries_can_be_selected'), value: "multiple_selection_multiple_entries_can_be_selected" },
+                                { lable: i18n.t('selection_list_only_one_entry_can_be_selected'), value: "selection_list_only_one_entry_can_be_selected" },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}

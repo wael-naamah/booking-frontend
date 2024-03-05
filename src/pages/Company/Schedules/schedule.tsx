@@ -27,16 +27,18 @@ import {
   DatePicker,
   Switch,
   Input,
+  Dropdown,
+  Menu,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
 import WeekdaySelector from "./components/WeekdaySelector";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../../locales/i18n";
+import { EllipsisOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 
@@ -470,29 +472,35 @@ class SchedulePage extends React.Component<IScheduleProps, IScheduleState> {
             title={i18n.t('action')}
             key="action"
             render={(_: any, record: Schedule) => (
-              <Row>
-                <Popconfirm
-                  title={i18n.t('delete_this_schedule')}
-                  description={i18n.t('are_you_sure_you_want_to_delete_this_schedule')}
-                  okText={i18n.t('delete_it')}
-                  cancelText={i18n.t('no')}
-                  okButtonProps={{
-                    danger: true,
-                  }}
-                  onConfirm={() => onDeleteSchedule(record._id!)}
-                >
-                  <Button className="self-end mr-3" type="link">
-                    {i18n.t('delete')}
-                  </Button>
-                </Popconfirm>
-                <Button
-                  className="self-end mr-3"
-                  type="link"
-                  onClick={() => onEditSchedule(record)}
-                >
-                  {i18n.t('edit')}
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key="delete">
+                      <Popconfirm
+                        title={i18n.t('delete_this_schedule')}
+                        description={i18n.t('are_you_sure_you_want_to_delete_this_schedule')}
+                        okText={i18n.t('delete_it')}
+                        cancelText={i18n.t('no')}
+                        okButtonProps={{
+                          danger: true,
+                        }}
+                        onConfirm={() => onDeleteSchedule(record._id!)}
+                      >
+                        <span>{i18n.t('delete')}</span>
+                      </Popconfirm>
+                    </Menu.Item>
+                    <Menu.Item key="edit" onClick={() => onEditSchedule(record)}>
+                      {i18n.t('edit')}
+                    </Menu.Item>
+                  </Menu>
+                }
+                placement="bottomRight"
+                trigger={['click']}
+              >
+                <Button>
+                  <EllipsisOutlined />
                 </Button>
-              </Row>
+              </Dropdown>
             )}
           />
         </Table>

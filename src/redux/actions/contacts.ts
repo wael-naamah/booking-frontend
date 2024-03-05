@@ -147,6 +147,23 @@ export const deleteContactRequest = (id: string) => {
   };
 };
 
+export const sendCredentialsRequest = (id: string) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      const response = await fetch(`${API_URL}/contacts/credentials/${id}`, {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+
+      return null;
+    }
+  };
+};
+
 export const createContactRequest = (contact: Contact) => {
   return async (dispatch: Dispatch) => {
     dispatch(addContact());
