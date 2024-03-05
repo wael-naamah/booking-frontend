@@ -309,8 +309,7 @@
   "import_contacts": "Import Contacts",
   "export_contacts": "Export Contacts",
   "please_select_a_file": "Please select a file",
-  "send_credentials": "Send Credentials",
-  "send_credentials_to_this_contact": "Send credentials to this contact",
-  "are_you_sure_you_want_to_send_credentials_to_this_contact": "Are you sure you want to send credentials to this contact?",
+  "reset_password_for_this_contact": "Reset password for this contact?",
+  "are_you_sure_you_want_to_reset_password_for_this_contact": "Are you sure you want to reset the password for this contact and send an email with the new password?",
   "send_it": "Send It"
 }

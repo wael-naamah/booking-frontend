@@ -8,7 +8,7 @@ import {
   deleteContactRequest,
   updateContactRequest,
   importContactsRequest,
-  sendCredentialsRequest
+  resetContactPasswordRequest
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
 import { Contact, PaginatedForm, Salutation } from "../../Schema";
@@ -47,6 +47,7 @@ const { Option } = Select;
 
 interface IContactState {
   visible: boolean;
+  resetVisible: boolean;
   pageNum: number;
   totalCount: number;
   pageCount: number;
@@ -56,6 +57,7 @@ interface IContactState {
   importModelVisible: boolean;
   importLoading: boolean;
   file?: RcFile;
+  newPassword?: string;
 }
 
 interface IContactProps {
@@ -63,7 +65,7 @@ interface IContactProps {
   fetchContacts: (form: PaginatedForm) => Promise<any>;
   createContactRequest: (contact: Contact) => Promise<any>;
   deleteContactRequest: (id: string) => Promise<any>;
-  sendCredentialsRequest: (id: string) => Promise<any>;
+  resetContactPasswordRequest: (id: string, password: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
   contacts: Contact[];
   navigate?: (route: string) => void;
@@ -82,6 +84,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       search: '',
       importModelVisible: false,
       importLoading: false,
+      resetVisible: false,
     };
   }
 
@@ -129,6 +132,10 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     this.setState({ visible: true, editingContactId: contactId });
   };
 
+  onOpenResetPassword = (contactId: string) => {
+    this.setState({ resetVisible: true, editingContactId: contactId });
+  };
+
   onOpenImportModel = () => {
     this.setState({ importModelVisible: true });
   };
@@ -149,20 +156,6 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     this.props.deleteContactRequest(id).then((data) => {
       if (data.status && data.status === "success") {
         message.success(i18n.t('successfully_deleted_the_contact'));
-      } else {
-        message.error(i18n.t('something_went_wrong_please_try_again'));
-      }
-    });
-  };
-
-  onSendCredentials = (id: string) => {
-    this.props.sendCredentialsRequest(id).then((data) => {
-      if (data?.messege) {
-        if (data.messege === "Credentials sent") {
-          message.success("Credentials sent");
-        } else {
-          message.error(data.messege);
-        }
       } else {
         message.error(i18n.t('something_went_wrong_please_try_again'));
       }
@@ -377,6 +370,65 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     );
   };
 
+  renderResetPasswordModal = () => {
+    const { resetVisible, editingContactId } = this.state;
+
+    const onClose = () => {
+      this.setState({ resetVisible: false });
+    };
+
+    const onResetPassword = () => {
+      if (editingContactId && this.state.newPassword) {
+        this.props.resetContactPasswordRequest(editingContactId, this.state.newPassword).then((data) => {
+          if (data?.messege) {
+            message.success(i18n.t('successfully_updated_the_data'));
+          } else {
+            message.error(i18n.t('something_went_wrong_please_try_again'));
+          }
+        }).catch(err => {
+          message.error(i18n.t('something_went_wrong_please_try_again'));
+        }).finally(() => {
+          this.setState({ resetVisible: false });
+        });
+      }
+    };
+
+    return (
+      <Modal
+        title={i18n.t('reset_password')}
+        open={resetVisible}
+        centered
+        closable={false}
+        footer={() => null}
+        width={800}
+      >
+        <Divider />
+        <Row gutter={16}>
+          <Col span={24}>
+            <label>{i18n.t('new_password')}</label>
+            <Input className="mt-3" value={this.state.newPassword} onChange={(e) => this.setState({ newPassword: e.target.value })} />
+          </Col>
+        </Row>
+        <Divider />
+        <Row gutter={16} justify={"end"}>
+          <Button onClick={onClose}>{i18n.t('cancel')}</Button>
+          <Popconfirm
+            title={i18n.t('reset_password_for_this_contact')}
+            description={i18n.t('are_you_sure_you_want_to_reset_password_for_this_contact')}
+            okText={i18n.t('send_it')}
+            cancelText={i18n.t('no')}
+            okButtonProps={{
+              danger: true,
+            }}
+            onConfirm={onResetPassword}
+          >
+            <Button type="primary" className="ml-3">{i18n.t('save')}</Button>
+          </Popconfirm>
+        </Row>
+      </Modal>
+    );
+  };
+
   renderImportContactsModel = () => {
     const { importModelVisible, file } = this.state;
 
@@ -457,12 +509,13 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   }
 
   render() {
-    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, search } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, search, resetVisible } = this.state;
     const { loading, contacts } = this.props;
 
     return (
       <>
         {visible ? this.renderNewContactModal() : null}
+        {resetVisible ? this.renderResetPasswordModal() : null}
         {importModelVisible ? this.renderImportContactsModel() : null}
         <Card
           title={i18n.t('contacts')}
@@ -552,19 +605,8 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                             <span>{i18n.t('delete')}</span>
                           </Popconfirm>
                         </Menu.Item>
-                        <Menu.Item key="sendCredentials">
-                          <Popconfirm
-                            title={i18n.t('send_credentials_to_this_contact')}
-                            description={i18n.t('are_you_sure_you_want_to_send_credentials_to_this_contact')}
-                            okText={i18n.t('send_it')}
-                            cancelText={i18n.t('no')}
-                            okButtonProps={{
-                              danger: true,
-                            }}
-                            onConfirm={() => this.onSendCredentials(record._id!)}
-                          >
-                            <span>{i18n.t('send_credentials')}</span>
-                          </Popconfirm>
+                        <Menu.Item key="sendCredentials" onClick={() => this.onOpenResetPassword(record._id!)} >
+                          {i18n.t('reset_password')}
                         </Menu.Item>
                       </Menu>
                     }
@@ -607,7 +649,7 @@ const mapDispatchToProps = (
   createContactRequest: (contact: Contact) =>
     dispatch(createContactRequest(contact)),
   deleteContactRequest: (id: string) => dispatch(deleteContactRequest(id)),
-  sendCredentialsRequest: (id: string) => dispatch(sendCredentialsRequest(id)),
+  resetContactPasswordRequest: (id: string, password: string) => dispatch(resetContactPasswordRequest(id, password)),
   updateContactRequest: (id: string, contact: Contact) =>
     dispatch(updateContactRequest(id, contact)),
 });

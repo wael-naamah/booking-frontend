@@ -147,11 +147,13 @@ export const deleteContactRequest = (id: string) => {
   };
 };
 
-export const sendCredentialsRequest = (id: string) => {
+export const resetContactPasswordRequest = (id: string, password: string) => {
   return async (dispatch: Dispatch) => {
     try {
-      const response = await fetch(`${API_URL}/contacts/credentials/${id}`, {
+      const response = await fetch(`${API_URL}/contacts/reset-password/${id}`, {
         method: "POST",
+        body: JSON.stringify({ password }),
+        headers: { "Content-Type": "application/json" },
       });
       const data = await response.json();
 
