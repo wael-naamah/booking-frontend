@@ -6,6 +6,8 @@ import ServicesPage from '../pages/Company/Services';
 import CalendarPage from '../pages/Company/Calendar';
 import WorkingHoursPage from '../pages/Company/Schedules';
 import LoginPage from '../pages/Login';
+import ForgotPassword from '../pages/Login/ForgotPassword';
+import ResetPassword from '../pages/Login/ResetPassword';
 import SideBar from '../pages/SideBar';
 import Contact from '../pages/Contact';
 import ContactProfile from '../pages/Contact/Profile';
@@ -33,6 +35,8 @@ class Router extends React.Component {
         <Route path="/category" element={<CategoryPage />} />
         <Route path="/employee" element={<EmployeePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/profile" element={<ContactProfile />} />
         <Route path="/contact-calendar" element={<ContactCalendar />} />
       </Routes>

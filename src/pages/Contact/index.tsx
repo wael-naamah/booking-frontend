@@ -8,7 +8,7 @@ import {
   deleteContactRequest,
   updateContactRequest,
   importContactsRequest,
-  resetContactPasswordRequest
+  resetContactPasswordManually
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
 import { Contact, PaginatedForm, Salutation } from "../../Schema";
@@ -65,7 +65,7 @@ interface IContactProps {
   fetchContacts: (form: PaginatedForm) => Promise<any>;
   createContactRequest: (contact: Contact) => Promise<any>;
   deleteContactRequest: (id: string) => Promise<any>;
-  resetContactPasswordRequest: (id: string, password: string) => Promise<any>;
+  resetContactPasswordManually: (id: string, password: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
   contacts: Contact[];
   navigate?: (route: string) => void;
@@ -379,7 +379,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 
     const onResetPassword = () => {
       if (editingContactId && this.state.newPassword) {
-        this.props.resetContactPasswordRequest(editingContactId, this.state.newPassword).then((data) => {
+        this.props.resetContactPasswordManually(editingContactId, this.state.newPassword).then((data) => {
           if (data?.messege) {
             message.success(i18n.t('successfully_updated_the_data'));
           } else {
@@ -649,7 +649,7 @@ const mapDispatchToProps = (
   createContactRequest: (contact: Contact) =>
     dispatch(createContactRequest(contact)),
   deleteContactRequest: (id: string) => dispatch(deleteContactRequest(id)),
-  resetContactPasswordRequest: (id: string, password: string) => dispatch(resetContactPasswordRequest(id, password)),
+  resetContactPasswordManually: (id: string, password: string) => dispatch(resetContactPasswordManually(id, password)),
   updateContactRequest: (id: string, contact: Contact) =>
     dispatch(updateContactRequest(id, contact)),
 });

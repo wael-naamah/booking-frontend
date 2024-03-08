@@ -72,6 +72,11 @@ class LoginPage extends React.Component<ILoginProps, ILoginState> {
                         {i18n.t('login')}
                         </Button>
                       </Form.Item>
+                      <Form.Item className="flex justify-end">
+                        <Button type="link" onClick={() => this.props.navigate && this.props.navigate('/forgot-password')}>
+                        {i18n.t('forgot_password')}
+                        </Button>
+                      </Form.Item>
                     </Form>
                 </div>
             </div>

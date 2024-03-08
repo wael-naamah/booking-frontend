@@ -311,5 +311,10 @@
   "please_select_a_file": "Please select a file",
   "reset_password_for_this_contact": "Reset password for this contact?",
   "are_you_sure_you_want_to_reset_password_for_this_contact": "Are you sure you want to reset the password for this contact and send an email with the new password?",
-  "send_it": "Send It"
+  "send_it": "Send It",
+  "please_enter_your_email": "Please enter your email",
+  "send_reset_link": "Send reset link",
+  "forgot_password": "Forgot password?",
+  "back_to_login": "Back to login?",
+  "password_reset_successfully": "Password reset successfully"
 }

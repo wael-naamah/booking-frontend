@@ -311,5 +311,10 @@
   "please_select_a_file": "Bitte wählen Sie eine Datei aus",
   "reset_password_for_this_contact": "Passwort für diesen Kontakt zurücksetzen",
   "are_you_sure_you_want_to_reset_password_for_this_contact": "Möchten Sie das Passwort für diesen Kontakt wirklich zurücksetzen und eine E-Mail mit dem neuen Passwort senden?",
-  "send_it": "senden"
+  "send_it": "senden",
+  "please_enter_your_email": "Bitte geben Sie Ihre E-Mail-Adresse ein",
+  "send_reset_link": "Reset-Link senden",
+  "forgot_password": "Passwort vergessen?",
+  "back_to_login": "Zurück zur Anmeldung?",
+  "password_reset_successfully": "Passwort erfolgreich zurückgesetzt"
 }

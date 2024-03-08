@@ -5,6 +5,7 @@ interface AuthState {
   loggedIn: boolean;
   loading: boolean;
   resetPasswordLoading: boolean;
+  forgotLoading: boolean;
 }
 
 const initialState: AuthState = {
@@ -12,6 +13,7 @@ const initialState: AuthState = {
   loggedIn: false,
   loading: true,
   resetPasswordLoading: false,
+  forgotLoading: false,
 };
 
 const authReducer = (
@@ -72,6 +74,16 @@ const authReducer = (
       return {
         ...state,
         resetPasswordLoading: false,
+      };
+    case "auth/FORGOT_PASSWORD":
+      return {
+        ...state,
+        forgotLoading: true,
+      };
+    case "auth/FORGOT_PASSWORD_DONE":
+      return {
+        ...state,
+        forgotLoading: false,
       };
     default:
       return state;

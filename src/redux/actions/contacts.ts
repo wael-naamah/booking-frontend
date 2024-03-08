@@ -147,7 +147,7 @@ export const deleteContactRequest = (id: string) => {
   };
 };
 
-export const resetContactPasswordRequest = (id: string, password: string) => {
+export const resetContactPasswordManually = (id: string, password: string) => {
   return async (dispatch: Dispatch) => {
     try {
       const response = await fetch(`${API_URL}/contacts/reset-password/${id}`, {
