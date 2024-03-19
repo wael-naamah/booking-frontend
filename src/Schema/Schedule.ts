@@ -35,6 +35,7 @@ export interface Schedule {
 
 export interface ExtendedSchedule extends Schedule {
   employee_name: string;
+  assignments_services: string[];
 }
 
 export interface AddScheduleRequest extends Omit<Schedule, "_id" | "createdAt" | "updatedAt"> {}

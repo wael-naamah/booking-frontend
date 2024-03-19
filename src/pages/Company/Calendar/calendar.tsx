@@ -1,14 +1,16 @@
 import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../../redux/store";
-import { updateCalendarRequest, deleteCalendarRequest } from "../../../redux/actions";
+import { updateCalendarRequest, deleteCalendarRequest, fetchServices } from "../../../redux/actions";
 import {
     selectCalendars,
     selectCalendarsLoading,
     selectDeleteCalendarLoading,
+    selectServices,
+    selectServicesLoading,
     selectUpdateCalendarLoading,
 } from "../../../redux/selectors";
-import { AppointmentCluster, AppointmentDuration, AppointmentScheduling, AssignmentOfServices, Calendar, CalendarType, DescriptionDisplayType, Service } from "../../../Schema";
+import { AppointmentCluster, AppointmentDuration, AppointmentScheduling, AssignmentOfServices, Calendar, CalendarType, DescriptionDisplayType, ExtendedService, Service } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import {
     Row,
@@ -26,7 +28,6 @@ import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
 import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withAuthorization from "../../../HOC/withAuthorization";
 import "./index.css";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../../locales/i18n";
@@ -51,9 +52,12 @@ interface ICalendarProps {
     calendar: Calendar;
     updateCalendarLoading: boolean;
     deleteCalendarLoading: boolean;
+    services: ExtendedService[];
+    servicesLoading: boolean;
     updateCalendarRequest: (id: string, calendar: Calendar) => Promise<any>;
     deleteCalendarRequest: (id: string) => Promise<any>;
     onDeleteCalendar: () => void;
+    fetchServices: () => Promise<void>;
 }
 
 class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
@@ -79,9 +83,15 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
             });
         }
     }
+
+    componentDidMount(): void {
+        this.props.fetchServices();
+    }
+
+
     onUpdateCalendar = () => {
         const { localCalendar } = this.state;
-        const updateCalendar = Object.assign({}, localCalendar);
+        const updateCalendar = Object.assign({}, {...localCalendar, assignment_of_services: localCalendar?.assignments_services?.length ? AssignmentOfServices.CERTAIN : AssignmentOfServices.ALL});
 
         delete updateCalendar._id;
         delete updateCalendar.createdAt;
@@ -161,6 +171,7 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
 
     renderServices = () => {
         const { localCalendar } = this.state;
+        const { services, servicesLoading } = this.props;
 
         const onChange = (key: string, value: boolean | string | number) => {
             this.setState({
@@ -171,20 +182,33 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
             })
         };
 
+        const handleChange = (value: string[]) => {
+            this.setState({ localCalendar: { ...this.state.localCalendar, assignments_services: value } })
+        };
+
         return (
             <div>
                 <Row className="mb-6">
                     <Col span={8} className="w-full">
-                        <span>{i18n.t('show_description_on_booking_page')}</span>
+                        <span>{i18n.t("show_description_on_booking_page")}</span>
                     </Col>
                     <Col span={16}>
-                        <Select onChange={(value) => {
-                            onChange('assignment_of_services', value)
-                        }}
-                            value={localCalendar.assignment_of_services} className="w-full">
+                        <Select
+                            onChange={(value) => {
+                                onChange("assignment_of_services", value);
+                            }}
+                            value={localCalendar.assignment_of_services}
+                            className="w-full"
+                        >
                             {[
-                                { lable: i18n.t('all_services_are_bookable'), value: AssignmentOfServices.ALL },
-                                { lable: i18n.t('certain_services_can_be_booked'), value: AssignmentOfServices.CERTAIN },
+                                {
+                                    lable: i18n.t("all_services_are_bookable"),
+                                    value: AssignmentOfServices.ALL,
+                                },
+                                {
+                                    lable: i18n.t("certain_services_can_be_booked"),
+                                    value: AssignmentOfServices.CERTAIN,
+                                },
                             ].map((el) => (
                                 <Option key={el.lable} value={el.value}>
                                     {el.lable}
@@ -192,6 +216,30 @@ class CalendarPage extends React.Component<ICalendarProps, ICalendarState> {
                             ))}
                         </Select>
                     </Col>
+                </Row>
+                <Row className="mb-6">
+                    {localCalendar.assignment_of_services ===
+                        AssignmentOfServices.CERTAIN && (
+                            <>
+                                <Col span={8} className="w-full"></Col>
+                                <Col span={16}>
+                                    <Select
+                                        mode="multiple"
+                                        allowClear
+                                        loading={servicesLoading}
+                                        defaultValue={localCalendar.assignments_services}
+                                        className="w-full"
+                                        onChange={handleChange}
+                                    >
+                                        {services.map((service) => (
+                                            <Option key={service._id} value={service._id}>
+                                                {service.name + " (" + service.abbreviation_id + ")"}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Col>
+                            </>
+                        )}
                 </Row>
             </div>
         );
@@ -638,7 +686,9 @@ const mapStateToProps = (state: RootState) => ({
     calendars: selectCalendars(state),
     loading: selectCalendarsLoading(state),
     updateCalendarLoading: selectUpdateCalendarLoading(state),
-    deleteCalendarLoading: selectDeleteCalendarLoading(state)
+    deleteCalendarLoading: selectDeleteCalendarLoading(state),
+    services: selectServices(state),
+    servicesLoading: selectServicesLoading(state),
 });
 
 const mapDispatchToProps = (
@@ -646,10 +696,8 @@ const mapDispatchToProps = (
 ) => ({
     updateCalendarRequest: (id: string, calendar: Calendar) => dispatch(updateCalendarRequest(id, calendar)),
     deleteCalendarRequest: (id: string) => dispatch(deleteCalendarRequest(id)),
+    fetchServices: () => dispatch(fetchServices()),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CalendarPage));
