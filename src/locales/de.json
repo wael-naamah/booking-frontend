@@ -161,7 +161,7 @@
   "choices": "Auswahlmöglichkeiten",
   "simple_selection_only_one_entry_can_be_selected": "Einfache Auswahl (es kann nur ein Eintrag ausgewählt werden)",
   "multiple_selection_multiple_entries_can_be_selected": "Mehrfachauswahl (mehrere Einträge können ausgewählt werden)",
-  "selection_list_only_one_entry_can_be_selected": "Selection list (only one entry can be selected)",
+  "selection_list_only_one_entry_can_be_selected": "Auswahlliste (nur ein Eintrag kann ausgewählt werden)",
   "selection_is_optional_no_entry_has_to_be_selected": "Die Auswahl ist optional (es muss kein Eintrag ausgewählt werden)",
   "display_price": "Preis anzeigen",
   "show_appointment_duration": "Termindauer anzeigen",

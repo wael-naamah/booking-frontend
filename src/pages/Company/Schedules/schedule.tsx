@@ -557,8 +557,5 @@ const mapDispatchToProps = (
     dispatch(createScheduleRequest(schedule)),
 });
 
-// export default compose(
-//     withAuthorization,
-//   )(connect(mapStateToProps, mapDispatchToProps)(CalendarPage))
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SchedulePage));

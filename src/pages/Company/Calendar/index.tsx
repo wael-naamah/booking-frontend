@@ -86,10 +86,6 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
             return <div>{i18n.t('loading')}...</div>;
         }
 
-        if(!calendars.length){
-            return <Empty description={i18n.t('empty')}/>
-        }
-
         return (
             <div className="w-full">
                 <Row className="w-full" gutter={[16, 16]}>
@@ -118,7 +114,7 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                     </Col>
                 </Row>
 
-                {calendars.length ? <Calendar calendar={calendars[activeIndex]} onDeleteCalendar={this.onDeleteCalendar}/> : null}
+                {calendars.length ? <Calendar calendar={calendars[activeIndex]} onDeleteCalendar={this.onDeleteCalendar}/> : <Empty className="mt-16" description={i18n.t('empty')}/>}
             </div>
         );
     }

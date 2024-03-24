@@ -77,10 +77,6 @@ class SchedulesPage extends React.Component<ICalendarProps, ICalendarState> {
             return <div>{i18n.t('loading')}...</div>;
         }
 
-        if (!calendars.length) {
-            return <Empty description={i18n.t('empty')}/>
-        }
-
         return (
             <div className="w-full">
                 <Row className="w-full" gutter={[16, 16]}>
@@ -97,14 +93,22 @@ class SchedulesPage extends React.Component<ICalendarProps, ICalendarState> {
                         </Select>
                     </Col>
                 </Row>
-
-                <Spin spinning={loading}>
-                    <SchedulePage 
-                    weeklySchedules={schedules.filter(el => el.working_hours_type === ScheduleType.Weekly)} 
-                    certainSchedules={schedules.filter(el => el.working_hours_type === ScheduleType.Certain)} 
-                    calendarId={calendars.length ? calendars[activeIndex]._id! : ''} 
-                    onDeleteSchedule={this.onDeleteSchedule} />
-                </Spin>
+                {!calendars.length ? (
+                    <Empty className="mt-16" description={i18n.t("empty")} />
+                ) : (
+                    <Spin spinning={loading}>
+                        <SchedulePage
+                            weeklySchedules={schedules.filter(
+                                (el) => el.working_hours_type === ScheduleType.Weekly
+                            )}
+                            certainSchedules={schedules.filter(
+                                (el) => el.working_hours_type === ScheduleType.Certain
+                            )}
+                            calendarId={calendars.length ? calendars[activeIndex]._id! : ""}
+                            onDeleteSchedule={this.onDeleteSchedule}
+                        />
+                    </Spin>
+                )}
             </div>
         );
     }
