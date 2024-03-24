@@ -174,7 +174,7 @@ class SideBar extends React.Component<ISideBarProps, ISideBarState> {
             {this.props.loggedIn ? <Button onClick={() => this.props.logout()}>{i18n.t('logout')}</Button> : <Link to="/login">{i18n.t('login')}</Link>}
           <Button
             type="link"
-            onClick={() => window.open('https://booking-frontend-waels-projects-d2811c36.vercel.app/category', '_blank')}
+            onClick={() => window.open('https://bgas-kalender.at/category', '_blank')}
             style={{
               fontSize: "16px",
               width: 64,
