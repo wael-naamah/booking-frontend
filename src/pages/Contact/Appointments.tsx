@@ -142,7 +142,7 @@ class AppointmentsPage extends React.Component<
               <Row>
                 <Col span={24}>
                   <div className="flex flex-col">
-                    <img src={FILES_STORE + item.url} width={'100%'} className="object-contain" height={250} />
+                    <img src={FILES_STORE + item.url} width={'100%'} alt="download-icon" className="object-contain" height={250} />
                     <Button
                       className="self-start"
                       type="link"

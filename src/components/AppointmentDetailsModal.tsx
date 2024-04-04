@@ -11,7 +11,7 @@ import { fetchContactById, updateAppointmentRequest } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
 import { download, upload } from '../utils';
 import TextArea from 'antd/es/input/TextArea';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { withTranslation } from 'react-i18next';
 import i18n from "../locales/i18n";
@@ -135,7 +135,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                 <Row>
                                     <Col span={24}>
                                         <div className="flex flex-col">
-                                            <img src={FILES_STORE + item.url} width={'100%'} className="object-contain" height={250} />
+                                            <img src={FILES_STORE + item.url} width={'100%'} alt='download-icon' className="object-contain" height={250} />
                                             <Button
                                                 className="self-start"
                                                 type="link"
@@ -300,7 +300,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 "exhaust_flap",
                 "exhaust_pipes_condition_connection_direction",
                 "heating_water_pressure",
-                "gas_setting", ,
+                "gas_setting",
                 "date_of_the_next_exhaust_gas_measurement",
                 "flow_assurance",
                 "condensing_boilers_condensation_water_siphon",
@@ -362,6 +362,15 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
         const appointmentOverview = () => {
             const { contactLoading } = this.state;
+            const startDateTime = dayjs(selectedEvent?.start_date);
+            const endDateTime = dayjs(selectedEvent?.end_date);
+
+            const offsetMinutes = startDateTime.utcOffset();
+
+            const formattedTime =
+                startDateTime.subtract(offsetMinutes, 'minute').format("HH:mm A") +
+                " - " +
+                endDateTime.subtract(offsetMinutes, 'minute').format("HH:mm A");
 
             return (
                 <Spin spinning={contactLoading}>
@@ -372,7 +381,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         </Col>
                         <Col md={12} xs={24}>
                             <label>{i18n.t('time')}</label>
-                            <Input value={dayjs(selectedEvent?.start_date).format("HH:mm A") + " - " + dayjs(selectedEvent?.end_date).format("HH:mm A")} />
+                            <Input value={formattedTime} />
                         </Col>
                     </Row>
                     <Row className="mb-6" gutter={[16, 16]}>

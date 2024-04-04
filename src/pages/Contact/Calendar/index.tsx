@@ -5,7 +5,7 @@ import { fetchContactAppointments } from "../../../redux/actions";
 import { selectContactAppointments, selectContactAppointmentsLoading, selectProfile } from "../../../redux/selectors";
 import { ExtendedAppointment } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Row, Col, Spin } from "antd";
+import { Spin } from "antd";
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
 import * as moment from 'moment';
 
@@ -76,12 +76,20 @@ class ContactCalendarPage extends React.Component<IContactCalendarProps, IContac
         const localizer = momentLocalizer(moment);
 
 
-        const events = (appointments || []).map((el) => ({
-            title: el.service?.name || '',
-            start: new Date(el.start_date),
-            end: new Date(el.end_date),
-            ...el
-        }))
+        const events = (appointments || []).map((el) => {
+            const startUTC = new Date(el.start_date);
+            const endUTC = new Date(el.end_date);
+
+            const start = new Date(startUTC.getTime() + startUTC.getTimezoneOffset() * 60000);
+            const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
+
+            return {
+                title: el.service?.name || '',
+                start,
+                end,
+                ...el
+            }
+        })
 
         const handleSelectedEvent = async (event: CalendarEvent) => {
             this.setState({
