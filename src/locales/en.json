@@ -316,5 +316,11 @@
   "send_reset_link": "Send reset link",
   "forgot_password": "Forgot password?",
   "back_to_login": "Back to login?",
-  "password_reset_successfully": "Password reset successfully"
+  "password_reset_successfully": "Password reset successfully",
+  "this_appointment_has_been_canceled": "This appointment has been canceled",
+  "cancel_appointment": "Cancel appointment",
+  "cancel_this_appointment": "Cancel this appointment?",
+  "are_you_sure_you_want_to_cancel_this_appointment": "Are you sure you want to cancel this appointment?",
+  "cancel_it": "Cancel It",
+  "successfully_cancelled_the_appointment": "Successfully cancelled the appointment"
 }

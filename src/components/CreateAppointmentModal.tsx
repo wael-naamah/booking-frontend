@@ -2,7 +2,7 @@ import { Button, Card, Checkbox, Col, Divider, Form, Input, Modal, Row, Select, 
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { Appointment, Attachment, Calendar, Contact, ExtendedService, Salutation } from '../Schema';
+import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ExtendedService, Salutation } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectAddAppointmentLoading, selectServices, selectServicesLoading } from '../redux/selectors';
 import { addAppointmentRequest, fetchServices } from '../redux/actions';
@@ -108,6 +108,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 has_maintenance_agreement: Boolean(values.has_maintenance_agreement),
                 has_bgas_before: Boolean(values.has_bgas_before),
                 year: values.year,
+                appointment_status: AppointmentStatus.Confirmed,
                 attachments: savedFileList.length ? savedFileList : undefined,
                 remarks: values.remarks || undefined,
                 company_remarks: values.company_remarks || undefined,

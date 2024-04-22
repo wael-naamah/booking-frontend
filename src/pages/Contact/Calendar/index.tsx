@@ -16,6 +16,7 @@ import Header from "../../../components/Header";
 import { Content } from "antd/es/layout/layout";
 import AppointmentDetailsModal from "../../../components/AppointmentDetailsModal";
 import "./CalendarMobile.scss";
+import i18n from "../../../locales/i18n";
 
 interface CalendarEvent extends ExtendedAppointment {
     title: string;
@@ -107,11 +108,28 @@ class ContactCalendarPage extends React.Component<IContactCalendarProps, IContac
                         <BigCalendar
                             localizer={localizer}
                             events={events}
+                            culture={i18n.language}
                             startAccessor="start"
                             endAccessor="end"
                             popup={true}
                             onSelectEvent={(e) => handleSelectedEvent(e)}
                             style={{ minHeight: 800 }}
+                            messages={{
+                                next: i18n.t('next'),
+                                previous: i18n.t('previous'),
+                                today: i18n.t('today'),
+                                month: i18n.t('month'),
+                                week: i18n.t('week'),
+                                day: i18n.t('day'),
+                                work_week: i18n.t('work_week'),
+                                allDay: i18n.t('all_day'),
+                                yesterday: i18n.t('yesterday'),
+                                tomorrow: i18n.t('tomorrow'),
+                                noEventsInRange: i18n.t('no_events_in_range'),
+                                showMore: function showMore(total) {
+                                    return '+' + total + i18n.t('events');
+                                }
+                            }}
                         />
                     </Spin>
                 </Content>

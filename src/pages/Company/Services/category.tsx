@@ -383,7 +383,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                             </Upload.Dragger>
                             {newService.attachment && <Row className="flex items-center my-2" justify={'space-between'}>
                                 <Col className="flex items-center">
-                                    <img src={FILES_STORE + newService.attachment.url} width={40} height={40} />
+                                    <img alt="img" src={FILES_STORE + newService.attachment.url} width={40} height={40} />
                                     <span className="ml-2">{newService.attachment.title}</span>
                                 </Col>
 

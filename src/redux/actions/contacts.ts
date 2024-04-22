@@ -89,7 +89,7 @@ export const importContactsRequest = async (file: RcFile) => {
   try {
   const uploadFileData = new FormData();
   uploadFileData.append("file", file);
-  const result = await fetch(`${API_URL}/files/upload-contacts-file`, {
+  const result = await fetch(`${API_URL}/files/import-contacts-file`, {
     method: "POST",
     body: uploadFileData,
   });

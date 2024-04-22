@@ -10,7 +10,12 @@ export enum ControlPointsValues {
 
 export interface ControlPoints {
   title: string;
-  value?: ControlPointsValues;
+  value: ControlPointsValues;
+}
+
+export enum AppointmentStatus {
+  Confirmed = "Confirmed",
+  Cancelled = "Cancelled",
 }
 export interface Appointment {
   _id?: string;
@@ -31,6 +36,8 @@ export interface Appointment {
   imported_service_name?: string,
   imported_service_duration?: string,
   imported_service_price?: string,
+  appointment_status: AppointmentStatus;
+  updated_by?: boolean;
   attachments?: Attachment[];
   remarks?: string;
   employee_attachments?: Attachment[];

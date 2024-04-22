@@ -56,6 +56,7 @@ interface IContactState {
   search: string;
   importModelVisible: boolean;
   importLoading: boolean;
+  exportLoading: boolean;
   file?: RcFile;
   newPassword?: string;
 }
@@ -84,6 +85,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       search: '',
       importModelVisible: false,
       importLoading: false,
+      exportLoading: false,
       resetVisible: false,
     };
   }
@@ -141,7 +143,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   };
 
   onExportContacts = () => {
+    this.setState({ exportLoading: true });
     window.open(`${API_URL}/files/export-contacts-file`, '_blank');
+    this.setState({ exportLoading: true });
   }
 
   handlePageChange = (value: number) => {
@@ -441,8 +445,8 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 
       this.setState({ importLoading: true });
       importContactsRequest(this.state.file).then((data) => {
-        if (data.status && data.status === "success") {
-          message.success(data.message);
+        if (data?.status && data?.status === "success") {
+          message.success(data?.message);
         } else {
           message.error(i18n.t('something_went_wrong_please_try_again'));
         }
@@ -491,14 +495,14 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                     {i18n.t('import_contacts')}
                   </p>
                 </Space>
-              </Upload.Dragger>
+              </Upload.Dragger> 
             </Col>
           </Row>
           <Divider className="mb-4 mt-2" />
           <Row gutter={16} justify={"end"}>
             <Button onClick={onClose}>{i18n.t('cancel')}</Button>
             <Form.Item>
-              <Button type="primary" className="ml-2" htmlType="submit">
+              <Button loading={this.state.importLoading} type="primary" className="ml-2" htmlType="submit">
                 {i18n.t('save')}
               </Button>
             </Form.Item>
@@ -509,7 +513,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   }
 
   render() {
-    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, search, resetVisible } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, exportLoading, search, resetVisible } = this.state;
     const { loading, contacts } = this.props;
 
     return (
@@ -533,7 +537,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
-              <Button className="ml-2" loading={importLoading} onClick={() => this.onExportContacts()} type="primary">
+              <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
                 {i18n.t('export_contacts')}
               </Button>
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">

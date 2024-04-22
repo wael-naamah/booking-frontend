@@ -209,6 +209,8 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                     <Col span={6} xs={24} md={6}>
                         <Card className="calendar-card">
                             <Calendar
+                                className="hide-year-navigation"
+                                mode="month"
                                 fullscreen={false}
                                 value={currentDate ? currentDate : dayjs()}
                                 onSelect={this.onSelectDate}

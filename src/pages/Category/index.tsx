@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchCategories, fetchTimeSlots, addAppointmentRequest } from "../../redux/actions";
 import { selectCategories, selectCategoriesLoading, selectLoggedIn, selectProfile, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Appointment, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
+import { Appointment, AppointmentStatus, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message, Upload, Space } from "antd";
@@ -107,6 +107,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             has_maintenance_agreement: Boolean(values.has_maintenance_agreement),
             has_bgas_before: Boolean(values.has_bgas_before),
             year: values.year,
+            appointment_status: AppointmentStatus.Confirmed,
             attachments: savedFileList.length ? savedFileList : undefined,
             remarks: values.remarks || undefined,
         }

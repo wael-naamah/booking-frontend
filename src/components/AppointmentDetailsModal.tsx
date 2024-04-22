@@ -1,12 +1,12 @@
-import { Button, Checkbox, Col, DatePicker, Divider, Form, Input, List, Modal, Row, Select, Space, Spin, Tabs, Upload, message } from 'antd';
+import { Button, Checkbox, Col, DatePicker, Divider, Form, Input, List, Modal, Popconfirm, Row, Select, Space, Spin, Tabs, Tag, Upload, message } from 'antd';
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
 import { CheckCircleOutlined, CloseCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
-import { Appointment, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment } from '../Schema';
+import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment } from '../Schema';
 import { RootState } from '../redux/store';
-import { selectUpdateAppointmentLoading } from '../redux/selectors';
+import { selectProfile, selectUpdateAppointmentLoading } from '../redux/selectors';
 import { fetchContactById, updateAppointmentRequest } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
 import { download, upload } from '../utils';
@@ -42,6 +42,7 @@ interface IModalProps {
     calendars?: Calendar[];
     isContact?: boolean;
     disabled?: boolean;
+    profile?: any;
 }
 
 interface IModalState {
@@ -372,6 +373,26 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 " - " +
                 endDateTime.subtract(offsetMinutes, 'minute').format("HH:mm A");
 
+            const onCancelAppointment = () => {
+                // @ts-ignore
+                const { _id, createdAt, updatedAt, service, title, start, end, sourceResource, resourceId, ...propsToUpdate } = selectedEvent!
+                this.props
+                    .updateAppointmentRequest(selectedEvent?._id!, {
+                        ...propsToUpdate,
+                        appointment_status: AppointmentStatus.Cancelled,
+                        updated_by: this.props.profile?.role
+                    })
+                    .then((data) => {
+                        if (data._id) {
+                            message.success(i18n.t('successfully_cancelled_the_appointment'));
+                            this.props.onSave();
+                        } else {
+                            message.error(i18n.t('something_went_wrong_please_try_again'));
+                        }
+                    });
+            };
+
+
             return (
                 <Spin spinning={contactLoading}>
                     <Row className="mb-6" gutter={[16, 16]}>
@@ -465,6 +486,25 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             {i18n.t('has_maintenance_agreement')}
                         </Checkbox>
                     </Row>
+                    <Row className="mb-6" gutter={[16, 16]}>
+                        {selectedEvent?.appointment_status === AppointmentStatus.Cancelled ?
+                            <Tag color='red' >{i18n.t('this_appointment_has_been_canceled')}</Tag> : this.props.disabled ? null : (
+                                <>
+                                    <Popconfirm
+                                        title={i18n.t('cancel_this_appointment')}
+                                        description={i18n.t('are_you_sure_you_want_to_cancel_this_appointment')}
+                                        okText={i18n.t('cancel_it')}
+                                        cancelText={i18n.t('no')}
+                                        okButtonProps={{
+                                            danger: true,
+                                        }}
+                                        onConfirm={() => onCancelAppointment()}
+                                    >
+                                        <Button type="default" danger>{i18n.t('cancel_appointment')}</Button>
+                                    </Popconfirm>
+                                </>
+                            )}
+                    </Row>
                 </Spin>
             )
         }
@@ -500,7 +540,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                 open={this.props.visible}
                 centered
                 footer={() => {
-                    return this.props.disabled ? null : (
+                    return this.props.disabled || selectedEvent?.appointment_status === AppointmentStatus.Cancelled ? null : (
                         <>
                             <Button onClick={onClose}>{i18n.t('cancel')}</Button>
                             <Button type="primary" onClick={onSave}>{i18n.t('save')}</Button>
@@ -561,6 +601,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
 const mapStateToProps = (state: RootState) => ({
     updateLoading: selectUpdateAppointmentLoading(state),
+    profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (

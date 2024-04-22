@@ -316,5 +316,11 @@
   "send_reset_link": "Reset-Link senden",
   "forgot_password": "Passwort vergessen?",
   "back_to_login": "Zurück zur Anmeldung?",
-  "password_reset_successfully": "Passwort erfolgreich zurückgesetzt"
+  "password_reset_successfully": "Passwort erfolgreich zurückgesetzt",
+  "this_appointment_has_been_canceled": "Dieser Termin wurde abgesagt",
+  "cancel_appointment": "Termin absagen",
+  "cancel_this_appointment": "Diesen Termin absagen?",
+  "are_you_sure_you_want_to_cancel_this_appointment": "Möchten Sie diesen Termin wirklich absagen?",
+  "cancel_it": "absagen",
+  "successfully_cancelled_the_appointment": "Der Termin wurde erfolgreich abgesagt"
 }
