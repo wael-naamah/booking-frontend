@@ -8,3 +8,5 @@ export const selectDeleteEmailConfigLoading = (state: RootState) => state.settin
 
 export const selectEmailTemplates = (state: RootState) => state.settings.emailTemplates;
 export const selectEmailTemplatesLoading = (state: RootState) => state.settings.emailTemplatesLoading;
+
+export const selectLanguage = (state: RootState) => state.settings.language;

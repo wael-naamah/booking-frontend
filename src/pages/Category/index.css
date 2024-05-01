@@ -9,3 +9,8 @@
         margin-top: 20px;
     }
 }
+
+.hide-year-navigation .ant-picker-calendar-mode-switch,
+.hide-year-navigation .ant-picker-calendar-mode-switch {
+  display: none !important;
+}

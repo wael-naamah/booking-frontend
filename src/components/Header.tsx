@@ -7,7 +7,7 @@ import { selectLoggedIn, selectProfile } from "../redux/selectors";
 import { RootState } from "../redux/store";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { logoutRequest } from "../redux/actions";
+import { logoutRequest, setLanguageRequest } from "../redux/actions";
 import { Link } from "react-router-dom";
 import { withTranslation } from "react-i18next";
 import i18n from "../locales/i18n";
@@ -17,6 +17,7 @@ const { Option } = Select;
 interface IHeaderProps {
   loggedIn: boolean;
   logout: () => void;
+  setLanguage: (lang: string) => void;
   profile: any;
 }
 class Header extends React.Component<IHeaderProps> {
@@ -28,6 +29,7 @@ class Header extends React.Component<IHeaderProps> {
     const { logout, loggedIn, profile } = this.props;
     const onSelectLang = (lang: string) => {
       i18n.changeLanguage(lang);
+      this.props.setLanguage(lang);
     }
 
     return (
@@ -93,6 +95,7 @@ const mapDispatchToProps = (
   dispatch: ThunkDispatch<RootState, undefined, any>
 ) => ({
   logout: () => dispatch(logoutRequest()),
+  setLanguage: (lang: string) => dispatch(setLanguageRequest(lang)),
 });
 
 export default connect(

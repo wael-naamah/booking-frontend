@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { fetchContactAppointments } from "../../../redux/actions";
-import { selectContactAppointments, selectContactAppointmentsLoading, selectProfile } from "../../../redux/selectors";
+import { selectContactAppointments, selectContactAppointmentsLoading, selectLanguage, selectProfile } from "../../../redux/selectors";
 import { ExtendedAppointment } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Spin } from "antd";
@@ -106,6 +106,7 @@ class ContactCalendarPage extends React.Component<IContactCalendarProps, IContac
                     <Header />
                     <Spin spinning={loading}>
                         <BigCalendar
+                            key={i18n.language}
                             localizer={localizer}
                             events={events}
                             culture={i18n.language}
@@ -142,6 +143,7 @@ const mapStateToProps = (state: RootState) => ({
     appointments: selectContactAppointments(state),
     loading: selectContactAppointmentsLoading(state),
     profile: selectProfile(state),
+    language: selectLanguage(state),
 });
 
 const mapDispatchToProps = (

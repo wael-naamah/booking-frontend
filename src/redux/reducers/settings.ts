@@ -12,6 +12,7 @@ interface EmailConfigState {
   updateEmailTemplateLoading: boolean;
   deleteEmailTemplateLoading: boolean;
   addEmailTemplateLoading: boolean;
+  language: string;
 }
 
 const initialState: EmailConfigState = {
@@ -25,6 +26,7 @@ const initialState: EmailConfigState = {
   updateEmailTemplateLoading: false,
   deleteEmailTemplateLoading: false,
   addEmailTemplateLoading: false,
+  language: "de",
 };
 
 const settingsReducer = (
@@ -156,6 +158,11 @@ const settingsReducer = (
         emailTemplates: updatedTemplates,
       };
     }
+    case "settings/SET_LANGUAGE":
+      return {
+        ...state,
+        language: action.language,
+      };
     default:
       return state;
   }

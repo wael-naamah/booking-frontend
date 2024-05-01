@@ -20,6 +20,19 @@ const DELETE_EMAIL_TEMPLATE_DONE = "settings/DELETE_EMAIL_TEMPLATE_DONE" as cons
 const ADD_EMAIL_TEMPLATE = "settings/ADD_EMAIL_TEMPLATE" as const;
 const ADD_EMAIL_TEMPLATE_DONE = "settings/ADD_EMAIL_TEMPLATE_DONE" as const;
 
+export const SET_LANGUAGE = 'settings/SET_LANGUAGE' as const;
+
+export const setLanguage = (lang: string) => ({
+  type: SET_LANGUAGE,
+  language: lang,
+});
+
+export const setLanguageRequest = (lang: string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(setLanguage(lang));
+  };
+};
+
 export const addEmailConfig = () => ({
   type: ADD_EMAIL_CONFIG,
 });
@@ -297,4 +310,5 @@ export type EmailConfigAction = ReturnType<
   | typeof updateEmailTemplateDone
   | typeof getEmailTemplates
   | typeof getEmailTemplatesDone
+  | typeof setLanguage
 >;

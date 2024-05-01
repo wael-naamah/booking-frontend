@@ -290,6 +290,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                     <Col md={16} xs={24}>
                                         <Card className="border border-gray-300 w-full h-96 rounded-md">
                                             <Calendar
+                                                className="hide-year-navigation"
                                                 fullscreen={false}
                                                 value={currentDate ? currentDate : dayjs()}
                                                 onSelect={this.onSelectDate}
