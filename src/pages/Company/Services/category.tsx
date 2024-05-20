@@ -30,8 +30,6 @@ import {
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.css";
 import { RcFile } from "antd/es/upload";
@@ -45,10 +43,6 @@ const { TextArea } = Input;
 const { Column } = Table;
 const { Option } = Select;
 
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-    weekStart: 1,
-});
 
 interface ICategoryState {
     editingTitle: number | null;

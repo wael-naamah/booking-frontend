@@ -32,7 +32,6 @@ import {
 } from "antd";
 import { Content } from "antd/es/layout/layout";
 import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.css";
 import WeekdaySelector from "./components/WeekdaySelector";
@@ -42,10 +41,6 @@ import { EllipsisOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
 
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-  weekStart: 1,
-});
 
 function calculateHoursDifference(numOfDays: number, hoursPerDay: number) {
   return Math.floor(numOfDays * hoursPerDay);

@@ -25,8 +25,6 @@ import {
     Empty,
 } from "antd";
 import { Content } from "antd/es/layout/layout";
-import dayjs from "dayjs";
-import updateLocale from "dayjs/plugin/updateLocale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.css";
 import { withTranslation } from 'react-i18next';
@@ -35,10 +33,6 @@ import i18n from "../../../locales/i18n";
 const { TextArea } = Input;
 const { Option } = Select;
 
-dayjs.extend(updateLocale);
-dayjs.updateLocale("en", {
-    weekStart: 1,
-});
 
 interface ICalendarState {
     editingTitle: number | null;

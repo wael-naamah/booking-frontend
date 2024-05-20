@@ -80,7 +80,7 @@ class EmployeePage extends React.Component<IEmployeeProps, IEmployeeState> {
             const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
 
             return {
-                title: el.service?.name || '',
+                title: el.service?.name || el?.imported_service_name || '',
                 start,
                 end,
                 ...el

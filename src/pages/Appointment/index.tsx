@@ -70,12 +70,20 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         };
     }
 
+    fetchAppointments = async () => {
+        const { currentDate } = this.state;
+        const firstDateOfMonth = dayjs(currentDate).startOf('month');
+        const lastDateOfMonth = dayjs(currentDate).endOf('month');
+        try {
+            this.props.fetchAppointments({ start: firstDateOfMonth.toISOString(), end: lastDateOfMonth.toISOString() });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    
+    }
 
     componentDidMount() {
-        const firstDateOfMonth = dayjs().startOf('month');
-        const lastDateOfMonth = dayjs().endOf('month');
-
-        this.props.fetchAppointments({ start: firstDateOfMonth.toISOString(), end: lastDateOfMonth.toISOString() });
+        this.fetchAppointments();
         this.props.fetchEmployees({ page: 1, limit: 100 });
         this.fetchTimeslots();
     }
@@ -110,6 +118,12 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         if (prevState.currentDate !== currentDate) {
             this.fetchTimeslots();
         }
+
+        if (dayjs(currentDate).month() !== dayjs(prevState.currentDate).month() ||
+              dayjs(currentDate).year() !== dayjs(prevState.currentDate).year()
+          ) {
+            this.fetchAppointments();
+          }
     }
 
     renderEventModal = () => {
@@ -150,7 +164,10 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         const { currentDate, views, modalState, newAppointmentModal } = this.state;
         const localizer = momentLocalizer(moment);
 
-        const resourceMap = (employees || []).map(el => ({
+        const resourceMap = (employees || []).concat([{
+            _id: '--',
+            employee_name: i18n.t('other')
+        }] as CalendarType[] ).map(el => ({
             resourceId: el._id,
             resourceTitle: el.employee_name
         }))
@@ -163,7 +180,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             const end = new Date(endUTC.getTime() + endUTC.getTimezoneOffset() * 60000);
 
             return {
-                title: el.service?.name || '',
+                title: el.service?.name || el?.imported_service_name || '',
                 start,
                 end,
                 resourceId: el.calendar_id,
@@ -172,6 +189,10 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
             };
         });
 
+        const handleNavigate = (newDate: Date) => {
+            const currentDate = dayjs(newDate);
+            this.setState({ currentDate });
+        };
 
         const handleSelectedEvent = async (event: CalendarEvent) => {
             this.setState({
@@ -241,6 +262,7 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
                                 resourceTitleAccessor="resourceTitle"
                                 step={60}
                                 selectable
+                                onNavigate={handleNavigate}
                                 onSelectSlot={(slot) => {
                                     const currentDate = new Date();
                                     if (slot.start < currentDate) {

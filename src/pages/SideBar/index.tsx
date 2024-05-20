@@ -18,7 +18,7 @@ import i18n from "../../locales/i18n";
 import { withTranslation } from 'react-i18next';
 import { RootState } from "../../redux/store";
 import { selectLoggedIn } from "../../redux/selectors";
-import { logoutRequest } from "../../redux/actions";
+import { logoutRequest, setLanguageRequest } from "../../redux/actions";
 
 const { Header, Sider, Content } = Layout;
 const {Option} = Select;
@@ -49,6 +49,7 @@ const NavLink: React.FunctionComponent<{
 interface ISideBarProps {
   loggedIn: boolean;
   logout: () => void;
+  setLanguage: (lang: string) => void;
 }
 
 interface ISideBarState {
@@ -72,6 +73,7 @@ class SideBar extends React.Component<ISideBarProps, ISideBarState> {
 
     const onSelectLang = (lang: string) => {
       i18n.changeLanguage(lang);
+      this.props.setLanguage(lang);
     }
 
   return (
@@ -207,6 +209,7 @@ const mapDispatchToProps = (
   dispatch: ThunkDispatch<RootState, undefined, any>
 ) => ({
   logout: () => dispatch(logoutRequest()),
+  setLanguage: (lang: string) => dispatch(setLanguageRequest(lang)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(SideBar))
