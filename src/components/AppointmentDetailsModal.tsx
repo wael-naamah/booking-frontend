@@ -7,7 +7,7 @@ import { CheckCircleOutlined, CloseCircleOutlined, MinusCircleOutlined } from '@
 import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectProfile, selectUpdateAppointmentLoading } from '../redux/selectors';
-import { fetchContactById, updateAppointmentRequest } from '../redux/actions';
+import { fetchContactById, updateAppointmentRequest, deleteAppointmentRequest } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
 import { download, upload } from '../utils';
 import TextArea from 'antd/es/input/TextArea';
@@ -38,6 +38,9 @@ interface IModalProps {
     updateAppointmentRequest: (
         id: string,
         appointment: Appointment
+    ) => Promise<any>;
+    deleteAppointmentRequest: (
+        id: string,
     ) => Promise<any>;
     calendars?: Calendar[];
     isContact?: boolean;
@@ -96,6 +99,17 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
         const onClose = () => {
             this.props.onClose();
+        }
+
+        const onDelete = () => {
+            this.props.deleteAppointmentRequest(selectedEvent?._id!).then((data) => {
+                if (data.status && data.status === "success") {
+                    message.success(i18n.t('successfully_deleted_the_appointment'));
+                    onClose();
+                } else {
+                    message.error(i18n.t('something_went_wrong_please_try_again'));
+                }
+            });
         }
 
         const onSave = () => {
@@ -544,6 +558,11 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         <>
                             <Button onClick={onClose}>{i18n.t('cancel')}</Button>
                             <Button type="primary" onClick={onSave}>{i18n.t('save')}</Button>
+                            {this.props.profile && this.props.profile.role === "user" ? (
+                                <>
+                                    <Button type="primary" danger onClick={onDelete}>{i18n.t('delete')}</Button>
+                                </>
+                            ) : null}
                         </>
                     )
                 }}
@@ -609,6 +628,8 @@ const mapDispatchToProps = (
 ) => ({
     updateAppointmentRequest: (id: string, appointment: Appointment) =>
         dispatch(updateAppointmentRequest(id, appointment)),
+    deleteAppointmentRequest: (id: string) => dispatch(deleteAppointmentRequest(id)),
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AppointmentDetailsModal))

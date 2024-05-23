@@ -1,7 +1,7 @@
 import React, { ComponentType, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { selectLoginLoading, selectProfile } from '../redux/selectors';
+import { selectProfile } from '../redux/selectors';
 import { Spin } from 'antd';
 import { RootState } from '../redux/store';
 
