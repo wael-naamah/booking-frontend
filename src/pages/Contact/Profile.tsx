@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { updateContactRequest, updateProfileRequest, resetPasswordRequest } from "../../redux/actions";
 import { selectProfile, selectResetPasswordLoading, selectUpdateContactLoading } from "../../redux/selectors";
-import { Contact, ResetPasswordForm, Salutation } from "../../Schema";
+import { Contact, ResetPasswordForm } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Button, Card, Col, Divider, Empty, Form, Input, Row, Select, Tabs, message } from "antd";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -83,9 +83,9 @@ class ProfilePage extends React.Component<ICalendarProps, ICalendarState> {
                             >
                                 <Select>
                                     {[
-                                        { lable: i18n.t('mr'), value: Salutation.MISTER },
-                                        { lable: i18n.t('mrs'), value: Salutation.WOMAN },
-                                        { lable: i18n.t('company'), value: Salutation.COMPANY },
+                                        { lable: i18n.t('mr'), value: i18n.t('mr') },
+                                        { lable: i18n.t('mrs'), value: i18n.t('mrs') },
+                                        { lable: i18n.t('company'), value: i18n.t('company') },
                                     ].map((el) => (
                                         <Option key={el.lable} value={el.value}>
                                             {el.lable}

@@ -11,7 +11,7 @@ import {
   resetContactPasswordManually
 } from "../../redux/actions";
 import { selectContacts, selectContactsLoading } from "../../redux/selectors";
-import { Contact, PaginatedForm, Salutation } from "../../Schema";
+import { Contact, PaginatedForm } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { compose } from 'redux'
 import {
@@ -241,9 +241,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               >
                 <Select>
                   {[
-                    { lable: i18n.t('mr'), value: Salutation.MISTER },
-                    { lable: i18n.t('mrs'), value: Salutation.WOMAN },
-                    { lable: i18n.t('company'), value: Salutation.COMPANY },
+                    { lable: i18n.t('mr'), value: i18n.t('mr') },
+                    { lable: i18n.t('mrs'), value: i18n.t('mrs') },
+                    { lable: i18n.t('company'), value: i18n.t('company') },
                   ].map((el) => (
                     <Option key={el.lable} value={el.value}>
                       {el.lable}

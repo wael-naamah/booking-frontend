@@ -2,7 +2,7 @@ import { Button, Card, Checkbox, Col, Divider, Form, Input, Modal, Row, Select, 
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ExtendedService, Salutation } from '../Schema';
+import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ExtendedService } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectAddAppointmentLoading, selectServices, selectServicesLoading } from '../redux/selectors';
 import { addAppointmentRequest, fetchServices } from '../redux/actions';
@@ -193,9 +193,9 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                 <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
                                     <Select>
                                         {[
-                                            { lable: i18n.t('mr'), value: Salutation.MISTER },
-                                            { lable: i18n.t('mrs'), value: Salutation.WOMAN },
-                                            { lable: i18n.t('company'), value: Salutation.COMPANY },
+                                            { lable: i18n.t('mr'), value: i18n.t('mr') },
+                                            { lable: i18n.t('mrs'), value: i18n.t('mrs') },
+                                            { lable: i18n.t('company'), value: i18n.t('company') },
                                         ].map((el) => (
                                             <Option key={el.lable} value={el.value}>
                                                 {el.lable}

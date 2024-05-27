@@ -1,12 +1,6 @@
-export enum Salutation {
-  WOMAN = "Mrs",
-  MISTER = "Mr",
-  COMPANY = "Company",
-}
-
 export interface Contact {
   _id?: string;
-  salutation: Salutation;
+  salutation: string;
   first_name: string;
   last_name: string;
   address: string;

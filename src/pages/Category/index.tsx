@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
-import { fetchCategories, fetchTimeSlots, addAppointmentRequest } from "../../redux/actions";
+import { fetchCategories, fetchTimeSlots, addAppointmentRequest, updateProfileRequest } from "../../redux/actions";
 import { selectCategories, selectCategoriesLoading, selectLoggedIn, selectProfile, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
-import { Appointment, AppointmentStatus, Attachment, Category, Contact, Salutation, Service } from "../../Schema";
+import { Appointment, AppointmentStatus, Attachment, Category, Contact, Service } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message, Upload, Space } from "antd";
@@ -49,6 +49,7 @@ interface ICategoryProps {
     fetchCategories: () => Promise<any>;
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => Promise<any>;
     onSubmit: (appointment: Appointment) => Promise<any>;
+    updateProfileRequest: (profile: any) => Promise<any>;
     loggedIn: boolean;
     profile: any;
 }
@@ -129,6 +130,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                     : dayjs(),
                         current: 0
                     });
+                    this.props.updateProfileRequest(contact);
                 } else {
                     message.error(i18n.t('something_went_wrong_while_booking_the_appointment'))
                 }
@@ -327,9 +329,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                 <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
                                                     <Select>
                                                         {[
-                                                            { lable: i18n.t('mr'), value: Salutation.MISTER },
-                                                            { lable: i18n.t('mrs'), value: Salutation.WOMAN },
-                                                            { lable: i18n.t('company'), value: Salutation.COMPANY },
+                                                            { lable: i18n.t('mr'), value: i18n.t('mr') },
+                                                            { lable: i18n.t('mrs'), value: i18n.t('mrs') },
+                                                            { lable: i18n.t('company'), value: i18n.t('company') },
                                                         ].map((el) => (
                                                             <Option key={el.lable} value={el.value}>
                                                                 {el.lable}
@@ -384,9 +386,9 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                     <Select>
                                                         {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
                                                         i18n.t('praiseworthy'), i18n.t('nordgas'), i18n.t('orange'), i18n.t('rapido'),
-                                                        i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((salutation) => (
-                                                            <Option key={salutation} value={salutation}>
-                                                                {salutation}
+                                                        i18n.t('saunier_duval'), i18n.t('vaillant'), i18n.t('viessmann'), i18n.t('wolf'), i18n.t('other')].map((brand) => (
+                                                            <Option key={brand} value={brand}>
+                                                                {brand}
                                                             </Option>
                                                         ))}
                                                     </Select>
@@ -551,7 +553,9 @@ const mapDispatchToProps = (
     fetchCategories: () => dispatch(fetchCategories()),
     fetchTimeSlots: (date: string, categoryId: string, serviceId: string) => dispatch(fetchTimeSlots(date, categoryId, serviceId)),
     onSubmit: (appointment: Appointment): Promise<any> =>
-        dispatch(addAppointmentRequest(appointment))
+        dispatch(addAppointmentRequest(appointment)),
+    updateProfileRequest: (profile: any) =>
+        dispatch(updateProfileRequest(profile)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CategoryPage));
