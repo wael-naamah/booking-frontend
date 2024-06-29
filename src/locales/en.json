@@ -322,5 +322,6 @@
   "cancel_this_appointment": "Cancel this appointment?",
   "are_you_sure_you_want_to_cancel_this_appointment": "Are you sure you want to cancel this appointment?",
   "cancel_it": "Cancel It",
-  "successfully_cancelled_the_appointment": "Successfully cancelled the appointment"
+  "successfully_cancelled_the_appointment": "Successfully cancelled the appointment",
+  "change_date": "Change date"
 }

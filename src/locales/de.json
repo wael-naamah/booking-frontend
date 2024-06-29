@@ -322,5 +322,6 @@
   "cancel_this_appointment": "Diesen Termin absagen?",
   "are_you_sure_you_want_to_cancel_this_appointment": "Möchten Sie diesen Termin wirklich absagen?",
   "cancel_it": "absagen",
-  "successfully_cancelled_the_appointment": "Der Termin wurde erfolgreich abgesagt"
+  "successfully_cancelled_the_appointment": "Der Termin wurde erfolgreich abgesagt",
+  "change_date": "Datum ändern"
 }

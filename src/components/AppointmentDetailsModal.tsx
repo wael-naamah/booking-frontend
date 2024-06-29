@@ -4,14 +4,14 @@ import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
 import { CheckCircleOutlined, CloseCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
-import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment } from '../Schema';
+import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ControlPoints, ControlPointsValues, ExtendedAppointment, TimeSlotsForm } from '../Schema';
 import { RootState } from '../redux/store';
-import { selectProfile, selectUpdateAppointmentLoading } from '../redux/selectors';
-import { fetchContactById, updateAppointmentRequest, deleteAppointmentRequest } from '../redux/actions';
+import { selectProfile, selectSelectorTimeslots, selectSelectorTimeslotsLoading, selectUpdateAppointmentLoading } from '../redux/selectors';
+import { fetchContactById, updateAppointmentRequest, deleteAppointmentRequest, fetchTimeSlots } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
 import { download, upload } from '../utils';
 import TextArea from 'antd/es/input/TextArea';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { withTranslation } from 'react-i18next';
 import i18n from "../locales/i18n";
@@ -42,15 +42,25 @@ interface IModalProps {
     deleteAppointmentRequest: (
         id: string,
     ) => Promise<any>;
+    fetchTimeSlots: (form: TimeSlotsForm, selector: boolean) => Promise<any>;
     calendars?: Calendar[];
     isContact?: boolean;
     disabled?: boolean;
     profile?: any;
+    timeslots: {
+        start: string;
+        end: string;
+        calendar_id: string;
+        employee_name: string;
+    }[];
+    timeslotsLoading: boolean;
 }
 
 interface IModalState {
     employee_remarks?: string;
     ended_at?: Date;
+    updated_date?: Dayjs | null;
+    new_time_slot?: string;
     savedFileList: Attachment[],
     calendarId: string;
     uploading: boolean,
@@ -93,6 +103,30 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
     componentDidMount(): void {
         this.fetchContactData();
     }
+    componentDidUpdate(prevProps: IModalProps, prevState: IModalState) {
+        const { updated_date } = this.state;
+        if (prevState.updated_date !== updated_date) {
+            this.fetchTimeslots();
+        }
+    }
+
+    fetchTimeslots = async () => {
+        const { updated_date } = this.state;
+        try {
+            if (updated_date)
+                this.props.fetchTimeSlots({ date: updated_date.toISOString() }, true)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    formatTime = (time: string) => {
+        const date = new Date(time);
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
     renderEventModal = () => {
         const { contact } = this.state;
         const { selectedEvent } = this.props
@@ -115,7 +149,22 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
         const onSave = () => {
             // @ts-ignore
             const { _id, createdAt, updatedAt, service, title, start, end, sourceResource, resourceId, ...propsToUpdate } = selectedEvent!
-            const { savedFileList, employee_remarks, ended_at, calendarId } = this.state;
+            const { savedFileList, employee_remarks, ended_at, calendarId, new_time_slot, updated_date } = this.state;
+
+            let startDate = null;
+            let endDate = null;
+            if (new_time_slot) {
+                const [startTime, endTime] = (new_time_slot || "").split(" - ");
+
+                const valueISOString = updated_date!.toISOString();
+                const offsetMinutes = updated_date!.utcOffset();
+                const adjustedISOString = dayjs(valueISOString).add(offsetMinutes, 'minutes').toISOString();
+                const startDateTimeString = `${adjustedISOString.slice(0, 10)}T${startTime}:00.000Z`;
+                const endDateTimeString = `${adjustedISOString.slice(0, 10)}T${endTime}:00.000Z`;
+
+                startDate = new Date(startDateTimeString);
+                endDate = new Date(endDateTimeString);
+            }
 
             this.props
                 .updateAppointmentRequest(selectedEvent?._id!, {
@@ -125,7 +174,13 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         ended_at: ended_at ? ended_at?.toISOString() : undefined,
                         employee_attachments: savedFileList,
                         calendar_id: calendarId,
-                        control_points: this.state.controlPoints
+                        control_points: this.state.controlPoints,
+                    },
+                    ...{
+                        ...(startDate && endDate ? {
+                            start_date: startDate!.toISOString(),
+                            end_date: endDate!.toISOString(),
+                        } : {})
                     }
                 })
                 .then((data) => {
@@ -524,11 +579,34 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
         }
 
         const renderAssignedCalendar = () => {
-            const { calendarId } = this.state;
+            const { calendarId, new_time_slot } = this.state;
 
             const onSelectCalendar = (value: any) => {
                 this.setState({ calendarId: value })
             }
+
+            const onSelectNewTimeSlot = (value: any) => {
+                this.setState({ new_time_slot: value })
+            }
+
+            const formattedSlots: { slot: string, calendar_id: string, employee_name: string }[] = [...this.props.timeslots]
+                .filter((slot) => slot.calendar_id === calendarId)
+                .sort((a, b) => a.start.localeCompare(b.start))
+                .reduce((result: { slot: string, calendar_id: string, employee_name: string }[], slot) => {
+                    const formattedStart = this.formatTime(slot.start);
+                    const formattedEnd = this.formatTime(slot.end);
+                    const formattedSlot = `${formattedStart} - ${formattedEnd}`;
+                    const slots: string[] = []
+
+                    // Add to result if not already present
+                    if (!slots.includes(formattedSlot)) {
+                        slots.push(formattedSlot);
+                        result.push({ slot: formattedSlot, calendar_id: slot.calendar_id, employee_name: slot.employee_name })
+                    }
+
+                    return result;
+                }, []);
+
 
             return (
                 <Row>
@@ -540,6 +618,32 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             {this.props.calendars?.map((calendar) => {
                                 return (
                                     <Option key={calendar._id} value={calendar._id}>{calendar.employee_name}</Option>
+                                )
+                            })}
+                        </Select>
+                    </Col>
+                    <Col span={24}>
+                        <label>{i18n.t('change_date')}</label>
+                        <DatePicker
+                            className="w-full mt-3 mb-6"
+                            onChange={(value) => {
+                                this.setState({ updated_date: dayjs(value) });
+                            }}
+                            format={"YYYY-MM-DD"}
+                            disabledDate={(current) =>
+                                current && current.isBefore(dayjs(), "day")
+                            }
+                            value={this.state.updated_date ? dayjs(this.state.updated_date) : null}
+                        />
+                    </Col>
+                    <Col span={24}>
+                        <label>{i18n.t('calendar')}</label>
+                        <Select className="w-full mt-3 mb-6" loading={this.props.timeslotsLoading} value={new_time_slot} onChange={(value) => {
+                            onSelectNewTimeSlot(value)
+                        }}>
+                            {formattedSlots?.map((calendar) => {
+                                return (
+                                    <Option key={calendar.slot} value={calendar.slot}>{calendar.slot}</Option>
                                 )
                             })}
                         </Select>
@@ -621,6 +725,8 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 const mapStateToProps = (state: RootState) => ({
     updateLoading: selectUpdateAppointmentLoading(state),
     profile: selectProfile(state),
+    timeslots: selectSelectorTimeslots(state),
+    timeslotsLoading: selectSelectorTimeslotsLoading(state)
 });
 
 const mapDispatchToProps = (
@@ -629,7 +735,7 @@ const mapDispatchToProps = (
     updateAppointmentRequest: (id: string, appointment: Appointment) =>
         dispatch(updateAppointmentRequest(id, appointment)),
     deleteAppointmentRequest: (id: string) => dispatch(deleteAppointmentRequest(id)),
-
+    fetchTimeSlots: (form: TimeSlotsForm, selector: boolean) => dispatch(fetchTimeSlots(form.date, form.category_id, form.service_id, selector)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AppointmentDetailsModal))

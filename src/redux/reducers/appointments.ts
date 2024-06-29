@@ -9,6 +9,13 @@ interface CategoriesState {
     employee_name: string;
   }[];
   timeslotsLoading: boolean;
+  selectorTimeslots: {
+    start: string;
+    end: string;
+    calendar_id: string;
+    employee_name: string;
+  }[];
+  selectorTimeslotsLoading: boolean;
   appointments: Appointment[];
   appointmentsLoading: boolean;
   contactAppointments: ExtendedAppointment[];
@@ -25,6 +32,8 @@ interface CategoriesState {
 const initialState: CategoriesState = {
   timeslots: [],
   timeslotsLoading: true,
+  selectorTimeslots: [],
+  selectorTimeslotsLoading: true,
   appointments: [],
   appointmentsLoading: true,
   contactAppointments: [],
@@ -53,6 +62,17 @@ const categoriesReducer = (
         ...state,
         timeslotsLoading: false,
         timeslots: [...action.payload],
+      };
+    case "appointments/GET_SELECTOR_TIME_SLOTS":
+      return {
+        ...state,
+        selectorTimeslotsLoading: true,
+      };
+    case "appointments/GET_SELECTOR_TIME_SLOTS_DONE":
+      return {
+        ...state,
+        selectorTimeslotsLoading: false,
+        selectorTimeslots: [...action.payload],
       };
     case "appointments/GET_APPOINTMENTS":
       return {

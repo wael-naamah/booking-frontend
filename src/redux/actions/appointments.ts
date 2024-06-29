@@ -10,6 +10,9 @@ import { API_URL } from "../network/api";
 
 const GET_TIME_SLOTS = "appointments/GET_TIME_SLOTS" as const;
 const GET_TIME_SLOTS_DONE = "appointments/GET_TIME_SLOTS_DONE" as const;
+const GET_SELECTOR_TIME_SLOTS = "appointments/GET_SELECTOR_TIME_SLOTS" as const;
+const GET_SELECTOR_TIME_SLOTS_DONE =
+  "appointments/GET_SELECTOR_TIME_SLOTS_DONE" as const;
 const GET_APPOINTMENTS = "appointments/GET_APPOINTMENTS" as const;
 const GET_APPOINTMENTS_DONE = "appointments/GET_APPOINTMENTS_DONE" as const;
 const ADD_APPOINTMENT = "appointments/ADD_APPOINTMENT" as const;
@@ -20,10 +23,14 @@ const DELETE_APPOINTMENT = "appointments/DELETE_APPOINTMENT" as const;
 const DELETE_APPOINTMENT_DONE = "appointments/DELETE_APPOINTMENT_DONE" as const;
 const GET_EMPLOYEES = "appointments/GET_EMPLOYEES" as const;
 const GET_EMPLOYEES_DONE = "appointments/GET_EMPLOYEES_DONE" as const;
-const GET_CONTACT_APPOINTMENTS = "appointments/GET_CONTACT_APPOINTMENTS" as const;
-const GET_CONTACT_APPOINTMENTS_DONE = "appointments/GET_CONTACT_APPOINTMENTS_DONE" as const;
-const GET_CALENDAR_APPOINTMENTS = "appointments/GET_CALENDAR_APPOINTMENTS" as const;
-const GET_CALENDAR_APPOINTMENTS_DONE = "appointments/GET_CALENDAR_APPOINTMENTS_DONE" as const;
+const GET_CONTACT_APPOINTMENTS =
+  "appointments/GET_CONTACT_APPOINTMENTS" as const;
+const GET_CONTACT_APPOINTMENTS_DONE =
+  "appointments/GET_CONTACT_APPOINTMENTS_DONE" as const;
+const GET_CALENDAR_APPOINTMENTS =
+  "appointments/GET_CALENDAR_APPOINTMENTS" as const;
+const GET_CALENDAR_APPOINTMENTS_DONE =
+  "appointments/GET_CALENDAR_APPOINTMENTS_DONE" as const;
 
 export const getTimeSlots = () => ({
   type: GET_TIME_SLOTS,
@@ -41,13 +48,34 @@ export const getTimeSlotsDone = (
   payload: data,
 });
 
+export const getSelectorTimeSlots = () => ({
+  type: GET_SELECTOR_TIME_SLOTS,
+});
+
+export const getSelectorTimeSlotsDone = (
+  data: {
+    start: string;
+    end: string;
+    calendar_id: string;
+    employee_name: string;
+  }[]
+) => ({
+  type: GET_SELECTOR_TIME_SLOTS_DONE,
+  payload: data,
+});
+
 export const fetchTimeSlots = (
   date: string,
   category_id?: string,
-  service_id?: string
+  service_id?: string,
+  selector: boolean = false
 ) => {
   return async (dispatch: Dispatch) => {
-    dispatch(getTimeSlots());
+    if (selector) {
+      dispatch(getSelectorTimeSlots());
+    } else {
+      dispatch(getTimeSlots());
+    }
 
     try {
       const queryparams = new URLSearchParams();
@@ -60,11 +88,18 @@ export const fetchTimeSlots = (
       );
       const data = await response.json();
 
-      dispatch(getTimeSlotsDone(data));
+      if (selector) {
+        dispatch(getSelectorTimeSlotsDone(data));
+      } else {
+        dispatch(getTimeSlotsDone(data));
+      }
     } catch (error) {
       console.error("Error fetching categories:", error);
-
-      dispatch(getTimeSlotsDone([]));
+      if (selector) {
+        dispatch(getSelectorTimeSlotsDone([]));
+      } else {
+        dispatch(getTimeSlotsDone([]));
+      }
     }
   };
 };
@@ -120,7 +155,10 @@ export const addAppointmentDone = (appointment: Appointment | null) => ({
   appointment,
 });
 
-export const updateAppointmentRequest = (id: string, appointment: Appointment) => {
+export const updateAppointmentRequest = (
+  id: string,
+  appointment: Appointment
+) => {
   return async (dispatch: Dispatch) => {
     dispatch(updateAppointment());
 
@@ -288,6 +326,8 @@ export const fetchEmployees = (form: PaginatedForm) => {
 export type AppointmentsAction = ReturnType<
   | typeof getTimeSlots
   | typeof getTimeSlotsDone
+  | typeof getSelectorTimeSlots
+  | typeof getSelectorTimeSlotsDone
   | typeof getAppointments
   | typeof getAppointmentsDone
   | typeof getEmployees

@@ -45,7 +45,7 @@ interface IModalState {
     categoryId: string | null;
 }
 
-class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> {
+class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
     constructor(props: IModalProps) {
         super(props);
         this.state = {
@@ -480,4 +480,4 @@ const mapDispatchToProps = (
     fetchServices: () => dispatch(fetchServices()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(AppointmentDetailsModal))
+export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CreateAppointmentModal))
