@@ -323,5 +323,8 @@
   "are_you_sure_you_want_to_cancel_this_appointment": "Möchten Sie diesen Termin wirklich absagen?",
   "cancel_it": "absagen",
   "successfully_cancelled_the_appointment": "Der Termin wurde erfolgreich abgesagt",
-  "change_date": "Datum ändern"
+  "change_date": "Datum ändern",
+  "export_data": "Daten exportieren",
+  "contra": "contra",
+  "new_user": "Neukunde mit Vertrag"
 }

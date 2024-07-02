@@ -290,6 +290,26 @@ export const addAppointmentRequest = (appointment: Appointment) => {
   };
 };
 
+export const addAppointmentRequestWithSign = (appointment: Appointment,url:string) => {
+  return async (dispatch: Dispatch) => {
+    dispatch(addAppointment());
+    try {
+      const response = await fetch(`${API_URL}/appointments`, {
+        method: "POST",
+        body: JSON.stringify(appointment),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+
+      dispatch(addAppointmentDone(data));
+      return data;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      dispatch(addAppointmentDone(null));
+    }
+  };
+};
+
 export const getEmployees = () => ({
   type: GET_EMPLOYEES,
 });

@@ -15,7 +15,8 @@ import ContactCalendar from '../pages/Contact/Calendar';
 import ContactAppointments from '../pages/Contact/Appointments';
 import Settings from '../pages/Settings';
 import EmployeePage from '../pages/Employee';
-
+import SignContra from '../pages/sign_contra';
+import Contras from '../pages/Contras'
 class Router extends React.Component {
   render() {
     return (
@@ -25,6 +26,7 @@ class Router extends React.Component {
           element={<SideBar />}
         >
           <Route path="/appointment" element={<AppointmentPage />} />
+          <Route path="/contras" element={<Contras />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/contact/appointments/:contactId" element={<ContactAppointments />} />
@@ -33,6 +35,7 @@ class Router extends React.Component {
           <Route path="/settings" element={<Settings />} />
         </Route>
         <Route path="/category" element={<CategoryPage />} />
+        <Route path="/sign_contra" element={<SignContra />} />
         <Route path="/employee" element={<EmployeePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

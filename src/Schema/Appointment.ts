@@ -22,6 +22,7 @@ export interface Appointment {
   category_id: string;
   service_id: string;
   calendar_id: string;
+  new_user?: boolean;
   start_date: string;
   end_date: string;
   contact: Contact;

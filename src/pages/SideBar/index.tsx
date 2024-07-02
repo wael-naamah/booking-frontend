@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DesktopOutlined,
   CalendarOutlined,
   ContactsOutlined,
-  SettingOutlined
+  SettingOutlined,
+  MessageOutlined 
 } from "@ant-design/icons";
 import { Layout, Menu, Button, Row, Select } from "antd";
 
@@ -146,6 +147,15 @@ class SideBar extends React.Component<ISideBarProps, ISideBarState> {
             },
             {
               key: "4",
+              icon: <MessageOutlined  />,
+              label: <NavLink to={`/contras`}>
+                <span className="title">
+                  {i18n.t('Contras')}
+                </span>
+              </NavLink>,
+            },
+            {
+              key: "5",
               icon: <SettingOutlined />,
               label: <NavLink to={`/settings`}>
                 <span className="title">
@@ -176,7 +186,7 @@ class SideBar extends React.Component<ISideBarProps, ISideBarState> {
             {this.props.loggedIn ? <Button onClick={() => this.props.logout()}>{i18n.t('logout')}</Button> : <Link to="/login">{i18n.t('login')}</Link>}
           <Button
             type="link"
-            onClick={() => window.open('https://bgas-kalender.at/category', '_blank')}
+            onClick={() => window.open('category', '_blank')}
             style={{
               fontSize: "16px",
               width: 64,

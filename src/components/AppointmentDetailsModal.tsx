@@ -464,6 +464,9 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
             return (
                 <Spin spinning={contactLoading}>
+                       <Row>
+                       {contact?.contra}
+                       </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col md={12} xs={24} className="w-full">
                             <label>{i18n.t('performance')}</label>

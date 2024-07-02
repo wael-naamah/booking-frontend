@@ -5,20 +5,24 @@ import { fetchCalendars, createCalendarRequest } from "../../../redux/actions";
 import { selectCalendars, selectCalendarsLoading } from "../../../redux/selectors";
 import { Calendar as CalendarType } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
-import { Button, Col, Empty, Popconfirm, Row, Select, message } from "antd";
+import { Button, Col, Empty, Popconfirm, Row, Select, message, DatePicker } from "antd";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import withAuthorization from "../../../HOC/withAuthorization";
 import './index.css'
 import Calendar from './calendar'
 import { withTranslation } from 'react-i18next';
 import i18n from "../../../locales/i18n";
+import { API_URL } from "../../../redux/network/api";
 
 const { Option } = Select;
 
 
 interface ICalendarState {
     selectedCalendar: string;
+    calenderId: string,
     activeIndex: number;
+    start_date: any;
+    end_date: any
 }
 
 interface ICalendarProps {
@@ -32,6 +36,9 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
     constructor(props: ICalendarProps) {
         super(props);
         this.state = {
+            start_date: '',
+            end_date: '',
+            calenderId: '-1',
             selectedCalendar: '',
             activeIndex: 0,
         };
@@ -47,7 +54,12 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
     }
 
     onSelectCalendar = (value: any, record: any) => {
-        this.setState({ selectedCalendar: value, activeIndex: record.key })
+        this.setState({
+            selectedCalendar: value,
+            activeIndex: record.key,
+            start_date: null,
+            end_date: null,
+        });
     }
 
     onDeleteCalendar = () => {
@@ -77,7 +89,33 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
             }
         })
     }
+    extractData = async () => {
+        if (this.state.calenderId === '-1') {
+            this.setState({
+                calenderId: this.props.calendars[0]._id!
+            })
+        }
+        fetch(`${API_URL}/appointments/get_by_date_and_id`,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    calendar_id: this.state.calenderId === '-1' ? this.props.calendars[0]._id : this.state.calenderId,
+                    start_date: this.state.start_date,
+                    end_date: this.state.end_date,
 
+                }),
+                headers: { "Content-Type": "application/json" },
+            }
+        ).then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'appointments.xlsx';
+                link.click();
+
+            });
+    }
     render() {
         const { loading, calendars } = this.props;
         const { selectedCalendar, activeIndex } = this.state;
@@ -89,9 +127,21 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
         return (
             <div className="w-full">
                 <Row className="w-full" gutter={[16, 16]}>
-                    <Col span={10}>
+                    <Col span={4}>
                         <Select className="w-full" value={selectedCalendar} onChange={(value, record) => {
                             this.onSelectCalendar(value, record)
+                            let id = '';
+                            calendars.forEach(c => {
+                                ;
+                                if (selectedCalendar.split(' ')[0] === c.employee_name.split(' ')[0]) {
+                                    if (c._id) {
+                                        id = c._id
+                                    }
+                                }
+                            })
+                            this.setState({
+                                calenderId: id
+                            })
                         }}>
                             {calendars.map((calendar, index) => {
                                 const value = `${calendar.employee_name} ${calendar.active ? '' : `(${i18n.t('not_activated')})`}`
@@ -101,7 +151,7 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                             })}
                         </Select>
                     </Col>
-                    <Col span={6}>
+                    <Col span={12}>
                         <Popconfirm
                             title={i18n.t('create_new_calendar')}
                             description={i18n.t('are_you_sure_you_want_to_create_new_calendar')}
@@ -111,10 +161,21 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                         >
                             <Button loading={false} className="mb-3" type="primary">{i18n.t('new_calendar')}</Button>
                         </Popconfirm>
+                        <DatePicker
+                            className="mx-2"
+                            value={this.state.start_date}
+                            onChange={(date) => this.setState({ start_date: date })}
+                        />
+                        <DatePicker
+                            className="mx-2"
+                            value={this.state.end_date}
+                            onChange={(date) => this.setState({ end_date: date })}
+                        />
+                        <Button onClick={this.extractData} loading={false} className="mb-3" type="primary">{i18n.t('export_data')}</Button>
                     </Col>
                 </Row>
 
-                {calendars.length ? <Calendar calendar={calendars[activeIndex]} onDeleteCalendar={this.onDeleteCalendar}/> : <Empty className="mt-16" description={i18n.t('empty')}/>}
+                {calendars.length ? <Calendar calendar={calendars[activeIndex]} onDeleteCalendar={this.onDeleteCalendar} /> : <Empty className="mt-16" description={i18n.t('empty')} />}
             </div>
         );
     }

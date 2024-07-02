@@ -8,12 +8,13 @@ import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Content } from "antd/es/layout/layout";
 import { Row, Col, Card, Collapse, Steps, Calendar, Button, Spin, Form, Input, Select, Checkbox, message, Upload, Space } from "antd";
 
+import SignaturePad from 'react-signature-canvas'
 import ServiceLogo from '../../assets/services/service.png'
 import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import Header from "../../components/Header";
-import { FILES_STORE } from "../../redux/network/api";
+import { API_URL, FILES_STORE } from "../../redux/network/api";
 import { generatePassword, upload } from "../../utils";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
@@ -32,6 +33,10 @@ interface ICategoryState {
     selectedService: Service | null;
     selectedSlot: { slot: string, calendar_id: string } | null;
     currentDate: Dayjs | null;
+    is_new_user: string;
+    sign: any;
+    service_type: string[],
+    url: any;
     current: number;
     savedFileList: Attachment[],
     uploading: boolean,
@@ -55,6 +60,9 @@ interface ICategoryProps {
 }
 
 class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
+    sigPad: React.RefObject<SignaturePad>;
+    formRef = React.createRef<any>();
+
     constructor(props: ICategoryProps) {
         super(props);
         this.state = {
@@ -62,16 +70,75 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             selectedService: null,
             selectedSlot: null,
             currentDate: null,
+            service_type: [],
+            sign: '',
+            url: null,
+            is_new_user: '',
             current: 0,
             savedFileList: [],
             uploading: false,
         };
+        this.sigPad = React.createRef<SignaturePad>();
     }
 
-    formRef = React.createRef<any>();
+    conditions = [
+        `-Heizwert-Gerät € 197,-   `,
+        `-Brennwert-Gerät* € 262,  `,
+        `-Durchlauferhitzer.€ 173,  `,
+        `-Gaskonvektor €173,-`,
+        `-BW-wärmepumpe€ 350,`,
+    
+        `-Luft-Wärmepumpe..... € 350,-`,
+      ];
+    
+      clear = () => {
+        if (this.sigPad.current) {
+          this.sigPad.current.clear();
+        }
+      };
+    
+      handleSelectChange = (event: any) => {
+        this.setState({
+          is_new_user: event === "new_user" ? "new_user" : "",
+        });
+      };
+    
+      handleServiceClick = (e: any) => {
+        const thereIsData =
+          this.state.service_type.filter((ss) => {
+            return ss !== e.target.value;
+          }).length > 0;
+        if (thereIsData) {
+          const filterdArray = this.state.service_type.filter((ss) => {
+            return ss !== e.target.value;
+          });
+          this.setState({
+            service_type: filterdArray,
+          });
+        } else {
+          this.setState({
+            service_type: [...this.state.service_type, e.target.value],
+          });
+        }
+      };
+      setUrl = (url: string) => {
+        this.setState({
+          sign: url,
+        });
+      };
+      handleClear = () => {
+        if (this.state.sign) {
+          this.setState({
+            sign: null,
+          });
+        }
+      };
+      handleGenerate = async () => {
+        console.log(this.state.sign);
+      };
 
-    onFinish = (values: any) => {
-        const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList } = this.state;
+    onFinish = async (values: any) => {
+        const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList, is_new_user } = this.state;
         const [startTime, endTime] = (selectedSlot?.slot || "").split(" - ");
 
         const valueISOString = currentDate!.toISOString();
@@ -113,6 +180,49 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             remarks: values.remarks || undefined,
         }
 
+        if (is_new_user !== "") {
+            const content = [
+              `*Brennerdichtung (€ 60 - € 90) im Preis bereits enthalten, andere Geräte benötigen diese nicht.
+      Bis ca. 30 min Fahrt € 20,-                                                                                                               Bis ca. 60 min Fahrt	€ 55,-
+    `,
+              `                   
+      •	Komplette Wartung während Öffnungszeiten                                                                              • Etwaige Materialkosten   
+      •	Arbeitszeit pauschal, egal wie lange es dauert                                                                         • Reparaturen
+      •	Anfahrt Wien               
+    `,
+            ];
+  
+            await fetch(`${API_URL}/mailer/send_with_contra_and_sign`, {
+              method: "POST",
+              body: JSON.stringify({
+                sign_url:
+                  this.sigPad!.current?.getTrimmedCanvas().toDataURL("image/png"),
+                name:
+                  appointment.contact.first_name +
+                  " " +
+                  appointment.contact.last_name,
+                street_number: appointment.contact.address,
+                postal_code: appointment.contact.zip_code,
+                mobile_number: appointment.contact.telephone,
+                title: "contra",
+                address: appointment.contact.address,
+                device_type: appointment.brand_of_device,
+                device_type2: appointment.remarks,
+                year: appointment.year,
+                password: generatePassword(),
+                email: appointment.contact.email,
+                tester: appointment.company_remarks,
+                gander:
+                  appointment.contact.salutation === "Mrs" ? "female" : "male",
+                content1: this.state.service_type
+                  .map((st, i) => st + " ")
+                  .toString(),
+                content2: content[0],
+                content3: content[1],
+              }),
+              headers: { "Content-Type": "application/json" },
+            });
+          }
 
         this.props.onSubmit(appointment)
             .then(data => {
@@ -122,6 +232,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         selectedCategory: null,
                         selectedService: null,
                         selectedSlot: null,
+                        is_new_user: '',
                         currentDate:
                             dayjs().day() === 0
                                 ? dayjs().add(1, "day").startOf("day")
@@ -431,16 +542,35 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-
+                                        <div className='col-span-2 grid grid-cols-3  gap-y-0 gap-5'>
+                                            {
+                                                this.state.is_new_user === 'new_user' && (this.conditions.map((c) => (
+                                                    <Form.Item valuePropName="checked">
+                                                        <Checkbox onClick={this.handleServiceClick} value={c}    >{c}</Checkbox>
+                                                    </Form.Item>
+                                                )))
+                                            }
+                                        </div>
                                         <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
-                                            <Select>
-                                                {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }].map((el) => (
+                                            <Select onChange={this.handleSelectChange} >
+                                                {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }
+                                                    , { lable: i18n.t('new_user'), value: 'new_user' }
+                                                ].map((el) => (
                                                     <Option key={el.lable} value={el.value}>
                                                         {el.lable}
                                                     </Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
+                                        {this.state.is_new_user === 'new_user' && (<Row gutter={16}>
+                                            <Col md={24} xs={24}>
+                                                <p>sign here </p>
+                                                <SignaturePad
+                                                    ref={this.sigPad}
+                                                    canvasProps={{ width: 500, height: 200, className: '   border-[.5px] border-solid border-[#0001]' }}
+                                                />
+                                            </Col></Row>
+                                        )}
                                         <Form.Item name="exhaust_gas_measurement" valuePropName="checked">
                                             <Checkbox>{i18n.t('exhaust_gas_measurement')}</Checkbox>
                                         </Form.Item>
