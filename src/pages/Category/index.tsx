@@ -542,15 +542,6 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                 </Form.Item>
                                             </Col>
                                         </Row>
-                                        <div className='col-span-2 grid grid-cols-3  gap-y-0 gap-5'>
-                                            {
-                                                this.state.is_new_user === 'new_user' && (this.conditions.map((c) => (
-                                                    <Form.Item valuePropName="checked">
-                                                        <Checkbox onClick={this.handleServiceClick} value={c}    >{c}</Checkbox>
-                                                    </Form.Item>
-                                                )))
-                                            }
-                                        </div>
                                         <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
                                             <Select onChange={this.handleSelectChange} >
                                                 {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }
@@ -562,6 +553,15 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                 ))}
                                             </Select>
                                         </Form.Item>
+                                        <div className='col-span-2 grid grid-cols-2  gap-y-0 gap-5'>
+                                            {
+                                                this.state.is_new_user === 'new_user' && (this.conditions.map((c) => (
+                                                    <Form.Item valuePropName="checked">
+                                                        <Checkbox onClick={this.handleServiceClick} value={c}>{c}</Checkbox>
+                                                    </Form.Item>
+                                                )))
+                                            }
+                                        </div>
                                         {this.state.is_new_user === 'new_user' && (<Row gutter={16}>
                                             <Col md={24} xs={24}>
                                                 <p>sign here </p>

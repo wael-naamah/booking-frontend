@@ -109,7 +109,7 @@ const Contras = () => {
       })
 
       setBtnDisabled(false)
-      alert('email sent successfully  !')
+      alert('email sent successfully!')
     } catch (error) {
       throw (error)
     }
@@ -223,7 +223,7 @@ const Contras = () => {
 
 
           <div className='container mt-[44px] mx-auto border-[1px] border-solid border-[#00000000067]'>
-            <div className="grid grid-cols-6 justify-center items-center">
+            {/* <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
                 <Input required
                   value={year}
@@ -235,11 +235,12 @@ const Contras = () => {
 
                 <label className='font-bold'>  Baujahr</label>
               </div>
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
-                <Input required
+                <Input
+                  required
                   value={deviceType}
                   onChange={handleChangeDeviceType}
                   type="text" placeholder="Type "
@@ -251,7 +252,7 @@ const Contras = () => {
             </div>
             <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
-                <Input required
+                <Input 
                   value={deviceType2}
                   onChange={handleChangeDeviceType2}
                   type="text"
