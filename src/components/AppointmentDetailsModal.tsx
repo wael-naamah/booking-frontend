@@ -66,7 +66,8 @@ interface IModalState {
     uploading: boolean,
     contact: Contact | null,
     contactLoading: boolean,
-    controlPoints: ControlPoints[]
+    controlPoints: ControlPoints[],
+    downloadUrl: string | null;
 }
 
 class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> {
@@ -79,7 +80,25 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             contactLoading: true,
             calendarId: props.selectedEvent?.calendar_id || "",
             controlPoints: props.selectedEvent?.control_points || [],
+            downloadUrl: null,
         };
+    }
+
+    base64ToBlob(base64: string, contentType = '', sliceSize = 512) {
+        const byteCharacters = atob(base64);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, { type: contentType });
     }
 
     fetchContactData = async () => {
@@ -102,11 +121,39 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
     componentDidMount(): void {
         this.fetchContactData();
+        this.updateDownloadUrl();
     }
+
     componentDidUpdate(prevProps: IModalProps, prevState: IModalState) {
         const { updated_date } = this.state;
         if (prevState.updated_date !== updated_date) {
             this.fetchTimeslots();
+        }
+        if (prevState.contact?.contra !== this.state.contact?.contra) {
+            this.updateDownloadUrl();
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.state.downloadUrl) {
+            URL.revokeObjectURL(this.state.downloadUrl);
+        }
+    }
+
+    updateDownloadUrl() {
+        const { contact } = this.state;
+
+        if (contact?.contra) {
+            const base64Data = contact.contra.split(';base64,').pop();
+            const mimeType = contact.contra.match(/^data:(.*);base64,/)?.[1] || 'application/octet-stream';
+
+            const blob = this.base64ToBlob(base64Data!, mimeType);
+
+            const downloadUrl = URL.createObjectURL(blob);
+
+            this.setState({ downloadUrl });
+        } else {
+            this.setState({ downloadUrl: null });
         }
     }
 
@@ -464,9 +511,6 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
             return (
                 <Spin spinning={contactLoading}>
-                       <Row>
-                       {contact?.contra}
-                       </Row>
                     <Row className="mb-6" gutter={[16, 16]}>
                         <Col md={12} xs={24} className="w-full">
                             <label>{i18n.t('performance')}</label>
@@ -576,6 +620,15 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                                     </Popconfirm>
                                 </>
                             )}
+                    </Row>
+                    <Row>
+                        {this.state.downloadUrl ? (
+                            <a href={this.state.downloadUrl} download="downloaded_file.pdf">
+                                Download Contract
+                            </a>
+                        ) : (
+                            null
+                        )}
                     </Row>
                 </Spin>
             )
