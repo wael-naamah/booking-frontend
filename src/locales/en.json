@@ -326,5 +326,6 @@
   "change_date": "Change date",
   "export_data":"Export Data",
   "contra": "Contra",
-  "new_user":"New customer with contract"
+  "new_user":"New customer with contract",
+  "view_contract": "View contract"
 }

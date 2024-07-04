@@ -39,7 +39,7 @@ import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
 import withAuthorization from "../../HOC/withAuthorization";
 import { RcFile } from "antd/es/upload";
-import { API_URL } from "../../redux/network/api";
+import { API_URL, FILES_STORE } from "../../redux/network/api";
 import { EllipsisOutlined } from '@ant-design/icons';
 
 const { Column } = Table;
@@ -145,7 +145,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   onExportContacts = () => {
     this.setState({ exportLoading: true });
     window.open(`${API_URL}/files/export-contacts-file`, '_blank');
-    this.setState({ exportLoading: true });
+    this.setState({ exportLoading: false });
   }
 
   handlePageChange = (value: number) => {
@@ -576,7 +576,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                   <a target="_blank"
                     className="self-end mr-3"
                  
-                    href={`data:application/pdf;base64,${record.contra}`} rel="noreferrer"
+                    href={`${FILES_STORE}${record.contra}`} rel="noreferrer"
                   >
                     {i18n.t('view')}
                   </a>

@@ -66,8 +66,7 @@ interface IModalState {
     uploading: boolean,
     contact: Contact | null,
     contactLoading: boolean,
-    controlPoints: ControlPoints[],
-    downloadUrl: string | null;
+    controlPoints: ControlPoints[]
 }
 
 class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> {
@@ -79,27 +78,10 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
             contact: null,
             contactLoading: true,
             calendarId: props.selectedEvent?.calendar_id || "",
-            controlPoints: props.selectedEvent?.control_points || [],
-            downloadUrl: null,
+            controlPoints: props.selectedEvent?.control_points || []
         };
     }
 
-    base64ToBlob(base64: string, contentType = '', sliceSize = 512) {
-        const byteCharacters = atob(base64);
-        const byteArrays = [];
-
-        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-            const slice = byteCharacters.slice(offset, offset + sliceSize);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-
-        return new Blob(byteArrays, { type: contentType });
-    }
 
     fetchContactData = async () => {
         this.setState({ contactLoading: true });
@@ -121,7 +103,6 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
 
     componentDidMount(): void {
         this.fetchContactData();
-        this.updateDownloadUrl();
     }
 
     componentDidUpdate(prevProps: IModalProps, prevState: IModalState) {
@@ -129,33 +110,8 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
         if (prevState.updated_date !== updated_date) {
             this.fetchTimeslots();
         }
-        if (prevState.contact?.contra !== this.state.contact?.contra) {
-            this.updateDownloadUrl();
-        }
     }
 
-    componentWillUnmount() {
-        if (this.state.downloadUrl) {
-            URL.revokeObjectURL(this.state.downloadUrl);
-        }
-    }
-
-    updateDownloadUrl() {
-        const { contact } = this.state;
-
-        if (contact?.contra) {
-            const base64Data = contact.contra.split(';base64,').pop();
-            const mimeType = contact.contra.match(/^data:(.*);base64,/)?.[1] || 'application/octet-stream';
-
-            const blob = this.base64ToBlob(base64Data!, mimeType);
-
-            const downloadUrl = URL.createObjectURL(blob);
-
-            this.setState({ downloadUrl });
-        } else {
-            this.setState({ downloadUrl: null });
-        }
-    }
 
     fetchTimeslots = async () => {
         const { updated_date } = this.state;
@@ -622,9 +578,9 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             )}
                     </Row>
                     <Row>
-                        {this.state.downloadUrl ? (
-                            <a href={this.state.downloadUrl} download="downloaded_file.pdf">
-                                Download Contract
+                        {contact?.contra ? (
+                            <a href={FILES_STORE + contact?.contra} target='_blank' download="downloaded_file.pdf" rel="noreferrer">
+                                {i18n.t('view_contract')}
                             </a>
                         ) : (
                             null
