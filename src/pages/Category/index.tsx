@@ -191,7 +191,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
       •	Anfahrt Wien               
     `,
             ];
-  
+
             await fetch(`${API_URL}/mailer/send_with_contra_and_sign`, {
               method: "POST",
               body: JSON.stringify({
@@ -201,10 +201,10 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                   appointment.contact.first_name +
                   " " +
                   appointment.contact.last_name,
-                street_number: appointment.contact.address,
+                street_number: appointment.contact.location,
                 postal_code: appointment.contact.zip_code,
                 mobile_number: appointment.contact.telephone,
-                title: "contra",
+                title: "",
                 address: appointment.contact.address,
                 device_type: appointment.brand_of_device,
                 device_type2: appointment.remarks,
