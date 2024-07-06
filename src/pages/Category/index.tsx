@@ -82,12 +82,12 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     }
 
     devicesMap = [
-        `-Heizwert-Gerät € 197,-   `,
-        `-Brennwert-Gerät* € 262,  `,
-        `-Durchlauferhitzer.€ 173,  `,
-        `-Gaskonvektor €173,-`,
-        `-BW-wärmepumpe€ 350,`,
-        `-Luft-Wärmepumpe..... € 350,-`,
+        `Heizwert-Gerät € 197`,
+        `Brennwert-Gerät* € 262`,
+        `Durchlauferhitzer.€ 173`,
+        `Gaskonvektor € 153`,
+        `BW-wärmepumpe € 350`,
+        `Luft-Wärmepumpe € 350`,
       ];
     
       clear = () => {
@@ -178,7 +178,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             appointment_status: AppointmentStatus.Confirmed,
             attachments: savedFileList.length ? savedFileList : undefined,
             remarks: values.remarks || undefined,
-            selected_devices: this.state.selectedDevices.join(" ").toString() || undefined,
+            selected_devices: this.state.selectedDevices.join(" - ").toString() || undefined,
         }
 
         this.props.onSubmit(appointment)
