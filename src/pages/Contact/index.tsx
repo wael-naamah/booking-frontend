@@ -568,15 +568,15 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Column title={i18n.t('email')} dataIndex={"email"} />
               <Column title={i18n.t('telephone')} dataIndex={"telephone"} />
               <Column title={i18n.t('location')} dataIndex={"location"} />
-              <Column title={i18n.t('contra')}  
+              <Column title={i18n.t('contract')}  
                 dataIndex={""} 
-                key="contra"
+                key="contract_link"
                 render={(_: any, record: Contact) => (
-                 record.contra && (
+                 record.contract_link && (
                   <a target="_blank"
                     className="self-end mr-3"
                  
-                    href={`${FILES_STORE}${record.contra}`} rel="noreferrer"
+                    href={`${FILES_STORE}${record.contract_link}`} rel="noreferrer"
                   >
                     {i18n.t('view')}
                   </a>

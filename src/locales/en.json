@@ -325,7 +325,7 @@
   "successfully_cancelled_the_appointment": "Successfully cancelled the appointment",
   "change_date": "Change date",
   "export_data":"Export Data",
-  "contra": "Contra",
+  "contract": "Contract",
   "new_user":"New customer with contract",
   "view_contract": "View contract"
 }

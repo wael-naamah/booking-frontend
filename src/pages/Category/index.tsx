@@ -14,7 +14,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import Header from "../../components/Header";
-import { API_URL, FILES_STORE } from "../../redux/network/api";
+import { FILES_STORE } from "../../redux/network/api";
 import { generatePassword, upload } from "../../utils";
 import { withTranslation } from 'react-i18next';
 import i18n from "../../locales/i18n";
@@ -33,9 +33,9 @@ interface ICategoryState {
     selectedService: Service | null;
     selectedSlot: { slot: string, calendar_id: string } | null;
     currentDate: Dayjs | null;
-    is_new_user: string;
+    is_new_user: boolean;
     sign: any;
-    service_type: string[],
+    selectedDevices: string[],
     url: any;
     current: number;
     savedFileList: Attachment[],
@@ -70,10 +70,10 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             selectedService: null,
             selectedSlot: null,
             currentDate: null,
-            service_type: [],
+            selectedDevices: [],
             sign: '',
             url: null,
-            is_new_user: '',
+            is_new_user: false,
             current: 0,
             savedFileList: [],
             uploading: false,
@@ -81,13 +81,12 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         this.sigPad = React.createRef<SignaturePad>();
     }
 
-    conditions = [
+    devicesMap = [
         `-Heizwert-Gerät € 197,-   `,
         `-Brennwert-Gerät* € 262,  `,
         `-Durchlauferhitzer.€ 173,  `,
         `-Gaskonvektor €173,-`,
         `-BW-wärmepumpe€ 350,`,
-    
         `-Luft-Wärmepumpe..... € 350,-`,
       ];
     
@@ -99,25 +98,25 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
     
       handleSelectChange = (event: any) => {
         this.setState({
-          is_new_user: event === "new_user" ? "new_user" : "",
+          is_new_user: event === "new_user" ? true : false,
         });
       };
     
-      handleServiceClick = (e: any) => {
-        const thereIsData =
-          this.state.service_type.filter((ss) => {
-            return ss !== e.target.value;
-          }).length > 0;
-        if (thereIsData) {
-          const filterdArray = this.state.service_type.filter((ss) => {
-            return ss !== e.target.value;
+      handleDeviceClick = (e: any) => {
+        const checked =
+          this.state.selectedDevices.some((device) => {
+            return device === e.target.value;
+          });
+        if (checked) {
+          const filterdArray = this.state.selectedDevices.filter((device) => {
+            return device !== e.target.value;
           });
           this.setState({
-            service_type: filterdArray,
+            selectedDevices: filterdArray,
           });
         } else {
           this.setState({
-            service_type: [...this.state.service_type, e.target.value],
+            selectedDevices: [...this.state.selectedDevices, e.target.value],
           });
         }
       };
@@ -138,7 +137,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
       };
 
     onFinish = async (values: any) => {
-        const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList, is_new_user } = this.state;
+        const { selectedCategory, selectedService, selectedSlot, currentDate, savedFileList } = this.state;
         const [startTime, endTime] = (selectedSlot?.slot || "").split(" - ");
 
         const valueISOString = currentDate!.toISOString();
@@ -151,6 +150,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const endDate = new Date(endDateTimeString);
 
         const contact: Contact = {
+            sign_url: this.sigPad!.current?.getTrimmedCanvas().toDataURL("image/png"),
             salutation: values.salutation,
             first_name: values.first_name,
             last_name: values.last_name,
@@ -178,51 +178,8 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
             appointment_status: AppointmentStatus.Confirmed,
             attachments: savedFileList.length ? savedFileList : undefined,
             remarks: values.remarks || undefined,
+            selected_devices: this.state.selectedDevices.join(" ").toString() || undefined,
         }
-
-        if (is_new_user !== "") {
-            const content = [
-              `*Brennerdichtung (€ 60 - € 90) im Preis bereits enthalten, andere Geräte benötigen diese nicht.
-      Bis ca. 30 min Fahrt € 20,-                                                                                                               Bis ca. 60 min Fahrt	€ 55,-
-    `,
-              `                   
-      •	Komplette Wartung während Öffnungszeiten                                                                              • Etwaige Materialkosten   
-      •	Arbeitszeit pauschal, egal wie lange es dauert                                                                         • Reparaturen
-      •	Anfahrt Wien               
-    `,
-            ];
-
-            await fetch(`${API_URL}/mailer/send_with_contra_and_sign`, {
-              method: "POST",
-              body: JSON.stringify({
-                sign_url:
-                  this.sigPad!.current?.getTrimmedCanvas().toDataURL("image/png"),
-                name:
-                  appointment.contact.first_name +
-                  " " +
-                  appointment.contact.last_name,
-                street_number: appointment.contact.location,
-                postal_code: appointment.contact.zip_code,
-                mobile_number: appointment.contact.telephone,
-                title: "",
-                address: appointment.contact.address,
-                device_type: appointment.brand_of_device,
-                device_type2: appointment.remarks,
-                year: appointment.year,
-                password: generatePassword(),
-                email: appointment.contact.email,
-                tester: appointment.company_remarks,
-                gander:
-                  appointment.contact.salutation === "Mrs" ? "female" : "male",
-                content1: this.state.service_type
-                  .map((st, i) => st + " ")
-                  .toString(),
-                content2: content[0],
-                content3: content[1],
-              }),
-              headers: { "Content-Type": "application/json" },
-            });
-          }
 
         this.props.onSubmit(appointment)
             .then(data => {
@@ -232,7 +189,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                         selectedCategory: null,
                         selectedService: null,
                         selectedSlot: null,
-                        is_new_user: '',
+                        is_new_user: false,
                         currentDate:
                             dayjs().day() === 0
                                 ? dayjs().add(1, "day").startOf("day")
@@ -336,7 +293,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
         const initialValues = this.props.profile || undefined;
 
         const { categories, loading, timeslots, timeslotsLoading } = this.props;
-        const { selectedService, selectedSlot, current, currentDate, savedFileList, uploading } = this.state;
+        const { selectedService, selectedSlot, current, currentDate, savedFileList, uploading, is_new_user } = this.state;
 
         const formattedSlots: { slot: string, calendar_id: string }[] = timeslots.reduce((result: { slot: string, calendar_id: string }[], slot) => {
             const formattedStart = this.formatTime(slot.start);
@@ -545,7 +502,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
                                             <Select onChange={this.handleSelectChange} >
                                                 {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }
-                                                    , { lable: i18n.t('new_user'), value: 'new_user' }
+                                                    , ...(initialValues.contract_link ? [] : [{ lable: i18n.t('new_user'), value: 'new_user' }])
                                                 ].map((el) => (
                                                     <Option key={el.lable} value={el.value}>
                                                         {el.lable}
@@ -553,21 +510,21 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                                 ))}
                                             </Select>
                                         </Form.Item>
-                                        <div className='col-span-2 grid grid-cols-2  gap-y-0 gap-5'>
+                                        <div className='col-span-2 grid grid-cols-2 gap-y-0 gap-5'>
                                             {
-                                                this.state.is_new_user === 'new_user' && (this.conditions.map((c) => (
+                                                is_new_user && (this.devicesMap.map((c) => (
                                                     <Form.Item valuePropName="checked">
-                                                        <Checkbox onClick={this.handleServiceClick} value={c}>{c}</Checkbox>
+                                                        <Checkbox onClick={this.handleDeviceClick} value={c}>{c}</Checkbox>
                                                     </Form.Item>
                                                 )))
                                             }
                                         </div>
-                                        {this.state.is_new_user === 'new_user' && (<Row gutter={16}>
+                                        {is_new_user && (<Row gutter={16}>
                                             <Col md={24} xs={24}>
                                                 <p>sign here </p>
                                                 <SignaturePad
                                                     ref={this.sigPad}
-                                                    canvasProps={{ width: 500, height: 200, className: '   border-[.5px] border-solid border-[#0001]' }}
+                                                    canvasProps={{ className: 'w-full md:w-1/2 h-[200px] border-[.5px] border-solid border-[#0001]' }}
                                                 />
                                             </Col></Row>
                                         )}

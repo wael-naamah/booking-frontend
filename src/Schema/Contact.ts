@@ -10,8 +10,9 @@ export interface Contact {
   phone_numbber_2?: string;
   phone_numbber_3?: string;
   email: string;
-  contra?: string;
   password?: string;
+  contract_link?: string;
+  sign_url?: string;
   note_on_address?: string;
   newsletter?: boolean;
   categories_permission?: string[];

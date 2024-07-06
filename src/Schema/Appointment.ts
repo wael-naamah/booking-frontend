@@ -28,6 +28,7 @@ export interface Appointment {
   contact: Contact;
   brand_of_device?: string;
   model?: string;
+  selected_devices?: string;
   exhaust_gas_measurement?: boolean;
   has_maintenance_agreement?: boolean;
   has_bgas_before?: boolean;

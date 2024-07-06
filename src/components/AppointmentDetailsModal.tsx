@@ -578,8 +578,8 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                             )}
                     </Row>
                     <Row>
-                        {contact?.contra ? (
-                            <a href={FILES_STORE + contact?.contra} target='_blank' download="downloaded_file.pdf" rel="noreferrer">
+                        {contact?.contract_link ? (
+                            <a href={FILES_STORE + contact?.contract_link} target='_blank' download="downloaded_file.pdf" rel="noreferrer">
                                 {i18n.t('view_contract')}
                             </a>
                         ) : (
