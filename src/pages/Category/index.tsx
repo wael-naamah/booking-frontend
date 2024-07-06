@@ -502,7 +502,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                         <Form.Item label={i18n.t('has_maintenance_agreement')} name="has_maintenance_agreement" rules={[{ required: true }]}>
                                             <Select onChange={this.handleSelectChange} >
                                                 {[{ lable: i18n.t('no'), value: false }, { lable: i18n.t('Yes_the_prices_according_to_the_maintenance_agreement_apply'), value: true }
-                                                    , ...(initialValues.contract_link ? [] : [{ lable: i18n.t('new_user'), value: 'new_user' }])
+                                                    , ...(initialValues?.contract_link ? [] : [{ lable: i18n.t('new_user'), value: 'new_user' }])
                                                 ].map((el) => (
                                                     <Option key={el.lable} value={el.value}>
                                                         {el.lable}

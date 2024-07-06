@@ -223,11 +223,11 @@ const Contras = () => {
 
 
           <div className='container mt-[44px] mx-auto border-[1px] border-solid border-[#00000000067]'>
-            {/* <div className="grid grid-cols-6 justify-center items-center">
+            <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
                 <Input required
-                  value={year}
-                  onChange={handleChangeYear}
+                  value={deviceType}
+                  onChange={handleChangeDeviceType}
                   type="text" placeholder="Type (Bsp.: VCW AT 194/4-5, HG15, Luna 3 blue, CBG-2-24)"
                   className="w-full px-3 rounded-md" />
               </div>
@@ -235,9 +235,9 @@ const Contras = () => {
 
                 <label className='font-bold'>  Baujahr</label>
               </div>
-            </div> */}
+            </div>
 
-            <div className="grid grid-cols-6 justify-center items-center">
+            {/* <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
                 <Input
                   required
@@ -249,7 +249,7 @@ const Contras = () => {
               <div className='  border p-4 border-[#00000067]'>
                 <label className=' font-bold'>  Baujahr</label>
               </div>
-            </div>
+            </div> */}
             <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
                 <Input 

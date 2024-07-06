@@ -572,11 +572,11 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                 dataIndex={""} 
                 key="contract_link"
                 render={(_: any, record: Contact) => (
-                 record.contract_link && (
+                 record?.contract_link && (
                   <a target="_blank"
                     className="self-end mr-3"
                  
-                    href={`${FILES_STORE}${record.contract_link}`} rel="noreferrer"
+                    href={`${FILES_STORE}${record?.contract_link}`} rel="noreferrer"
                   >
                     {i18n.t('view')}
                   </a>
