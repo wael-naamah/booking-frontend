@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../redux/store";
 import { fetchAppointments, fetchTimeSlots, fetchEmployees } from "../../redux/actions";
-import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
+import { selectAppointments, selectAppointmentsLoading, selectEmployees, selectEmployeesLoading, selectProfile, selectTimeslots, selectTimeslotsLoading } from "../../redux/selectors";
 import { AppointmentForm, TimeSlotsForm, Calendar as CalendarType, PaginatedForm, ExtendedAppointment } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Row, Col, Card, Calendar, Spin, message } from "antd";
@@ -55,6 +55,7 @@ interface IAppointmentProps {
     employees: CalendarType[];
     employeesLoading: boolean;
     fetchEmployees: (form: PaginatedForm) => Promise<any>;
+    profile: any;
 }
 
 class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentState> {
@@ -72,6 +73,12 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
 
     fetchAppointments = async () => {
         const { currentDate } = this.state;
+        const { profile } = this.props;
+        const dateTwoMonthsAgo = dayjs().subtract(2, 'month');
+        if ( profile?.role === 'user' && dayjs(currentDate).isBefore(dateTwoMonthsAgo)) {
+            return;
+        }
+    
         const firstDateOfMonth = dayjs(currentDate).startOf('month');
         const lastDateOfMonth = dayjs(currentDate).endOf('month');
         try {
@@ -79,7 +86,6 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
         } catch (error) {
             console.error('Error fetching data:', error);
         }
-    
     }
 
     componentDidMount() {
@@ -309,6 +315,7 @@ const mapStateToProps = (state: RootState) => ({
     timeslotsLoading: selectTimeslotsLoading(state),
     employees: selectEmployees(state),
     employeesLoading: selectEmployeesLoading(state),
+    profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (

@@ -674,7 +674,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
                         <>
                             <Button onClick={onClose}>{i18n.t('cancel')}</Button>
                             <Button type="primary" onClick={onSave}>{i18n.t('save')}</Button>
-                            {this.props.profile && this.props.profile.role === "user" ? (
+                            {this.props.profile && ["user", "admin"].includes(this.props.profile?.role) ? (
                                 <>
                                     <Button type="primary" danger onClick={onDelete}>{i18n.t('delete')}</Button>
                                 </>

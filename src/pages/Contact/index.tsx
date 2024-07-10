@@ -10,7 +10,7 @@ import {
   importContactsRequest,
   resetContactPasswordManually
 } from "../../redux/actions";
-import { selectContacts, selectContactsLoading } from "../../redux/selectors";
+import { selectContacts, selectContactsLoading, selectProfile } from "../../redux/selectors";
 import { Contact, PaginatedForm } from "../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { compose } from 'redux'
@@ -69,6 +69,7 @@ interface IContactProps {
   resetContactPasswordManually: (id: string, password: string) => Promise<any>;
   updateContactRequest: (id: string, contact: Contact) => Promise<any>;
   contacts: Contact[];
+  profile: any;
   navigate?: (route: string) => void;
 }
 
@@ -495,7 +496,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                     {i18n.t('import_contacts')}
                   </p>
                 </Space>
-              </Upload.Dragger> 
+              </Upload.Dragger>
             </Col>
           </Row>
           <Divider className="mb-4 mt-2" />
@@ -514,7 +515,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 
   render() {
     const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, exportLoading, search, resetVisible } = this.state;
-    const { loading, contacts } = this.props;
+    const { loading, contacts, profile } = this.props;
 
     return (
       <>
@@ -537,9 +538,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
-              <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
+              {profile.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
                 {i18n.t('export_contacts')}
-              </Button>
+              </Button>}
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">
                 {i18n.t('new_contact')}
               </Button>
@@ -568,19 +569,19 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Column title={i18n.t('email')} dataIndex={"email"} />
               <Column title={i18n.t('telephone')} dataIndex={"telephone"} />
               <Column title={i18n.t('location')} dataIndex={"location"} />
-              <Column title={i18n.t('contract')}  
-                dataIndex={""} 
+              <Column title={i18n.t('contract')}
+                dataIndex={""}
                 key="contract_link"
                 render={(_: any, record: Contact) => (
-                 record?.contract_link && (
-                  <a target="_blank"
-                    className="self-end mr-3"
-                 
-                    href={`${FILES_STORE}${record?.contract_link}`} rel="noreferrer"
-                  >
-                    {i18n.t('view')}
-                  </a>
-                 )
+                  record?.contract_link && (
+                    <a target="_blank"
+                      className="self-end mr-3"
+
+                      href={`${FILES_STORE}${record?.contract_link}`} rel="noreferrer"
+                    >
+                      {i18n.t('view')}
+                    </a>
+                  )
                 )} />
               <Column
                 title={i18n.t('appointments')}
@@ -657,6 +658,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 const mapStateToProps = (state: RootState) => ({
   contacts: selectContacts(state),
   loading: selectContactsLoading(state),
+  profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (

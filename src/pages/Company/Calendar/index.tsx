@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { fetchCalendars, createCalendarRequest } from "../../../redux/actions";
-import { selectCalendars, selectCalendarsLoading } from "../../../redux/selectors";
+import { selectCalendars, selectCalendarsLoading, selectProfile } from "../../../redux/selectors";
 import { Calendar as CalendarType } from "../../../Schema";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Button, Col, Empty, Popconfirm, Row, Select, message, DatePicker } from "antd";
@@ -30,6 +30,7 @@ interface ICalendarProps {
     fetchCalendars: () => Promise<any>;
     createCalendarRequest: (calendar: CalendarType) => Promise<any>;
     calendars: CalendarType[];
+    profile: any;
 }
 
 class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
@@ -117,7 +118,7 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
             });
     }
     render() {
-        const { loading, calendars } = this.props;
+        const { loading, calendars, profile } = this.props;
         const { selectedCalendar, activeIndex } = this.state;
 
         if (loading) {
@@ -161,17 +162,21 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                         >
                             <Button loading={false} className="mb-3" type="primary">{i18n.t('new_calendar')}</Button>
                         </Popconfirm>
-                        <DatePicker
-                            className="mx-2"
-                            value={this.state.start_date}
-                            onChange={(date) => this.setState({ start_date: date })}
-                        />
-                        <DatePicker
-                            className="mx-2"
-                            value={this.state.end_date}
-                            onChange={(date) => this.setState({ end_date: date })}
-                        />
-                        <Button onClick={this.extractData} loading={false} className="mb-3" type="primary">{i18n.t('export_data')}</Button>
+                        {profile?.role === "user" ? null :
+                            <>
+                                <DatePicker
+                                    className="mx-2"
+                                    value={this.state.start_date}
+                                    onChange={(date) => this.setState({ start_date: date })}
+                                />
+                                <DatePicker
+                                    className="mx-2"
+                                    value={this.state.end_date}
+                                    onChange={(date) => this.setState({ end_date: date })}
+                                />
+                                <Button onClick={this.extractData} loading={false} className="mb-3" type="primary">{i18n.t('export_data')}</Button>
+                            </>
+                        }
                     </Col>
                 </Row>
 
@@ -185,6 +190,7 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
 const mapStateToProps = (state: RootState) => ({
     calendars: selectCalendars(state),
     loading: selectCalendarsLoading(state),
+    profile: selectProfile(state),
 });
 
 const mapDispatchToProps = (

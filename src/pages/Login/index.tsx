@@ -41,7 +41,7 @@ class LoginPage extends React.Component<ILoginProps, ILoginState> {
         this.props.login({ email, password }).then(data => {
           if(data && data._id){
             if (this.props.navigate)
-            this.props.navigate(data.role === 'user' ? '/appointment' : data.role === 'calendar' ? '/employee' : '/category')
+            this.props.navigate(["user", "admin"].includes(data.role) ? '/appointment' : data.role === 'calendar' ? '/employee' : '/category')
           } else if(data && data.message){
             message.error(data.message)
           }
