@@ -14,7 +14,7 @@ const SignContra: React.FC = () => {
   const phone_number = searchParams.get('phone_number');
   const zip_code = searchParams.get('zip_code');
   const location = searchParams.get('location');
-  const gander = searchParams.get('gander');
+  const gender = searchParams.get('gender');
 
   const handleClear = () => {
     if (sigPadRef.current) {
@@ -34,7 +34,7 @@ const SignContra: React.FC = () => {
           first_name: first_name,
           location: location,
           zip_code: zip_code ?? '',
-          gander: gander,
+          gender: gender,
           phone_number: phone_number,
         }),
         headers: { "Content-Type": "application/json" },

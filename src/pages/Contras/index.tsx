@@ -1,34 +1,25 @@
 import React, { useState } from 'react';
-import { Form, Input, Checkbox } from "antd";
+import { Form, Input, Checkbox, message } from "antd";
 import i18n from "../../locales/i18n";
 import { API_URL } from '../../redux/network/api';
-const content = [
-  `*Brennerdichtung (€ 60 - € 90) im Preis bereits enthalten, andere Geräte benötigen diese nicht.
-    Bis ca. 30 min Fahrt € 20,-                                                                                                               Bis ca. 60 min Fahrt	€ 55,-
-  `, `                   
-    •	Komplette Wartung während Öffnungszeiten                                                                              • Etwaige Materialkosten   
-    •	Arbeitszeit pauschal, egal wie lange es dauert                                                                         • Reparaturen
-    •	Anfahrt Wien               
-  `
+
+const devicesMap = [
+  `Heizwert-Gerät € 197`,
+  `Brennwert-Gerät* € 262`,
+  `Durchlauferhitzer.€ 173`,
+  `Gaskonvektor € 153`,
+  `BW-wärmepumpe € 350`,
+  `Luft-Wärmepumpe € 350`,
 ];
-const conditions = [
-  `-Heizwert-Gerät € 197,-   `,
-  `-Brennwert-Gerät* € 262,  `,
-  `-Durchlauferhitzer.€ 173,  `,
-  `-Gaskonvektor €173,-`,
-  `-BW-wärmepumpe€ 350,`,
-  `-Luft-Wärmepumpe..... € 350,-`
-]
 const Contras = () => {
   const [name, setName] = useState('')
-  const [gander, setGander] = useState('female')
+  const [gender, setGender] = useState('Frau')
   const [streetNumber, setStreetNumber] = useState('')
   const [postalCode, setPostalCode] = useState('')
   const [mobileNumber, setMobileNumber] = useState('')
   const [title, setTitle] = useState('')
   const [address, setAddress] = useState('')
   const [deviceType, setDeviceType] = useState('')
-  const [deviceType2, setDeviceType2] = useState('')
   const [year, setYear] = useState('')
   const [email, setEmail] = useState('')
   const [tester, setTester] = useState('')
@@ -59,9 +50,6 @@ const Contras = () => {
   }
   const handleChangeDeviceType = (e: any) => {
     setDeviceType(e.target.value)
-  }
-  const handleChangeDeviceType2 = (e: any) => {
-    setDeviceType2(e.target.value)
   }
   const handleChangeYear = (e: any) => {
     setYear(e.target.value)
@@ -96,16 +84,18 @@ const Contras = () => {
           title: title,
           address: address,
           device_type: deviceType,
-          device_type2: deviceType2,
           year: year,
           email: email,
-          tester: tester,
-          gander: gander,
-          content1: serviceType.map((st, i) => st + ' ').toString(),
-          content2: content[0],
-          content3: content[1]
+          gender: gender,
+          selected_devices: serviceType.map((st, i) => st + ' ').toString(),
         }),
         headers: { "Content-Type": "application/json" },
+      }).then(res => res.json()).then(data => {
+        if (data?.status === "success") {
+          message.success('Email sent successfully!')
+        }else {
+          message.error('Failed to send email')
+        }
       })
 
       setBtnDisabled(false)
@@ -130,21 +120,21 @@ const Contras = () => {
             <div className="flex  border  border-[#00000067] p-4">
               <label className="inline-flex items-center">
                 <Input required
-                  name="gander"
+                  name="gender"
                   type="radio"
                   onChange={(e) => {
                     const { checked } = e.target
                     if (checked) {
-                      setGander('female')
+                      setGender('Frau')
                     }
                   }} value="female" className="form-checkbox h-5 w-5 text-gray-600" />
                 <span className="ml-2">Frau</span>
               </label>
               <label className="inline-flex items-center ml-6">
-                <Input required name="gander" onChange={(e) => {
+                <Input required name="gender" onChange={(e) => {
                   const { checked } = e.target
                   if (checked) {
-                    setGander('male')
+                    setGender('Herr')
                   }
                 }} type="radio" value="male" className="form-checkbox h-5 w-5 text-gray-600" />
                 <span className="ml-2">Herr</span>
@@ -225,49 +215,27 @@ const Contras = () => {
           <div className='container mt-[44px] mx-auto border-[1px] border-solid border-[#00000000067]'>
             <div className="grid grid-cols-6 justify-center items-center">
               <div className='col-span-5 border p-4 border-[#00000067]'>
+              <label className='font-bold'>Model</label>
                 <Input required
                   value={deviceType}
                   onChange={handleChangeDeviceType}
                   type="text" placeholder="Type (Bsp.: VCW AT 194/4-5, HG15, Luna 3 blue, CBG-2-24)"
-                  className="w-full px-3 rounded-md" />
+                  className="w-full px-3 mt-2 rounded-md" />
               </div>
               <div className='border p-4 border-[#00000067]'>
-
-                <label className='font-bold'>  Baujahr</label>
-              </div>
-            </div>
-
-            {/* <div className="grid grid-cols-6 justify-center items-center">
-              <div className='col-span-5 border p-4 border-[#00000067]'>
-                <Input
-                  required
-                  value={deviceType}
-                  onChange={handleChangeDeviceType}
-                  type="text" placeholder="Type "
-                  className="w-full px-3   rounded-md" />
-              </div>
-              <div className='  border p-4 border-[#00000067]'>
-                <label className=' font-bold'>  Baujahr</label>
-              </div>
-            </div> */}
-            <div className="grid grid-cols-6 justify-center items-center">
-              <div className='col-span-5 border p-4 border-[#00000067]'>
-                <Input 
-                  value={deviceType2}
-                  onChange={handleChangeDeviceType2}
-                  type="text"
-                  placeholder="Type "
-                  className="w-full px-3 rounded-md" />
-              </div>
-              <div className='border p-4 border-[#00000067]'>
-                <label className=' font-bold'>  Baujahr</label>
+                <label className='font-bold'>Baujahr</label>
+                <Input required
+                  value={year}
+                  onChange={handleChangeYear}
+                  type="text" placeholder="Year"
+                  className="w-full px-3 mt-2 rounded-md" />
               </div>
             </div>
           </div>
         </div>
       </div>
       <div className='col-span-2 grid grid-cols-3  gap-y-0 gap-5'>
-        {conditions.map(c => (
+        {devicesMap.map(c => (
           <Form.Item key={c} valuePropName="checked">
             <Checkbox
               onChange={() => handleCheckboxChange(c)}
