@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Button } from "antd";
+import { Button, message } from "antd";
 import SignatureCanvas from 'react-signature-canvas';
 import { useSearchParams } from 'react-router-dom';
 import { API_URL } from '../../redux/network/api';
@@ -44,7 +44,7 @@ const SignContra: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert('Operation done successfully');
+      message.success('Operation done successfully');
       window.location.href = '/';
     }
   };

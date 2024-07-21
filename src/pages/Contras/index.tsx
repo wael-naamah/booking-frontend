@@ -99,7 +99,6 @@ const Contras = () => {
       })
 
       setBtnDisabled(false)
-      alert('email sent successfully!')
     } catch (error) {
       throw (error)
     }
