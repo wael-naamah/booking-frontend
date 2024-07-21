@@ -3,6 +3,7 @@ import { Button } from "antd";
 import SignatureCanvas from 'react-signature-canvas';
 import { useSearchParams } from 'react-router-dom';
 import { API_URL } from '../../redux/network/api';
+import { generatePassword } from '../../utils';
 
 const SignContra: React.FC = () => {
   const sigPadRef = useRef<SignatureCanvas | null>(null);
@@ -14,6 +15,7 @@ const SignContra: React.FC = () => {
   const phone_number = searchParams.get('phone_number');
   const zip_code = searchParams.get('zip_code');
   const location = searchParams.get('location');
+  const address = searchParams.get('address');
   const gender = searchParams.get('gender');
 
   const handleClear = () => {
@@ -32,7 +34,9 @@ const SignContra: React.FC = () => {
           email: emailQuery,
           last_name: last_name,
           first_name: first_name,
+          password: generatePassword(),
           location: location,
+          address: address,
           zip_code: zip_code ?? '',
           gender: gender,
           phone_number: phone_number,
