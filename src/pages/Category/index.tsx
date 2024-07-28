@@ -198,7 +198,7 @@ class CategoryPage extends React.Component<ICategoryProps, ICategoryState> {
                                     : dayjs(),
                         current: 0
                     });
-                    this.props.updateProfileRequest(contact);
+                    this.props.updateProfileRequest(data.contact);
                 } else {
                     message.error(i18n.t('something_went_wrong_while_booking_the_appointment'))
                 }

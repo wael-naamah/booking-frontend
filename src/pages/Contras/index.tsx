@@ -93,6 +93,18 @@ const Contras = () => {
       }).then(res => res.json()).then(data => {
         if (data?.status === "success") {
           message.success('Email sent successfully!')
+          setName('')
+          setStreetNumber('')
+          setPostalCode('')
+          setMobileNumber('')
+          setTitle('')
+          setAddress('')
+          setDeviceType('')
+          setYear('')
+          setEmail('')
+          setGender('')
+          setTester('')
+          setServiceType([])
         }else {
           message.error('Failed to send email')
         }
@@ -140,8 +152,9 @@ const Contras = () => {
               </label>
 
             </div>
-            <div className="   pt-2 border border-[#00000067] ">
-              <Input required type="text" placeholder={i18n.t('title')}
+            <div className="pt-2 border border-[#00000067] ">
+              <Input
+                type="text" placeholder={i18n.t('title')}
                 value={title}
                 onChange={handleChangeTitle}
                 className="w-full px-3 py-2  rounded-md" />
@@ -204,7 +217,7 @@ const Contras = () => {
             <Input required
               value={tester}
               onChange={handleChangeTester}
-              className="w-full px-3 py-2  bg-gray-200    " />
+              className="w-full px-3 py-2  bg-gray-200"/>
           </div>
           <div className=" w-full flex  h-[30px]">
             <h1 className='font-bold '>       Geräte</h1>
