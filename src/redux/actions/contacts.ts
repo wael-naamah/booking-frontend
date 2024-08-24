@@ -61,7 +61,7 @@ export const fetchContacts = (form: PaginatedForm) => {
     try {
       const response = await fetch(
         `${API_URL}/contacts?${queryparams.toString()}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -80,7 +80,7 @@ export const fetchContacts = (form: PaginatedForm) => {
 export const fetchContactById = async (id: string) => {
   try {
     const response = await fetch(`${API_URL}/contacts/${id}`, {
-      headers: { "x-user-role": getProfile().role },
+      headers: { "x-user-role": getProfile()?.role },
     });
     const data = await response.json();
 
@@ -97,7 +97,7 @@ export const importContactsRequest = async (file: RcFile) => {
   const result = await fetch(`${API_URL}/files/import-contacts-file`, {
     method: "POST",
     body: uploadFileData,
-    headers: { "x-user-role": getProfile().role },
+    headers: { "x-user-role": getProfile()?.role },
   });
   const data = await result.json();
 
@@ -115,7 +115,7 @@ export const updateContactRequest = (id: string, contact: Contact) => {
       const response = await fetch(`${API_URL}/contacts/${id}`, {
         method: "PUT",
         body: JSON.stringify(contact),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -136,7 +136,7 @@ export const deleteContactRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/contacts/${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": getProfile().role },
+        headers: { "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -160,7 +160,7 @@ export const resetContactPasswordManually = (id: string, password: string) => {
       const response = await fetch(`${API_URL}/contacts/reset-password/${id}`, {
         method: "POST",
         body: JSON.stringify({ password }),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -181,7 +181,7 @@ export const createContactRequest = (contact: Contact) => {
       const response = await fetch(`${API_URL}/contacts`, {
         method: "POST",
         body: JSON.stringify(contact),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 

@@ -10,7 +10,7 @@ export const upload = async (file: RcFile) => {
   const result = await fetch(`${API_URL}/files/upload`, {
     method: "POST",
     body: uploadFileData,
-    headers: { "x-user-role": getProfile().role },
+    headers: { "x-user-role": getProfile()?.role },
   });
   const data = await result.json();
 
@@ -25,7 +25,7 @@ export const upload = async (file: RcFile) => {
 
 
 const toDataURL = (filename: string) => {
-  return fetch(`${API_URL}/files/download/${filename}`, {headers: { "x-user-role": getProfile().role },})
+  return fetch(`${API_URL}/files/download/${filename}`, {headers: { "x-user-role": getProfile()?.role },})
       .then((response) => {
           return response.blob();
       })

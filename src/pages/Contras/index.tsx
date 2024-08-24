@@ -90,7 +90,7 @@ const Contras = () => {
           gender: gender,
           selected_devices: serviceType.map((st, i) => st + ' ').toString(),
         }),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       }).then(res => res.json()).then(data => {
         if (data?.status === "success") {
           message.success('Email sent successfully!')

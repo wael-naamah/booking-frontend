@@ -55,7 +55,7 @@ export const fetchCalendars = (page: number = 1, limit: number = 10) => {
     try {
       const response = await fetch(
         `${API_URL}/calendars?page=${page}&limit=${limit}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -79,7 +79,7 @@ export const updateCalendarRequest = (id: string, calendar: Calendar) => {
       const response = await fetch(`${API_URL}/calendars/${id}`, {
         method: "PUT",
         body: JSON.stringify(calendar),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -100,7 +100,7 @@ export const deleteCalendarRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/calendars/${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": getProfile().role },
+        headers: { "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -126,7 +126,7 @@ export const createCalendarRequest = (calendar: Calendar) => {
       const response = await fetch(`${API_URL}/calendars`, {
         method: "POST",
         body: JSON.stringify(calendar),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 

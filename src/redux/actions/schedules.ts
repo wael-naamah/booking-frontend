@@ -56,7 +56,7 @@ export const fetchSchedulesByCalendarId = (calendarId: string) => {
     try {
       const response = await fetch(
         `${API_URL}/schedules/calendar/${calendarId}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -79,7 +79,7 @@ export const updateScheduleRequest = (id: string, schedule: Schedule) => {
       const response = await fetch(`${API_URL}/schedules/${id}`, {
         method: "PUT",
         body: JSON.stringify(schedule),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -100,7 +100,7 @@ export const deleteScheduleRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/schedules/${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": getProfile().role },
+        headers: { "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -126,7 +126,7 @@ export const createScheduleRequest = (schedule: Schedule) => {
       const response = await fetch(`${API_URL}/schedules`, {
         method: "POST",
         body: JSON.stringify(schedule),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 

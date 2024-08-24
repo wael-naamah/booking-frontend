@@ -561,13 +561,13 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                 }}
                 className="machine-list-search"
               />
-              <Button className="ml-2" loading={syncLoading} onClick={() => this.onSyncContacts()} type="primary">
+              {profile && profile?.role === 'user' ? null : <Button className="ml-2" loading={syncLoading} onClick={() => this.onSyncContacts()} type="primary">
                 {i18n.t('sync_contacts')}
-              </Button>
+              </Button>}
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
-              {profile?.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
+              {profile && profile?.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
                 {i18n.t('export_contacts')}
               </Button>}
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">

@@ -86,7 +86,7 @@ export const fetchTimeSlots = (
 
       const response = await fetch(
         `${API_URL}/appointments/timeslots?${queryparams.toString()}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -123,7 +123,7 @@ export const deleteAppointmentRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/appointments/${id}`, {
         method: "DELETE",
-        headers: { "x-user-role": getProfile().role },
+        headers: { "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -170,7 +170,7 @@ export const updateAppointmentRequest = (
       const response = await fetch(`${API_URL}/appointments/${id}`, {
         method: "PUT",
         body: JSON.stringify(appointment),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -200,7 +200,7 @@ export const fetchCalendarAppointments = (calendarId: string) => {
     try {
       const response = await fetch(
         `${API_URL}/appointments/calendar/${calendarId}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -230,7 +230,7 @@ export const fetchContactAppointments = (contactId: string) => {
     try {
       const response = await fetch(
         `${API_URL}/appointments/contact/${contactId}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -264,7 +264,7 @@ export const fetchAppointments = (form: AppointmentForm) => {
 
       const response = await fetch(
         `${API_URL}/appointments?${queryparams.toString()}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
@@ -286,7 +286,7 @@ export const addAppointmentRequest = (appointment: Appointment) => {
       const response = await fetch(`${API_URL}/appointments`, {
         method: "POST",
         body: JSON.stringify(appointment),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -307,7 +307,7 @@ export const addAppointmentRequestWithSign = (appointment: Appointment,url:strin
       const response = await fetch(`${API_URL}/appointments`, {
         method: "POST",
         body: JSON.stringify(appointment),
-        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile()?.role },
       });
       const data = await response.json();
 
@@ -341,7 +341,7 @@ export const fetchEmployees = (form: PaginatedForm) => {
 
       const response = await fetch(
         `${API_URL}/calendars?${queryparams.toString()}`, {
-          headers: { "x-user-role": getProfile().role },
+          headers: { "x-user-role": getProfile()?.role },
         }
       );
       const data = await response.json();
