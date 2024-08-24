@@ -153,7 +153,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
 
   onSyncContacts = () => {
     this.setState({ syncLoading: true });
-    fetch(`${API_URL}/contacts/sync`).then(res => res.json()).then((data) => {
+    fetch(`${API_URL}/contacts-sync`, {
+      method: 'POST',
+    }).then(res => res.json()).then((data) => {
       if (data.status && data.status === "success") {
         message.success(i18n.t('successfully_synced_the_contacts'));
       }
