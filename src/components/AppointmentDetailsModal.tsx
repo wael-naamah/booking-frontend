@@ -89,7 +89,7 @@ class AppointmentDetailsModal extends React.Component<IModalProps, IModalState> 
         // @ts-ignore
         const contact_id = selectedEvent.contact_id;
 
-        const contact = await fetchContactById(contact_id);
+        const contact = await fetchContactById(contact_id!);
 
         if (selectedEvent)
             this.setState({

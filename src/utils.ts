@@ -10,6 +10,7 @@ export const upload = async (file: RcFile) => {
   const result = await fetch(`${API_URL}/files/upload`, {
     method: "POST",
     body: uploadFileData,
+    headers: { "x-user-role": getProfile().role },
   });
   const data = await result.json();
 
@@ -24,7 +25,7 @@ export const upload = async (file: RcFile) => {
 
 
 const toDataURL = (filename: string) => {
-  return fetch(`${API_URL}/files/download/${filename}`)
+  return fetch(`${API_URL}/files/download/${filename}`, {headers: { "x-user-role": getProfile().role },})
       .then((response) => {
           return response.blob();
       })
@@ -65,3 +66,11 @@ export const generatePassword = () => {
 
   return getRandomPassword();
 };
+
+export const getProfile = () => {
+  const profile = localStorage.getItem('profile');
+  if (profile) {
+    return JSON.parse(profile);
+  }
+  return null;
+}

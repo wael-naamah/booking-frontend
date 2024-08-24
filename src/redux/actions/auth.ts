@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
 import { ResetPasswordForm } from "../../Schema";
+import { getProfile } from "../../utils";
 
 const START_UP = "auth/START_UP" as const;
 const START_UP_DONE = "auth/START_UP_DONE" as const;
@@ -65,7 +66,7 @@ export const resetPasswordRequest = (form: ResetPasswordForm) => {
       const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: "POST",
         body: JSON.stringify(form),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -109,7 +110,7 @@ export const loginRequest = (form: {email: string; password: string}) => {
       const response = await fetch(`${API_URL}/auth/signin`, {
         method: "POST",
         body: JSON.stringify(form),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -134,7 +135,7 @@ export const forgotPasswordRequest = (email: string) => {
       const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         body: JSON.stringify({email}),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -157,7 +158,7 @@ export const resetContactPasswordRequest = (password: string, token: string) => 
       const response = await fetch(`${API_URL}/auth/reset-contact-password`, {
         method: "POST",
         body: JSON.stringify({password, token}),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 

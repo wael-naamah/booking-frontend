@@ -57,6 +57,7 @@ interface IContactState {
   importModelVisible: boolean;
   importLoading: boolean;
   exportLoading: boolean;
+  syncLoading: boolean;
   file?: RcFile;
   newPassword?: string;
 }
@@ -87,6 +88,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       importModelVisible: false,
       importLoading: false,
       exportLoading: false,
+      syncLoading: false,
       resetVisible: false,
     };
   }
@@ -149,6 +151,19 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
     this.setState({ exportLoading: false });
   }
 
+  onSyncContacts = () => {
+    this.setState({ syncLoading: true });
+    fetch(`${API_URL}/contacts/sync`).then(res => res.json()).then((data) => {
+      if (data.status && data.status === "success") {
+        message.success(i18n.t('successfully_synced_the_contacts'));
+      }
+    }).catch((err) => {
+      message.error(i18n.t('something_went_wrong_please_try_again'));
+    }).finally(() => {
+      this.setState({ syncLoading: false });
+    });
+  };
+
   handlePageChange = (value: number) => {
     this.setState({ pageNum: value });
   };
@@ -166,6 +181,17 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
       }
     });
   };
+
+  onArchiveContact = (id: string, contact: Contact) => {
+    const { _id, createdAt, updatedAt, ...rest } = contact;
+    this.props.updateContactRequest(id, { ...rest, archived: !contact.archived }).then((data) => {
+      if (data._id) {
+        message.success(i18n.t('successfully_updated_the_contact'));
+      } else {
+        message.error(i18n.t('something_went_wrong_please_try_again'));
+      }
+    });
+  }
 
   renderNewContactModal = () => {
     const { visible, editingContactId } = this.state;
@@ -514,7 +540,7 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
   }
 
   render() {
-    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, exportLoading, search, resetVisible } = this.state;
+    const { pageNum, totalCount, currentPage, pageCount, visible, importModelVisible, importLoading, syncLoading, exportLoading, search, resetVisible } = this.state;
     const { loading, contacts, profile } = this.props;
 
     return (
@@ -535,10 +561,13 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                 }}
                 className="machine-list-search"
               />
+              <Button className="ml-2" loading={syncLoading} onClick={() => this.onSyncContacts()} type="primary">
+                {i18n.t('sync_contacts')}
+              </Button>
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
-              {profile.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
+              {profile?.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
                 {i18n.t('export_contacts')}
               </Button>}
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">
@@ -626,6 +655,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
                         </Menu.Item>
                         <Menu.Item key="sendCredentials" onClick={() => this.onOpenResetPassword(record._id!)} >
                           {i18n.t('reset_password')}
+                        </Menu.Item>
+                        <Menu.Item key="archiveContact" onClick={() => this.onArchiveContact(record._id!, record)} >
+                          {record.archived ? i18n.t('unarchive') : i18n.t('archive')}
                         </Menu.Item>
                       </Menu>
                     }

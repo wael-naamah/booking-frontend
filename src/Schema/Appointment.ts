@@ -26,6 +26,7 @@ export interface Appointment {
   start_date: string;
   end_date: string;
   contact: Contact;
+  contact_id?: string;
   brand_of_device?: string;
   model?: string;
   selected_devices?: string;
@@ -39,7 +40,8 @@ export interface Appointment {
   imported_service_duration?: string,
   imported_service_price?: string,
   appointment_status: AppointmentStatus;
-  updated_by?: boolean;
+  archived?: boolean;
+  updated_by?: string;
   attachments?: Attachment[];
   remarks?: string;
   employee_attachments?: Attachment[];

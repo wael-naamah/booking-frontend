@@ -105,7 +105,7 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                     end_date: this.state.end_date,
 
                 }),
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "x-user-role": this.props.profile.role },
             }
         ).then(response => response.blob())
             .then(blob => {

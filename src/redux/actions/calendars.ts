@@ -1,6 +1,7 @@
 import { Calendar } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
+import { getProfile } from "../../utils";
 
 const GET_CALENDARS = "calendars/GET_ALL" as const;
 const GET_CALENDARS_DONE = "calendars/GET_ALL_DONE" as const;
@@ -53,7 +54,9 @@ export const fetchCalendars = (page: number = 1, limit: number = 10) => {
 
     try {
       const response = await fetch(
-        `${API_URL}/calendars?page=${page}&limit=${limit}`
+        `${API_URL}/calendars?page=${page}&limit=${limit}`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 
@@ -76,7 +79,7 @@ export const updateCalendarRequest = (id: string, calendar: Calendar) => {
       const response = await fetch(`${API_URL}/calendars/${id}`, {
         method: "PUT",
         body: JSON.stringify(calendar),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -97,6 +100,7 @@ export const deleteCalendarRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/calendars/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -122,7 +126,7 @@ export const createCalendarRequest = (calendar: Calendar) => {
       const response = await fetch(`${API_URL}/calendars`, {
         method: "POST",
         body: JSON.stringify(calendar),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 

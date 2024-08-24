@@ -1,6 +1,7 @@
 import { Category, ExtendedService } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
+import { getProfile } from "../../utils";
 
 const GET_CATEGORIES = "categories/GET_ALL" as const;
 const GET_CATEGORIES_DONE = "categories/GET_ALL_DONE" as const;
@@ -56,7 +57,9 @@ export const fetchCategories = (page: number = 1, limit: number = 10) => {
 
     try {
       const response = await fetch(
-        `${API_URL}/categories?page=${page}&limit=${limit}`
+        `${API_URL}/categories?page=${page}&limit=${limit}`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 
@@ -77,7 +80,7 @@ export const updateCategoryRequest = (id: string, category: Category) => {
       const response = await fetch(`${API_URL}/categories/${id}`, {
         method: "PUT",
         body: JSON.stringify(category),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -98,6 +101,7 @@ export const deleteCategoryRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/categories/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -123,7 +127,7 @@ export const createCategoryRequest = (category: Category) => {
       const response = await fetch(`${API_URL}/categories`, {
         method: "POST",
         body: JSON.stringify(category),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -152,7 +156,9 @@ export const fetchServices = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/categories/services`
+        `${API_URL}/categories/services`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 

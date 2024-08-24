@@ -1,6 +1,7 @@
 import { Schedule } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
+import { getProfile } from "../../utils";
 
 const GET_SCHEDULES = "schedules/GET_ALL" as const;
 const GET_SCHEDULES_DONE = "schedules/GET_ALL_DONE" as const;
@@ -54,7 +55,9 @@ export const fetchSchedulesByCalendarId = (calendarId: string) => {
 
     try {
       const response = await fetch(
-        `${API_URL}/schedules/calendar/${calendarId}`
+        `${API_URL}/schedules/calendar/${calendarId}`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 
@@ -76,7 +79,7 @@ export const updateScheduleRequest = (id: string, schedule: Schedule) => {
       const response = await fetch(`${API_URL}/schedules/${id}`, {
         method: "PUT",
         body: JSON.stringify(schedule),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -97,6 +100,7 @@ export const deleteScheduleRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/schedules/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -122,7 +126,7 @@ export const createScheduleRequest = (schedule: Schedule) => {
       const response = await fetch(`${API_URL}/schedules`, {
         method: "POST",
         body: JSON.stringify(schedule),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 

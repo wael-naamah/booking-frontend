@@ -1,6 +1,7 @@
 import { EmailConfig, EmailTemplate } from "../../Schema";
 import { Dispatch } from "redux";
 import { API_URL } from "../network/api";
+import { getProfile } from "../../utils";
 
 const GET_EMAIL_CONFIG = "settings/GET_EMAIL_CONFIG" as const;
 const GET_EMAIL_CONFIG_DONE = "settings/GET_EMAIL_CONFIG_DONE" as const;
@@ -112,7 +113,9 @@ export const fetchEmailTemplate = (type: string) => {
 
     try {
       const response = await fetch(
-        `${API_URL}/mailer/template?type=${type}`
+        `${API_URL}/mailer/template?type=${type}`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 
@@ -139,7 +142,7 @@ export const updateEmailTemplateRequest = (id: string, template: EmailTemplate) 
       const response = await fetch(`${API_URL}/mailer/template/${id}`, {
         method: "PUT",
         body: JSON.stringify(template),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -160,6 +163,7 @@ export const deleteEmailTemplateRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/mailer/template/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -185,7 +189,7 @@ export const addEmailTemplateRequest = (template: EmailTemplate) => {
       const response = await fetch(`${API_URL}/mailer/template`, {
         method: "POST",
         body: JSON.stringify(template),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -206,7 +210,9 @@ export const fetchEmailConfig = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/mailer/config`
+        `${API_URL}/mailer/config`, {
+          headers: { "x-user-role": getProfile().role },
+        }
       );
       const data = await response.json();
 
@@ -233,7 +239,7 @@ export const updateEmailConfigRequest = (id: string, config: EmailConfig) => {
       const response = await fetch(`${API_URL}/mailer/config/${id}`, {
         method: "PUT",
         body: JSON.stringify(config),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -254,6 +260,7 @@ export const deleteEmailConfigRequest = (id: string) => {
     try {
       const response = await fetch(`${API_URL}/mailer/config/${id}`, {
         method: "DELETE",
+        headers: { "x-user-role": getProfile().role },
       });
       const data = await response.json();
 
@@ -279,7 +286,7 @@ export const addEmailConfigRequest = (config: EmailConfig) => {
       const response = await fetch(`${API_URL}/mailer/config`, {
         method: "POST",
         body: JSON.stringify(config),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       });
       const data = await response.json();
 

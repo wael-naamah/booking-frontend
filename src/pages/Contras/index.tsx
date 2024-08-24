@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Checkbox, message } from "antd";
 import i18n from "../../locales/i18n";
 import { API_URL } from '../../redux/network/api';
+import { getProfile } from '../../utils';
 
 const devicesMap = [
   `Heizwert-Gerät € 197`,
@@ -89,7 +90,7 @@ const Contras = () => {
           gender: gender,
           selected_devices: serviceType.map((st, i) => st + ' ').toString(),
         }),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-user-role": getProfile().role },
       }).then(res => res.json()).then(data => {
         if (data?.status === "success") {
           message.success('Email sent successfully!')
