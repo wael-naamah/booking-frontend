@@ -162,21 +162,17 @@ class CalendarsPage extends React.Component<ICalendarProps, ICalendarState> {
                         >
                             <Button loading={false} className="mb-3" type="primary">{i18n.t('new_calendar')}</Button>
                         </Popconfirm>
-                        {profile?.role === "user" ? null :
-                            <>
-                                <DatePicker
-                                    className="mx-2"
-                                    value={this.state.start_date}
-                                    onChange={(date) => this.setState({ start_date: date })}
-                                />
-                                <DatePicker
-                                    className="mx-2"
-                                    value={this.state.end_date}
-                                    onChange={(date) => this.setState({ end_date: date })}
-                                />
-                                <Button onClick={this.extractData} loading={false} className="mb-3" type="primary">{i18n.t('export_data')}</Button>
-                            </>
-                        }
+                        <DatePicker
+                            className="mx-2"
+                            value={this.state.start_date}
+                            onChange={(date) => this.setState({ start_date: date })}
+                        />
+                        <DatePicker
+                            className="mx-2"
+                            value={this.state.end_date}
+                            onChange={(date) => this.setState({ end_date: date })}
+                        />
+                        <Button onClick={this.extractData} loading={false} className="mb-3" type="primary">{i18n.t('export_data')}</Button>
                     </Col>
                 </Row>
 

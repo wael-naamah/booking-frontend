@@ -73,11 +73,6 @@ class AppointmentPage extends React.Component<IAppointmentProps, IAppointmentSta
 
     fetchAppointments = async () => {
         const { currentDate } = this.state;
-        const { profile } = this.props;
-        const dateTwoMonthsAgo = dayjs().subtract(2, 'month');
-        if ( profile?.role === 'user' && dayjs(currentDate).isBefore(dateTwoMonthsAgo)) {
-            return;
-        }
     
         const firstDateOfMonth = dayjs(currentDate).startOf('month');
         const lastDateOfMonth = dayjs(currentDate).endOf('month');

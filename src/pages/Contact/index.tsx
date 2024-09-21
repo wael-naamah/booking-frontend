@@ -569,9 +569,9 @@ class ContactPage extends React.Component<IContactProps, IContactState> {
               <Button className="ml-2" loading={importLoading} onClick={() => this.onOpenImportModel()} type="primary">
                 {i18n.t('import_contacts')}
               </Button>
-              {profile && profile?.role === 'user' ? null : <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
+              <Button className="ml-2" loading={exportLoading} onClick={() => this.onExportContacts()} type="primary">
                 {i18n.t('export_contacts')}
-              </Button>}
+              </Button>
               <Button className="ml-2" onClick={() => this.onOpen()} type="primary">
                 {i18n.t('new_contact')}
               </Button>
