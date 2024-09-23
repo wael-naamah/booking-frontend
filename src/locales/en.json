@@ -331,5 +331,6 @@
   "export_data":"Export Data",
   "contract": "Contract",
   "new_user":"New customer with contract",
-  "view_contract": "View contract"
+  "view_contract": "View contract",
+  "select_or_input": "Select or input"
 }

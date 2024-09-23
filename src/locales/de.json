@@ -331,5 +331,6 @@
   "export_data": "Daten exportieren",
   "contract": "Vertrag",
   "new_user": "Neukunde mit Vertrag",
-  "view_contract": "Vertrag anzeigen"
+  "view_contract": "Vertrag anzeigen",
+  "select_or_input": "Auswahl oder Eingabe"
 }

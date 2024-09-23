@@ -2,16 +2,17 @@ import { Button, Card, Checkbox, Col, Divider, Form, Input, Modal, Row, Select, 
 import React from 'react';
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { connect } from "react-redux";
-import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ExtendedService } from '../Schema';
+import { Appointment, AppointmentStatus, Attachment, Calendar, Contact, ExtendedService, PaginatedForm } from '../Schema';
 import { RootState } from '../redux/store';
 import { selectAddAppointmentLoading, selectServices, selectServicesLoading } from '../redux/selectors';
-import { addAppointmentRequest, fetchServices } from '../redux/actions';
+import { addAppointmentRequest, fetchServices, fetchContacts } from '../redux/actions';
 import { FILES_STORE } from '../redux/network/api';
 import { generatePassword, upload } from '../utils';
 import dayjs from 'dayjs';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import { withTranslation } from 'react-i18next';
 import i18n from "../locales/i18n";
+import _ from 'lodash';
 
 dayjs.extend(updateLocale)
 dayjs.updateLocale('en', {
@@ -31,6 +32,7 @@ interface IModalProps {
         appointment: Appointment
     ) => Promise<any>;
     fetchServices: () => Promise<void>;
+    fetchContacts: (form: PaginatedForm) => Promise<any>;
     calendars: Calendar[];
     services: ExtendedService[];
     servicesLoading: boolean;
@@ -43,6 +45,8 @@ interface IModalState {
     contact: Contact | null,
     serviceId: string | null;
     categoryId: string | null;
+    options: any[];
+    contacts: Contact[];
 }
 
 class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
@@ -54,7 +58,9 @@ class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
             contact: null,
             calendarId: props.selectedSlot?.resourceId || "",
             serviceId: null,
-            categoryId: null
+            categoryId: null,
+            options: [],
+            contacts: [],
         };
     }
 
@@ -67,6 +73,15 @@ class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
     componentDidMount() {
         this.fetchData();
     }
+
+    fetchContact = async (search: string) => {
+        if (!search) {
+            return [];
+        }
+        return this.props.fetchContacts({ page: 1, limit: 1000000, search }).then((res) => {
+            return res.data;
+        });
+    };
 
     onFinishFrom = () => {
         if (this.formRef.current) {
@@ -189,6 +204,69 @@ class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
                         onFinish={onFinish}
                     >
                         <Row gutter={16}>
+                            <Col span={24}>
+                                <Form.Item name="email" rules={[{ required: true, type: 'email' }]}>
+                                    <label>{i18n.t('email')}</label>
+                                    <Select
+                                        showSearch
+                                        placeholder={i18n.t('select_or_input')}
+                                        optionFilterProp="children"
+                                        onSearch={_.debounce((searchValue) => {
+                                            this.fetchContact(searchValue).then((contacts: Contact[]) => {
+                                                const options = (contacts.length > 0 ? contacts : [{
+                                                    email: searchValue,
+                                                    first_name: '',
+                                                    last_name: '',
+                                                    address: '',
+                                                    zip_code: '',
+                                                    location: '',
+                                                    telephone: '',
+                                                    salutation: '',
+                                                }]).map((contact: Contact) => ({
+                                                    value: contact.email,
+                                                    text: contact.first_name || contact.last_name ? `${contact.first_name} ${contact.last_name} (${contact.email})` : contact.email,
+                                                    ...contact,
+                                                }));
+                                                console.log(options);
+                                                this.setState({ options, contacts });
+                                            });
+                                        }, 300)}
+                                        onSelect={(value, option) => {
+                                            const contact = this.state.contacts.find((contact) => contact.email === value);
+                                            if (contact) {
+                                                this.formRef.current.setFieldsValue({
+                                                    email: value,
+                                                    first_name: contact.first_name,
+                                                    last_name: contact.last_name,
+                                                    address: contact.address,
+                                                    zip_code: contact.zip_code,
+                                                    location: contact.location,
+                                                    telephone: contact.telephone,
+                                                });
+                                            } else {
+                                                this.formRef.current.setFieldsValue({
+                                                    email: value,
+                                                    first_name: '',
+                                                    last_name: '',
+                                                    address: '',
+                                                    zip_code: '',
+                                                    location: '',
+                                                    telephone: '',
+                                                });
+                                            }
+                                        }}
+                                        getPopupContainer={triggerNode => triggerNode.parentElement}
+                                    >
+                                        {this.state.options.map((option) => (
+                                            <Option key={option.value} value={option.value}>
+                                                {option.text}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={16}>
                             <Col span={8}>
                                 <Form.Item label={i18n.t('salutation')} name="salutation" rules={[{ required: true }]}>
                                     <Select>
@@ -235,17 +313,12 @@ class CreateAppointmentModal extends React.Component<IModalProps, IModalState> {
                         </Row>
 
                         <Row gutter={16}>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <Form.Item label={i18n.t('telephone')} name="telephone" rules={[{ required: true }]}>
                                     <Input type="tel" />
                                 </Form.Item>
                             </Col>
-                            <Col span={8}>
-                                <Form.Item label={i18n.t('email')} name="email" rules={[{ required: true, type: 'email' }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <Form.Item label={i18n.t('brand_of_device')} name="brand_of_device">
                                     <Select>
                                         {[i18n.t('baxi'), i18n.t('buderus'), i18n.t('de_dietrich'), i18n.t('to_give'), i18n.t('junkers'),
@@ -478,6 +551,8 @@ const mapDispatchToProps = (
     addAppointmentRequest: (appointment: Appointment) =>
         dispatch(addAppointmentRequest(appointment)),
     fetchServices: () => dispatch(fetchServices()),
+    fetchContacts: (form: PaginatedForm) =>
+        dispatch(fetchContacts(form)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(CreateAppointmentModal))
